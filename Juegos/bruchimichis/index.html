@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bruchimichis</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg"></div>
+      <div class="title-card card">
+        <div class="logo-badge">🐱</div>
+        <h1 data-i18n="title">bruchimichis</h1>
+        <p class="subtitle" data-i18n="subtitle">Creá gatitos, movelos y hacelos correr.</p>
+        <div class="title-actions">
+          <button type="button" class="btn primary" id="btnPlay" data-i18n="play">Jugar</button>
+          <button type="button" class="btn accent" id="btnCreate" data-i18n="createCat">Crear Gato</button>
+          <button type="button" class="btn accent" id="btnRace" data-i18n="race">Carrera</button>
+        </div>
+        <a class="btn ghost" id="btnBackAdmin" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
+      </div>
+    </section>
+
+    <section id="screenCreate" class="screen">
+      <div class="panel card wide">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromCreate">←</button>
+          <h2 data-i18n="createCat">Crear Gato</h2>
+        </header>
+        <label class="field">
+          <span data-i18n="name">Nombre</span>
+          <input type="text" id="inputNombre" maxlength="24" data-i18n-placeholder="catName" placeholder="Nombre del gatito" />
+        </label>
+        <label class="field">
+          <span data-i18n="color">Color</span>
+          <select id="selectColor"></select>
+        </label>
+        <label class="field">
+          <span data-i18n="breed">Raza</span>
+          <input type="text" id="inputRaza" maxlength="32" data-i18n-placeholder="breedPh" placeholder="Ej: Persa, Siames, Mestizo..." list="razasList" />
+          <datalist id="razasList">
+            <option value="Persa"></option>
+            <option value="Siames"></option>
+            <option value="Maine Coon"></option>
+            <option value="Bengalí"></option>
+            <option value="Mestizo"></option>
+            <option value="Angora"></option>
+          </datalist>
+        </label>
+        <button type="button" class="btn primary" id="btnSaveCat" data-i18n="dropCat">¡Caer del cielo!</button>
+      </div>
+    </section>
+
+    <section id="screenPlay" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackTitle">←</button>
+        <h2 data-i18n="title">bruchimichis</h2>
+        <div class="world-actions">
+          <button type="button" class="btn accent" id="btnCreatePlay" data-i18n="createCat">Crear Gato</button>
+          <button type="button" class="btn primary" id="btnRacePlay" data-i18n="race">Carrera</button>
+        </div>
+      </header>
+      <p class="hint" id="playHint" data-i18n="playHint">Arrastrá los gatitos. Tocá uno para elegirlo.</p>
+      <div class="play-wrap">
+        <canvas id="playCanvas"></canvas>
+      </div>
+    </section>
+
+    <section id="screenRace" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackPlay">←</button>
+        <h2 data-i18n="race">Carrera</h2>
+        <p class="race-status" id="raceStatus" data-i18n="raceStatus">¡Clic en tu gatito para que corra más rápido!</p>
+      </header>
+      <div class="race-wrap">
+        <canvas id="raceCanvas"></canvas>
+      </div>
+      <p class="hint" id="raceHint" data-i18n="raceHint">Elegí tu gatito y hacé clic para acelerarlo.</p>
+    </section>
+  </div>
+  <script src="../../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

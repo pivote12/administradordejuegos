@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Country Notes</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg"></div>
+      <div class="title-card card">
+        <div class="logo-badge">🌐</div>
+        <h1 data-i18n="title">Country Notes</h1>
+        <p class="subtitle" data-i18n="subtitle">Creá países y aparecen en el mapa como bloques 128×128.</p>
+        <div class="title-actions">
+          <button type="button" class="btn primary" id="btnCrear" data-i18n="createCountry">Crear País</button>
+          <button type="button" class="btn accent" id="btnMundo" data-i18n="world">Mundo</button>
+        </div>
+        <a class="btn ghost" id="btnBackAdmin" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
+      </div>
+    </section>
+
+    <section id="screenForm" class="screen">
+      <div class="panel card wide form-panel">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnCancelForm">←</button>
+          <h2 id="formTitle" data-i18n="createCountry">Crear País</h2>
+        </header>
+
+        <label class="field"><span data-i18n="name">Nombre</span><input type="text" id="inputNombre" maxlength="64" /></label>
+
+        <label class="field">
+          <span data-i18n="continent">Continente</span>
+          <select id="selectContinente"></select>
+        </label>
+
+        <div class="row-2">
+          <label class="field"><span data-i18n="mainLang">Idioma principal</span><select id="selectLang1"></select></label>
+          <label class="field"><span data-i18n="secLang">Idioma secundario</span><select id="selectLang2"></select></label>
+        </div>
+
+        <label class="field"><span data-i18n="capital">Capital (nombre)</span><input type="text" id="inputCapital" maxlength="48" /></label>
+
+        <label class="field">
+          <span data-i18n="citiesCount">Ciudades (cantidad)</span>
+          <input type="number" id="inputCityCount" min="0" max="50" value="0" />
+        </label>
+        <div id="cityNamesBlock" class="dynamic-block"></div>
+
+        <fieldset class="fieldset">
+          <legend data-i18n="government">Gobierno</legend>
+          <div class="row-2">
+            <label class="field"><span data-i18n="firstName">Nombre</span><input type="text" id="inputGovNombre" maxlength="32" /></label>
+            <label class="field"><span data-i18n="lastName">Apellido</span><input type="text" id="inputGovApellido" maxlength="32" /></label>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span data-i18n="militaryCount">Militares (cantidad)</span>
+          <input type="number" id="inputMilCount" min="0" max="50" value="0" />
+        </label>
+        <div id="milNamesBlock" class="dynamic-block"></div>
+
+        <label class="field">
+          <span data-i18n="flagPng">Bandera (PNG)</span>
+          <input type="file" id="inputFlag" accept="image/png,.png" />
+        </label>
+        <p class="hint" id="flagHint" hidden data-i18n="flagLoaded">Bandera cargada.</p>
+        <img id="flagPreview" class="flag-preview" alt="Bandera" hidden />
+
+        <button type="button" class="btn primary" id="btnSaveCountry" data-i18n="saveCountry">Guardar país</button>
+      </div>
+    </section>
+
+    <section id="screenWorld" class="screen">
+      <header class="world-header map-toolbar">
+        <button type="button" class="btn icon" id="btnBackFromWorld">←</button>
+        <h2 id="worldTitle" data-i18n="world">Mundo</h2>
+      </header>
+      <p class="map-hint" id="mapHint" data-i18n="mapHint">Mapa 8192×8192. Doble clic en un país para ver sus datos.</p>
+      <div class="map-viewport" id="mapViewport">
+        <canvas id="worldCanvas"></canvas>
+      </div>
+    </section>
+
+    <section id="screenView" class="screen">
+      <div class="panel card wide view-panel">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromView">←</button>
+          <h2 id="viewTitle" data-i18n="country">País</h2>
+        </header>
+        <div id="viewBody"></div>
+      </div>
+    </section>
+  </div>
+  <script src="../../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

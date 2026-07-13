@@ -1,0 +1,76 @@
+{
+  "games": [
+    {
+      "id": "algicosathlon-maker-english",
+      "name": "Algicosathlon Maker In English",
+      "description": "Create games, design balls and compete in the Algicosathlon.",
+      "folder": "Algicosathlon Maker In English",
+      "icon": "🏅",
+      "tags": ["creator", "multiplayer", "minigames"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "decimal-explorer",
+      "name": "Decimal Explorer",
+      "description": "Discover which famous numbers share the same starting digits.",
+      "folder": "Decimal Explorer",
+      "icon": "🔢",
+      "tags": ["minigame", "math"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "bruchimichis",
+      "name": "bruchimichis",
+      "description": "Creá gatitos, movelos y hacelos correr en carreras.",
+      "folder": "bruchimichis",
+      "icon": "🐱",
+      "tags": ["gatos", "carrera", "creator"],
+      "creator": "Lourdes Roulier"
+    },
+    {
+      "id": "creador-2d",
+      "name": "Creador 2D",
+      "description": "Crea tu propio mundo en 2D con un editor de bloques.",
+      "folder": "Creador 2D",
+      "icon": "🎨",
+      "tags": ["2D", "creator", "bloques"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "object-battle",
+      "name": "Object Battle",
+      "description": "Create objects with faces, drop from the sky, and switch characters with Z.",
+      "folder": "Object Battle",
+      "icon": "⚔️",
+      "tags": ["battle", "creator", "objects"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "bloc-de-notas",
+      "name": "Bloc De Notas",
+      "description": "Bloc de notas simple para anotar lo que quieras.",
+      "folder": "Bloc De Notas",
+      "icon": "📝",
+      "tags": ["notas", "utilidad"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "country-notes",
+      "name": "Country Notes",
+      "description": "Creá países y aparecen en el mapa como bloques 128×128.",
+      "folder": "Country Notes",
+      "icon": "🌐",
+      "tags": ["países", "notas", "creator"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "shape-bowl-race",
+      "name": "Shape Bowl Race",
+      "description": "Create balls, race them in a bowl with Salto and Vuelta, and track Ganancias.",
+      "folder": "Shape Bowl Race",
+      "icon": "🥣",
+      "tags": ["creator", "race", "balls"],
+      "creator": "José Rafael Rodriguez Morillo"
+    }
+  ]
+}

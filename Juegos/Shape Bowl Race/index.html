@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shape Bowl Race</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg" aria-hidden="true"></div>
+      <div class="title-track" aria-hidden="true"></div>
+      <div class="title-card card">
+        <div class="logo-badge">🥣</div>
+        <h1 data-i18n="title">Shape Bowl Race</h1>
+        <p class="subtitle" data-i18n="subtitle">Create games, design balls and race them in the bowl</p>
+        <div class="title-actions">
+          <button type="button" class="btn primary" id="btnGoPartidas" data-i18n="start">Start</button>
+          <a class="btn ghost" id="btnBackToAdmin" href="../../index.html" hidden data-i18n="backToAdmin">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenPartidas" class="screen">
+      <div class="panel card">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <h2 data-i18n="games">Games</h2>
+        </header>
+
+        <form class="create-row" id="formNewPartida">
+          <input type="text" id="inputPartidaName" maxlength="32" data-i18n-placeholder="gameName" placeholder="Game name" required />
+          <button type="submit" class="btn primary" data-i18n="createGame">Create game</button>
+        </form>
+
+        <ul class="list" id="partidaList"></ul>
+        <p class="empty" id="partidaEmpty" hidden data-i18n="noGamesYet">No games yet.</p>
+      </div>
+    </section>
+
+    <section id="screenWorld" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackPartidas" data-i18n-title="games" title="Games">←</button>
+        <div>
+          <h2 id="worldTitle">—</h2>
+          <p class="meta" id="worldMeta">0 balls</p>
+        </div>
+        <div class="world-actions">
+          <button type="button" class="btn accent" id="btnBowlRace" data-i18n="bowlRace">Bowl Race</button>
+          <button type="button" class="btn accent" id="btnEarnings" data-i18n="earnings">Ganancias</button>
+          <button type="button" class="btn primary" id="btnCreateBall" data-i18n="createBallBtn">+ Create ball</button>
+        </div>
+      </header>
+
+      <div class="world-stage">
+        <div class="world-bg" aria-hidden="true"></div>
+        <div class="world-track" aria-hidden="true"></div>
+        <div class="world-arena" id="worldArena">
+          <div class="world-space-zone" aria-hidden="true"></div>
+          <div class="world-gravity-zone" aria-hidden="true"></div>
+          <div class="world-balls" id="worldBalls"></div>
+        </div>
+        <p class="world-hint" id="worldHint" data-i18n="dragBalls">Drag and drop the balls.</p>
+      </div>
+    </section>
+
+    <section id="screenBowlRace" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackFromBowl">←</button>
+        <div>
+          <h2 data-i18n="bowlRace">Bowl Race</h2>
+          <p class="meta" id="bowlMeta">—</p>
+        </div>
+      </header>
+      <div class="bowl-stage">
+        <canvas id="bowlCanvas" width="800" height="520"></canvas>
+        <p class="bowl-status" id="bowlStatus"></p>
+        <p class="bowl-hint" data-i18n="bowlDragHint">Hacé clic en el tazón y arrastralo para moverlo.</p>
+      </div>
+    </section>
+
+    <section id="screenEarnings" class="screen">
+      <div class="panel card wide">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromEarnings">←</button>
+          <h2 data-i18n="earningsStorage">Ganancias</h2>
+        </header>
+        <p class="hint" data-i18n="earningsHint">Las ganancias se guardan cuando una pelotita gana el Bowl Race. Se reinician si creás una pelota nueva.</p>
+        <ul class="win-list" id="earningsList"></ul>
+        <p class="empty" id="earningsEmpty" hidden data-i18n="noBallsInGame">No hay pelotas en esta partida.</p>
+      </div>
+    </section>
+
+    <section id="screenMake" class="screen">
+      <div class="make-layout">
+        <div class="make-preview-wrap">
+          <div class="make-preview-stage">
+            <div class="ball" id="makePreview">
+              <div class="ball-fill" id="makePreviewFill"></div>
+              <span class="ball-text" id="makePreviewText"></span>
+            </div>
+          </div>
+          <p class="preview-name" id="makePreviewName" data-i18n="unnamed">Unnamed</p>
+        </div>
+
+        <div class="make-panel card">
+          <header class="panel-header">
+            <button type="button" class="btn icon" id="btnBackWorld">←</button>
+            <h2 data-i18n="createBall">Create ball</h2>
+          </header>
+
+          <label class="field">
+            <span data-i18n="name">Name</span>
+            <input type="text" id="inputName" maxlength="24" data-i18n-placeholder="ballNamePh" placeholder="e.g. Sun, Bolt, 42..." />
+          </label>
+
+          <div class="field">
+            <span id="labelColor1" data-i18n="color">Color</span>
+            <div class="row">
+              <input type="color" id="inputColor" value="#4cc9f0" />
+              <label class="check">
+                <input type="checkbox" id="checkRainbow" />
+                <span data-i18n="rainbow">Rainbow</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field" id="monoBlock">
+            <label class="check block">
+              <input type="checkbox" id="checkMonochrome" />
+              <span data-i18n="monochrome">Monochrome</span>
+            </label>
+            <div class="row" id="monoRow" hidden>
+              <span data-i18n="color2">Color 2</span>
+              <input type="color" id="inputColor2" value="#f72585" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="check block">
+              <input type="checkbox" id="checkBorder" />
+              <span data-i18n="customBorder">Custom border</span>
+            </label>
+            <div class="row" id="borderRow" hidden>
+              <span data-i18n="borderColor">Border color</span>
+              <input type="color" id="inputBorderColor" value="#1b263b" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="check block">
+              <input type="checkbox" id="checkText" checked />
+              <span data-i18n="textInCenter">Text (name in the center)</span>
+            </label>
+            <div class="row" id="textRow">
+              <span data-i18n="textColor">Text color</span>
+              <input type="color" id="inputTextColor" value="#ffffff" />
+            </div>
+          </div>
+
+          <div class="actions make-actions">
+            <button type="button" class="btn ghost" id="btnCancelMake" data-i18n="cancel">Cancel</button>
+            <button type="button" class="btn primary" id="btnSaveBall" data-i18n="addToWorld">Add to world</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="save-toast" id="saveToast" hidden data-i18n="saved">Saved</div>
+
+  <script src="../../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

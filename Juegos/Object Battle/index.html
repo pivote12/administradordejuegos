@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Object Battle</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg" aria-hidden="true"></div>
+      <div class="title-card card">
+        <div class="logo-badge">⚔️</div>
+        <h1 data-i18n="title">Object Battle</h1>
+        <p class="subtitle" data-i18n="subtitle">Create objects with faces, drop from the sky, and switch with Z.</p>
+        <div class="title-actions">
+          <button type="button" class="btn primary" id="btnGoPartidas" data-i18n="start">Start</button>
+          <a class="btn ghost" id="btnBackToAdmin" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenPartidas" class="screen">
+      <div class="panel card">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <h2 data-i18n="games">Games</h2>
+        </header>
+        <form class="create-row" id="formNewPartida">
+          <input type="text" id="inputPartidaName" maxlength="32" data-i18n-placeholder="gameName" placeholder="Game name" required />
+          <button type="submit" class="btn primary" data-i18n="createGame">Create game</button>
+        </form>
+        <ul class="list" id="partidaList"></ul>
+        <p class="empty" id="partidaEmpty" hidden data-i18n="noGamesYet">No games yet.</p>
+      </div>
+    </section>
+
+    <section id="screenWorld" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackPartidas" title="Games">←</button>
+        <div>
+          <h2 id="worldTitle">Object Battle</h2>
+          <p class="meta" id="worldMeta">0 objects · P1</p>
+        </div>
+        <div class="world-actions">
+          <button type="button" class="btn accent" id="btnBattleBFDI" data-i18n="battleBfdi">Battle For BFDI</button>
+          <button type="button" class="btn accent" id="btnBFDIs" data-i18n="bfdis">BFDIs</button>
+          <button type="button" class="btn accent" id="btnHistory" data-i18n="history">Partidas</button>
+          <button type="button" class="btn primary" id="btnCreateObject" data-i18n="addObject">+ Create object</button>
+        </div>
+      </header>
+      <div class="hub-wrap">
+        <canvas id="hubCanvas"></canvas>
+        <p class="world-hint" data-i18n="worldHint">WASD move · Space jump · Z switch object · New objects fall from the sky</p>
+      </div>
+    </section>
+
+    <section id="screenMake" class="screen">
+      <div class="make-layout">
+        <div class="make-preview-wrap">
+          <div class="make-preview-stage ob-preview-stage">
+            <canvas id="makePreviewCanvas" width="140" height="140"></canvas>
+          </div>
+          <p class="preview-name" id="makePreviewName">Unnamed</p>
+        </div>
+        <div class="make-panel card">
+          <header class="panel-header">
+            <button type="button" class="btn icon" id="btnBackWorld">←</button>
+            <h2 data-i18n="createObject">Create object</h2>
+          </header>
+          <label class="field">
+            <span data-i18n="name">Name</span>
+            <input type="text" id="inputName" maxlength="24" data-i18n-placeholder="objectName" placeholder="Object name" />
+          </label>
+          <label class="field">
+            <span data-i18n="shape">Shape</span>
+            <select id="selectShape" size="8" class="shape-select"></select>
+          </label>
+          <label class="field">
+            <span>Color</span>
+            <input type="color" id="inputColor" value="#4cc9f0" />
+          </label>
+          <label class="field">
+            <span>Mouth</span>
+            <select id="selectMouth"></select>
+          </label>
+          <div class="actions make-actions">
+            <button type="button" class="btn ghost" id="btnCancelMake">Cancel</button>
+            <button type="button" class="btn primary" id="btnSaveObject">Add to world</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenBattle" class="screen">
+      <div class="panel card wide battle-panel">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromBattle">←</button>
+          <h2>Battle For BFDI</h2>
+        </header>
+        <p class="hint" id="battlePhaseHint"></p>
+        <h3 id="battleChallengeTitle"></h3>
+        <p id="battleChallengeDesc" class="meta"></p>
+        <ul class="battle-results" id="battleResults"></ul>
+        <div id="battleVoteBlock" hidden>
+          <p class="hint">Enter votes for each character in danger. Most votes = eliminated.</p>
+          <ul class="vote-list" id="battleVoteList"></ul>
+          <button type="button" class="btn primary" id="btnSubmitVotes">Eliminate highest votes</button>
+        </div>
+        <div id="battleFinalBlock" hidden>
+          <p class="hint">Final 3! Enter votes to pick the BFDI winner.</p>
+          <ul class="vote-list" id="battleFinalList"></ul>
+          <button type="button" class="btn primary" id="btnPickWinner">Crown winner</button>
+        </div>
+        <button type="button" class="btn accent" id="btnNextChallenge" hidden>Next challenge</button>
+      </div>
+    </section>
+
+    <section id="screenBFDIs" class="screen">
+      <div class="panel card wide">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromBFDIs">←</button>
+          <h2>BFDIs</h2>
+        </header>
+        <p class="hint">Total BFDI prizes won by each object.</p>
+        <ul class="win-list" id="bfdiList"></ul>
+        <p class="empty" id="bfdiEmpty" hidden>No BFDIs yet.</p>
+      </div>
+    </section>
+
+    <section id="screenHistory" class="screen">
+      <div class="panel card wide">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromHistory">←</button>
+          <h2>Partidas</h2>
+        </header>
+        <p class="hint">Full elimination order (first out → winner).</p>
+        <ul class="history-list" id="historyList"></ul>
+        <p class="empty" id="historyEmpty" hidden>No battles recorded yet.</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="../../i18n.js"></script>
+  <script src="shapes.js"></script>
+  <script src="bfdi.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administrador De Juegos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="layout">
+    <header class="hero card">
+      <div class="hero-badge">🎮</div>
+      <div class="hero-text">
+        <h1 id="heroTitle">Administrador De Juegos</h1>
+        <p class="subtitle" id="heroSubtitle">Elige un juego de la biblioteca y empieza a jugar.</p>
+      </div>
+      <div class="hero-actions">
+        <label class="lang-picker">
+          <span class="lang-picker-icon" aria-hidden="true">🌐</span>
+          <span class="sr-only" id="langPickerLabel">Idioma</span>
+          <select id="langSelect" aria-labelledby="langPickerLabel"></select>
+        </label>
+        <span class="stat-pill" id="gameCount">0 juegos</span>
+      </div>
+    </header>
+
+    <section class="panel card">
+      <div class="panel-top">
+        <h2 id="libraryTitle">Biblioteca</h2>
+        <label class="search">
+          <span class="sr-only" id="searchLabel">Buscar juego</span>
+          <input type="search" id="searchInput" placeholder="Buscar por nombre…" autocomplete="off" />
+        </label>
+      </div>
+
+      <p class="empty" id="emptyState" hidden>No hay juegos que coincidan con la búsqueda.</p>
+      <ul class="game-grid" id="gameGrid"></ul>
+    </section>
+
+    <footer class="footer">
+      <p id="footerText">Los juegos viven en la carpeta <code>Juegos/</code>. Para añadir uno nuevo, copia su carpeta ahí y regístralo en <code>games.json</code>.</p>
+    </footer>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

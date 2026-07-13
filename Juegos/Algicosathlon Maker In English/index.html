@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Algicosathlon Maker In English</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg" aria-hidden="true"></div>
+      <div class="title-track" aria-hidden="true"></div>
+      <div class="title-card card">
+        <div class="logo-badge">🏅</div>
+        <h1 data-i18n="title">Algicosathlon Maker In English</h1>
+        <p class="subtitle" data-i18n="subtitle">Create games, design balls and compete in the Algicosathlon</p>
+        <div class="title-actions">
+          <button type="button" class="btn primary" id="btnGoPartidas" data-i18n="start">Start</button>
+          <a class="btn ghost" id="btnBackToAdmin" href="../../index.html" hidden data-i18n="backToAdmin">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenPartidas" class="screen">
+      <div class="panel card">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <h2 data-i18n="games">Games</h2>
+        </header>
+
+        <form class="create-row" id="formNewPartida">
+          <input type="text" id="inputPartidaName" maxlength="32" data-i18n-placeholder="gameName" placeholder="Game name" required />
+          <button type="submit" class="btn primary" data-i18n="createGame">Create game</button>
+        </form>
+
+        <ul class="list" id="partidaList"></ul>
+        <p class="empty" id="partidaEmpty" hidden data-i18n="noGamesYet">No games yet. Create one to get started.</p>
+      </div>
+    </section>
+
+    <section id="screenGuardar" class="screen">
+      <div class="panel card wide">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromGuardar">←</button>
+          <h2 data-i18n="saveBalls">Save balls</h2>
+        </header>
+        <p class="hint" data-i18n="saveBallsHint">Save the ball from the editor to a .json file (1 ball per file). Loading fills the creator.</p>
+        <div class="guardar-panel">
+          <div class="guardar-folder-row">
+            <button type="button" class="btn ghost" id="btnPickFolder" data-i18n="chooseFolder">Choose folder</button>
+            <span class="guardar-folder-name" id="guardarFolderName" data-i18n="noFolder">No folder selected</span>
+          </div>
+          <div class="guardar-actions">
+            <button type="button" class="btn primary" id="btnSaveToFolder" data-i18n="saveBall">Save ball</button>
+            <button type="button" class="btn accent" id="btnLoadFromFolder" data-i18n="loadBall">Load ball</button>
+          </div>
+          <p class="guardar-status" id="guardarStatus"></p>
+          <div class="guardar-fallback">
+            <p class="hint" data-i18n="folderFallback">If your browser cannot pick a folder, use these options:</p>
+            <button type="button" class="btn ghost" id="btnDownloadBalls" data-i18n="downloadJson">Download .json</button>
+            <button type="button" class="btn ghost" id="btnUploadBalls" data-i18n="uploadJson">Upload .json</button>
+            <input type="file" id="inputUploadBalls" accept=".json,application/json" hidden />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenWorld" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackPartidas" title="Games">←</button>
+        <div>
+          <h2 id="worldTitle">Algicosathlon</h2>
+          <p class="meta" id="worldMeta">0 balls</p>
+        </div>
+        <div class="world-actions">
+          <button type="button" class="btn accent" id="btnAlgicosathlon" data-i18n="algicosathlon">Algicosathlon</button>
+          <button type="button" class="btn accent" id="btnViewerVoting" data-i18n="viewerVoting">Algicosathlon Viewer Voting</button>
+          <button type="button" class="btn accent" id="btnCombatirTodos" data-i18n="fightAll">Fight All</button>
+          <button type="button" class="btn accent" id="btnWinStorage" data-i18n="wins">Wins</button>
+          <button type="button" class="btn primary" id="btnCreateBall" data-i18n="createBallBtn">+ Create ball</button>
+        </div>
+      </header>
+
+      <div class="world-stage">
+        <div class="world-bg" aria-hidden="true"></div>
+        <div class="world-track" aria-hidden="true"></div>
+        <div class="world-arena" id="worldArena">
+          <div class="world-space-zone" aria-hidden="true"></div>
+          <div class="world-gravity-zone" aria-hidden="true"></div>
+          <div class="world-balls" id="worldBalls"></div>
+        </div>
+        <p class="world-hint" id="worldHint" data-i18n="dragBalls">Drag and drop the balls.</p>
+      </div>
+    </section>
+
+    <section id="screenAlgicosathlon" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackFromAthlon">←</button>
+        <div>
+          <h2 id="athlonScreenTitle">Algicosathlon</h2>
+          <p class="meta" id="athlonMeta">Minimum 2 balls</p>
+        </div>
+        <button type="button" class="btn ghost" id="btnRestartAthlon" hidden>Restart</button>
+      </header>
+      <div class="athlon-layout" id="athlonLayout">
+        <div class="athlon-main card" id="athlonMain">
+          <div class="athlon-challenge-head" id="athlonChallengeHead">
+            <span class="athlon-emoji" id="athlonEmoji">🏅</span>
+            <div>
+              <h3 id="athlonChallengeName">Ready to compete</h3>
+              <p class="athlon-challenge-desc" id="athlonChallengeDesc">Press Start to begin the Algicosathlon.</p>
+            </div>
+          </div>
+          <div class="athlon-stats" id="athlonStats"></div>
+          <div class="athlon-arena-wrap" id="athlonArenaWrap" hidden>
+            <div class="challenge-board" id="challengeBoard">
+              <div class="challenge-map" id="challengeMap"></div>
+              <div class="challenge-entities" id="challengeEntities"></div>
+            </div>
+            <p class="challenge-status" id="challengeStatus"></p>
+          </div>
+          <div class="athlon-log" id="athlonLog"></div>
+          <div class="athlon-actions">
+            <button type="button" class="btn primary" id="btnStartAthlon">Start Algicosathlon</button>
+          </div>
+        </div>
+      </div>
+      <div class="athlon-scoreboard" id="athlonScoreboard" hidden>
+        <div class="athlon-scoreboard-inner card">
+          <header class="athlon-scoreboard-head">
+            <h3>Scoreboard</h3>
+            <p class="athlon-rejoins" id="athlonRejoinsInfo">Rejoins: —</p>
+          </header>
+          <div class="athlon-roster-wrap">
+            <div class="athlon-roster" id="athlonRoster"></div>
+          </div>
+          <div class="elim-picker" id="elimPicker" hidden>
+            <h4>Elimination!</h4>
+            <p class="elim-picker-hint">No clear last place. Choose which ball is eliminated:</p>
+            <ul class="elim-list" id="elimList"></ul>
+          </div>
+          <div class="viewer-vote-picker" id="viewerVotePicker" hidden>
+            <h4>Viewer Voting</h4>
+            <p class="viewer-vote-hint">Bottom half at risk. Enter a viewer name and pick who they vote to eliminate:</p>
+            <div class="viewer-vote-form">
+              <input type="text" id="inputViewerName" maxlength="32" placeholder="Viewer name" />
+            </div>
+            <ul class="viewer-vote-options" id="viewerVoteOptions"></ul>
+            <div class="viewer-vote-tally" id="viewerVoteTally"></div>
+            <ul class="viewer-vote-log" id="viewerVoteLogList"></ul>
+            <button type="button" class="btn primary viewer-finish-btn" id="btnFinishViewerVoting">Finish voting · eliminate most voted</button>
+          </div>
+          <div class="rejoin-picker" id="rejoinPicker" hidden>
+            <h4>Use rejoin</h4>
+            <p class="rejoin-picker-hint">Choose which eliminated ball returns (+1 challenge to the total):</p>
+            <ul class="rejoin-list" id="rejoinList"></ul>
+            <button type="button" class="btn ghost" id="btnSkipRejoin">Cancel</button>
+          </div>
+          <div class="athlon-scoreboard-actions">
+            <button type="button" class="btn accent" id="btnUseRejoin" hidden>Use rejoin</button>
+            <button type="button" class="btn primary" id="btnNextChallenge" hidden>Next challenge</button>
+            <button type="button" class="btn ghost" id="btnRestartFromScoreboard" hidden>Restart</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenWinStorage" class="screen">
+      <div class="panel card wide">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackFromWins">←</button>
+          <h2 data-i18n="winStorage">Win Storage</h2>
+        </header>
+        <p class="hint" data-i18n="winStorageHint">Wins are saved when you win the Algicosathlon. They reset if you create a new ball.</p>
+        <ul class="win-list" id="winList"></ul>
+        <p class="empty" id="winEmpty" hidden data-i18n="noBallsWithWins">No balls with wins yet.</p>
+      </div>
+    </section>
+
+    <section id="screenMake" class="screen">
+      <div class="make-layout">
+        <div class="make-preview-wrap">
+          <div class="make-preview-stage">
+            <div class="ball" id="makePreview">
+              <div class="ball-fill" id="makePreviewFill"></div>
+              <span class="ball-text" id="makePreviewText"></span>
+            </div>
+          </div>
+          <p class="preview-name" id="makePreviewName" data-i18n="unnamed">Unnamed</p>
+        </div>
+
+        <div class="make-panel card">
+          <header class="panel-header">
+            <button type="button" class="btn icon" id="btnBackWorld">←</button>
+            <h2 data-i18n="createBall">Create ball</h2>
+          </header>
+
+          <label class="field">
+            <span data-i18n="name">Name</span>
+            <input type="text" id="inputName" maxlength="24" data-i18n-placeholder="ballNamePh" placeholder="e.g. Sun, Bolt, 42..." />
+          </label>
+
+          <div class="field">
+            <span id="labelColor1" data-i18n="color">Color</span>
+            <div class="row">
+              <input type="color" id="inputColor" value="#4cc9f0" />
+              <label class="check">
+                <input type="checkbox" id="checkRainbow" />
+                <span data-i18n="rainbow">Rainbow</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field" id="monoBlock">
+            <label class="check block">
+              <input type="checkbox" id="checkMonochrome" />
+              <span data-i18n="monochrome">Monochrome</span>
+            </label>
+            <div class="row" id="monoRow" hidden>
+              <span data-i18n="color2">Color 2</span>
+              <input type="color" id="inputColor2" value="#f72585" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="check block">
+              <input type="checkbox" id="checkBorder" />
+              <span data-i18n="customBorder">Custom border</span>
+            </label>
+            <div class="row" id="borderRow" hidden>
+              <span data-i18n="borderColor">Border color</span>
+              <input type="color" id="inputBorderColor" value="#1b263b" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="check block">
+              <input type="checkbox" id="checkText" checked />
+              <span data-i18n="textInCenter">Text (name in the center)</span>
+            </label>
+            <div class="row" id="textRow">
+              <span data-i18n="textColor">Text color</span>
+              <input type="color" id="inputTextColor" value="#ffffff" />
+            </div>
+          </div>
+
+          <div class="actions make-actions">
+            <button type="button" class="btn ghost" id="btnCancelMake" data-i18n="cancel">Cancel</button>
+            <button type="button" class="btn primary" id="btnSaveBall" data-i18n="addToWorld">Add to world</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="now-playing" id="nowPlaying" hidden>
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pause song">⏸</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Previous song">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Next song">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Song playing:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <div class="save-toast" id="saveToast" hidden>Saved</div>
+
+  <script src="../../i18n.js"></script>
+  <script src="music.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
