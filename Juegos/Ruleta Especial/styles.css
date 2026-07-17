@@ -165,6 +165,19 @@ html, body {
   pointer-events: none;
 }
 
+.btn.accent {
+  background: linear-gradient(135deg, #80ed99, #48cae4);
+  color: #0b1c20;
+}
+
+.wheel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  width: 100%;
+}
+
 .play-btn {
   min-width: 10rem;
   font-size: 1.1rem;
@@ -264,21 +277,15 @@ html, body {
   font-size: 1rem;
 }
 
-.save-row {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
 #saveNameInput {
-  flex: 1;
-  min-width: 0;
-  padding: 0.55rem 0.7rem;
-  border-radius: 0.7rem;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   background: rgb(0 0 0 / 0.28);
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .saves-list {

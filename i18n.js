@@ -530,12 +530,12 @@
       changeColor: L("Cambiar color", "Change color", "Changer la couleur", "Farbe ändern", "Mudar cor", "Cambia colore"),
       saves: L("Ruletas guardadas", "Saved wheels", "Roulettes enregistrées", "Gespeicherte Räder", "Roletas salvas", "Ruote salvate"),
       savesHint: L(
-        "Guardá la ruleta actual o cargá una guardada.",
-        "Save the current wheel or load a saved one.",
-        "Enregistrez la roulette actuelle ou chargez-en une.",
-        "Aktuelles Rad speichern oder laden.",
-        "Salve a roleta atual ou carregue uma salva.",
-        "Salva la ruota attuale o caricane una."
+        "Poné un nombre y tocá Guardar. Después podés cargar o borrar.",
+        "Enter a name and tap Save. Then you can load or delete.",
+        "Entrez un nom et appuyez sur Enregistrer.",
+        "Namen eingeben und Speichern tippen.",
+        "Digite um nome e toque em Salvar.",
+        "Inserisci un nome e premi Salva."
       ),
       saveNamePh: L("Nombre del guardado…", "Save name…", "Nom de la sauvegarde…", "Speichername…", "Nome do save…", "Nome del salvataggio…"),
       saveWheel: L("Guardar", "Save", "Enregistrer", "Speichern", "Salvar", "Salva"),
