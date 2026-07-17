@@ -8,10 +8,10 @@
   GameI18n.init("bruchimichis");
 
   const COLOR_VALUES = [
+    { value: "gris", key: "colorGray" },
     { value: "negro", key: "colorBlack" },
     { value: "cafe", key: "colorBrown" },
     { value: "blanco", key: "colorWhite" },
-    { value: "gris", key: "colorGray" },
     { value: "negro y blanco", key: "colorBlackWhite" },
     { value: "blanco y cafe", key: "colorWhiteBrown" },
   ];
