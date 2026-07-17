@@ -9,8 +9,8 @@
 
   const COLOR_VALUES = [
     { value: "negro", key: "colorBlack" },
-    { value: "blanco", key: "colorWhite" },
     { value: "cafe", key: "colorBrown" },
+    { value: "blanco", key: "colorWhite" },
     { value: "gris", key: "colorGray" },
     { value: "negro y blanco", key: "colorBlackWhite" },
     { value: "blanco y cafe", key: "colorWhiteBrown" },
@@ -18,9 +18,9 @@
 
   const COLOR_MAP = {
     negro: { a: "#1a1a1a", b: "#1a1a1a" },
-    blanco: { a: "#f2f2f2", b: "#f2f2f2" },
     cafe: { a: "#8b5a2b", b: "#8b5a2b" },
-    gris: { a: "#8a8a8a", b: "#8a8a8a" },
+    blanco: { a: "#f2f2f2", b: "#f2f2f2" },
+    gris: { a: "#808080", b: "#808080" },
     "negro y blanco": { a: "#1a1a1a", b: "#f2f2f2" },
     "blanco y cafe": { a: "#f2f2f2", b: "#8b5a2b" },
   };
@@ -46,11 +46,20 @@
   function fillColorSelect() {
     if (!ui.selectColor) return;
     const current = ui.selectColor.value || "blanco";
+    const fallbacks = {
+      colorBlack: "Negro",
+      colorBrown: "Café",
+      colorWhite: "Blanco",
+      colorGray: "Gris",
+      colorBlackWhite: "Negro y blanco",
+      colorWhiteBrown: "Blanco y café",
+    };
     ui.selectColor.innerHTML = "";
     COLOR_VALUES.forEach(({ value, key }) => {
       const opt = document.createElement("option");
       opt.value = value;
-      opt.textContent = GameI18n.t(key);
+      const translated = GameI18n.t(key);
+      opt.textContent = translated === key ? fallbacks[key] || value : translated;
       ui.selectColor.appendChild(opt);
     });
     ui.selectColor.value = COLOR_VALUES.some((c) => c.value === current) ? current : "blanco";
