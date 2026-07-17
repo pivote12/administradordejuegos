@@ -555,36 +555,36 @@
       running: L("Corriendo…", "Running…", "En cours…", "Läuft…", "Rodando…", "In corso…"),
       paused: L("Pausado.", "Paused.", "En pause.", "Pausiert.", "Pausado.", "In pausa."),
       chanceHint: L(
-        "Si activás otra chance, se resta del 100% de “baja 1 segundo”.",
-        "If you enable another chance, it is subtracted from the 100% “minus 1 second”.",
+        "Si activás otra chance, se resta del 100% de \"baja 1 segundo\".",
+        "If you enable another chance, it is subtracted from the 100% \"minus 1 second\".",
         "Si vous activez une chance, elle se soustrait du 100 % « -1 seconde ».",
-        "Aktivierte Chancen werden vom 100 %-„-1 Sekunde“ abgezogen.",
-        "Se ativar outra chance, ela é subtraída dos 100% de “-1 segundo”.",
-        "Se attivi un'altra probabilità, si sottrae dal 100% di “-1 secondo”."
+        "Aktivierte Chancen werden vom 100%-\"-1 Sekunde\" abgezogen.",
+        "Se ativar outra chance, ela e subtraida dos 100% de \"-1 segundo\".",
+        "Se attivi un'altra probabilita, si sottrae dal 100% di \"-1 secondo\"."
       ),
-      defaultChance: L("{n}% chance baja 1 segundo", "{n}% chance minus 1 second", "{n} % chance -1 seconde", "{n} % Chance −1 Sekunde", "{n}% chance -1 segundo", "{n}% probabilità -1 secondo"),
+      defaultChance: L("{n}% chance baja 1 segundo", "{n}% chance minus 1 second", "{n} % chance -1 seconde", "{n} % Chance -1 Sekunde", "{n}% chance -1 segundo", "{n}% probabilita -1 secondo"),
       chanceOverflow: L("La suma de chances no puede superar 100%.", "Chances cannot add up to more than 100%.", "La somme ne peut pas dépasser 100 %.", "Summe darf 100 % nicht überschreiten.", "A soma não pode passar de 100%.", "La somma non può superare il 100%."),
       activeChances: L("Chances activas", "Active chances", "Chances actives", "Aktive Chancen", "Chances ativas", "Probabilità attive"),
-      fxMinus1: L("Baja 1 segundo", "Minus 1 second", "-1 seconde", "−1 Sekunde", "-1 segundo", "-1 secondo"),
+      fxMinus1: L("Baja 1 segundo", "Minus 1 second", "-1 seconde", "-1 Sekunde", "-1 segundo", "-1 secondo"),
       fxPlus1: L("Un segundo más", "Plus 1 second", "+1 seconde", "+1 Sekunde", "+1 segundo", "+1 secondo"),
       fxDouble: L("Se duplica el tiempo", "Time doubles", "Le temps double", "Zeit verdoppelt", "O tempo dobra", "Il tempo raddoppia"),
       fxSwap: L("Minutos y segundos intercambian posición", "Minutes and seconds swap", "Minutes et secondes s'échangent", "Minuten und Sekunden tauschen", "Minutos e segundos trocam", "Minuti e secondi si scambiano"),
-      fxMinus10: L("10 segundos menos", "Minus 10 seconds", "-10 secondes", "−10 Sekunden", "-10 segundos", "-10 secondi"),
+      fxMinus10: L("10 segundos menos", "Minus 10 seconds", "-10 secondes", "-10 Sekunden", "-10 segundos", "-10 secondi"),
       fxHalf: L("Se reduce a la mitad", "Time halves", "Le temps est divisé par 2", "Zeit halbiert", "O tempo pela metade", "Il tempo dimezza"),
       fxFreeze: L("El tiempo se congela por 3 segundos", "Time freezes for 3 seconds", "Le temps gèle 3 secondes", "Zeit friert 3 Sekunden", "O tempo congela por 3 segundos", "Il tempo si congela per 3 secondi"),
-      fxWaitHalf: L("Espera entre ticks a la mitad", "Tick wait halved", "Attente entre ticks ÷2", "Tick-Wartezeit halb", "Espera entre ticks pela metade", "Attesa tra tick a metà"),
-      fxWaitDouble: L("Espera entre ticks duplicada", "Tick wait doubled", "Attente entre ticks ×2", "Tick-Wartezeit doppelt", "Espera entre ticks duplicada", "Attesa tra tick raddoppiata"),
+      fxWaitHalf: L("Espera entre ticks a la mitad", "Tick wait halved", "Attente entre ticks /2", "Tick-Wartezeit halb", "Espera entre ticks pela metade", "Attesa tra tick a metà"),
+      fxWaitDouble: L("Espera entre ticks duplicada", "Tick wait doubled", "Attente entre ticks x2", "Tick-Wartezeit doppelt", "Espera entre ticks duplicada", "Attesa tra tick raddoppiata"),
       fxWaitNormal: L("Espera entre ticks normal", "Tick wait normal", "Attente normale", "Normale Tick-Wartezeit", "Espera entre ticks normal", "Attesa tra tick normale"),
       fxPlus60: L("1 minuto más al tiempo", "Plus 1 minute", "+1 minute", "+1 Minute", "+1 minuto", "+1 minuto"),
-      evtMinus1: L("−1 segundo", "−1 second", "−1 seconde", "−1 Sekunde", "−1 segundo", "−1 secondo"),
+      evtMinus1: L("-1 segundo", "-1 second", "-1 seconde", "-1 Sekunde", "-1 segundo", "-1 secondo"),
       evtPlus1: L("+1 segundo", "+1 second", "+1 seconde", "+1 Sekunde", "+1 segundo", "+1 secondo"),
-      evtDouble: L("¡Tiempo duplicado!", "Time doubled!", "Temps doublé !", "Zeit verdoppelt!", "Tempo dobrado!", "Tempo raddoppiato!"),
-      evtSwap: L("¡Minutos y segundos intercambiados!", "Minutes and seconds swapped!", "Minutes/secondes échangés !", "Minuten/Sekunden getauscht!", "Minutos e segundos trocados!", "Minuti e secondi scambiati!"),
-      evtMinus10: L("−10 segundos", "−10 seconds", "−10 secondes", "−10 Sekunden", "−10 segundos", "−10 secondi"),
-      evtHalf: L("¡Tiempo a la mitad!", "Time halved!", "Temps ÷2 !", "Zeit halbiert!", "Tempo pela metade!", "Tempo dimezzato!"),
-      evtFreeze: L("Congelado 3 segundos…", "Frozen for 3 seconds…", "Gelé 3 secondes…", "3 Sekunden eingefroren…", "Congelado 3 segundos…", "Congelato 3 secondi…"),
-      evtWaitHalf: L("Espera ×0.5", "Wait ×0.5", "Attente ×0,5", "Wartezeit ×0,5", "Espera ×0,5", "Attesa ×0,5"),
-      evtWaitDouble: L("Espera ×2", "Wait ×2", "Attente ×2", "Wartezeit ×2", "Espera ×2", "Attesa ×2"),
+      evtDouble: L("¡Tiempo duplicado!", "Time doubled!", "Temps double !", "Zeit verdoppelt!", "Tempo dobrado!", "Tempo raddoppiato!"),
+      evtSwap: L("¡Minutos y segundos intercambiados!", "Minutes and seconds swapped!", "Minutes/secondes echanges !", "Minuten/Sekunden getauscht!", "Minutos e segundos trocados!", "Minuti e secondi scambiati!"),
+      evtMinus10: L("-10 segundos", "-10 seconds", "-10 secondes", "-10 Sekunden", "-10 segundos", "-10 secondi"),
+      evtHalf: L("¡Tiempo a la mitad!", "Time halved!", "Temps /2 !", "Zeit halbiert!", "Tempo pela metade!", "Tempo dimezzato!"),
+      evtFreeze: L("Congelado 3 segundos…", "Frozen for 3 seconds…", "Gele 3 secondes…", "3 Sekunden eingefroren…", "Congelado 3 segundos…", "Congelato 3 secondi…"),
+      evtWaitHalf: L("Espera x0.5", "Wait x0.5", "Attente x0.5", "Wartezeit x0.5", "Espera x0.5", "Attesa x0.5"),
+      evtWaitDouble: L("Espera x2", "Wait x2", "Attente x2", "Wartezeit x2", "Espera x2", "Attesa x2"),
       evtWaitNormal: L("Espera normal", "Normal wait", "Attente normale", "Normale Wartezeit", "Espera normal", "Attesa normale"),
       evtPlus60: L("+1 minuto", "+1 minute", "+1 minute", "+1 Minute", "+1 minuto", "+1 minuto"),
     },
@@ -743,23 +743,41 @@
   function t(key, vars) {
     const lang = getLang();
     const gamePack = currentGameId ? GAMES[currentGameId] : null;
-    const value = pick(gamePack?.[key], lang) || pick(COMMON[key], lang) || key;
+    const value = pick(gamePack?.[key], lang) || pick(COMMON[key], lang);
+    if (value == null) return key;
     return format(value, vars);
   }
 
   function applyDom(root) {
     const scope = root || document;
     scope.querySelectorAll("[data-i18n]").forEach((el) => {
-      el.textContent = t(el.getAttribute("data-i18n"));
+      const key = el.getAttribute("data-i18n");
+      const lang = getLang();
+      const gamePack = currentGameId ? GAMES[currentGameId] : null;
+      const value = pick(gamePack?.[key], lang) || pick(COMMON[key], lang);
+      // Si falta la traducción, NO pisar el texto del HTML (evita mostrar "title"/"subtitle").
+      if (value != null) el.textContent = value;
     });
     scope.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-      el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
+      const key = el.getAttribute("data-i18n-placeholder");
+      const lang = getLang();
+      const gamePack = currentGameId ? GAMES[currentGameId] : null;
+      const value = pick(gamePack?.[key], lang) || pick(COMMON[key], lang);
+      if (value != null) el.placeholder = value;
     });
     scope.querySelectorAll("[data-i18n-title]").forEach((el) => {
-      el.title = t(el.getAttribute("data-i18n-title"));
+      const key = el.getAttribute("data-i18n-title");
+      const lang = getLang();
+      const gamePack = currentGameId ? GAMES[currentGameId] : null;
+      const value = pick(gamePack?.[key], lang) || pick(COMMON[key], lang);
+      if (value != null) el.title = value;
     });
     scope.querySelectorAll("[data-i18n-html]").forEach((el) => {
-      el.innerHTML = t(el.getAttribute("data-i18n-html"));
+      const key = el.getAttribute("data-i18n-html");
+      const lang = getLang();
+      const gamePack = currentGameId ? GAMES[currentGameId] : null;
+      const value = pick(gamePack?.[key], lang) || pick(COMMON[key], lang);
+      if (value != null) el.innerHTML = value;
     });
     if (scope === document && currentGameId && GAMES[currentGameId]?.title) {
       document.title = t("title");
@@ -769,6 +787,9 @@
 
   function init(gameId) {
     currentGameId = gameId;
+    if (!GAMES[gameId]) {
+      console.warn("[GameI18n] No hay traducciones para:", gameId, "| juegos:", Object.keys(GAMES));
+    }
     applyDom(document);
     return { t, getLang, applyDom, refresh: () => applyDom(document) };
   }
