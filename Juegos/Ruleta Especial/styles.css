@@ -228,11 +228,32 @@ html, body {
 .option-list li span,
 .history-list li span { flex: 1; }
 
-.swatch {
-  width: 0.85rem;
-  height: 0.85rem;
-  border-radius: 999px;
+.color-wrap {
+  position: relative;
+  width: 1.35rem;
+  height: 1.35rem;
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.swatch {
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  border: 2px solid rgb(255 255 255 / 0.35);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+}
+
+.color-wrap input[type="color"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .btn-del {
@@ -241,6 +262,71 @@ html, body {
   color: var(--muted);
   cursor: pointer;
   font-size: 1rem;
+}
+
+.save-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+#saveNameInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--border);
+  background: rgb(0 0 0 / 0.28);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.saves-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.saves-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.65rem;
+  background: rgb(255 255 255 / 0.05);
+}
+
+.save-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.save-info strong {
+  font-size: 0.92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.save-info small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.save-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
 }
 
 .empty { color: var(--muted); font-size: 0.9rem; margin: 0.35rem 0 0; }

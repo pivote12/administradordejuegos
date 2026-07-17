@@ -3,7 +3,7 @@
 
   GameI18n.init("ruleta-especial");
 
-  const STORAGE_KEY = "ruleta-especial-v1";
+  const STORAGE_KEY = "ruleta-especial-v2";
   const COLORS = [
     "#ff6b8a", "#ffb347", "#4cc9f0", "#80ed99", "#c77dff",
     "#f72585", "#ffd166", "#48cae4", "#adb5bd", "#ff8fab"
@@ -12,6 +12,7 @@
   const state = {
     options: [],
     history: [],
+    saves: [],
     rotation: 0,
     spinning: false,
     animId: 0
@@ -24,32 +25,88 @@
     optionEmpty: document.getElementById("optionEmpty"),
     historyList: document.getElementById("historyList"),
     historyEmpty: document.getElementById("historyEmpty"),
+    savesList: document.getElementById("savesList"),
+    savesEmpty: document.getElementById("savesEmpty"),
+    saveNameInput: document.getElementById("saveNameInput"),
     winnerLine: document.getElementById("winnerLine"),
     optionCount: document.getElementById("optionCount"),
-    btnSpin: document.getElementById("btnSpin")
+    btnSpin: document.getElementById("btnSpin"),
+    btnSaveWheel: document.getElementById("btnSaveWheel")
   };
 
   const ctx = ui.canvas.getContext("2d");
 
+  function uid() {
+    return `s_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function isHexColor(value) {
+    return /^#[0-9a-fA-F]{6}$/.test(String(value || ""));
+  }
+
+  function defaultColor(index) {
+    return COLORS[index % COLORS.length];
+  }
+
+  function normalizeOption(raw, index) {
+    if (typeof raw === "string") {
+      const text = raw.trim();
+      if (!text) return null;
+      return { text: text.slice(0, 48), color: defaultColor(index) };
+    }
+    if (!raw || typeof raw !== "object") return null;
+    const text = String(raw.text || "").trim();
+    if (!text) return null;
+    return {
+      text: text.slice(0, 48),
+      color: isHexColor(raw.color) ? raw.color : defaultColor(index)
+    };
+  }
+
+  function cloneOptions(list) {
+    return (Array.isArray(list) ? list : [])
+      .map((o, i) => normalizeOption(o, i))
+      .filter(Boolean)
+      .slice(0, 40);
+  }
+
   function load() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      let raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        const legacy = localStorage.getItem("ruleta-especial-v1");
+        if (legacy) raw = legacy;
+      }
       if (!raw) return;
       const data = JSON.parse(raw);
-      state.options = Array.isArray(data.options)
-        ? data.options.map((o) => String(o).trim()).filter(Boolean).slice(0, 40)
-        : [];
+      state.options = cloneOptions(data.options);
       state.history = Array.isArray(data.history) ? data.history.slice(0, 50) : [];
+      state.saves = Array.isArray(data.saves)
+        ? data.saves
+            .map((s) => ({
+              id: String(s.id || uid()),
+              name: String(s.name || "").trim().slice(0, 32) || "Ruleta",
+              options: cloneOptions(s.options),
+              at: Number(s.at) || Date.now()
+            }))
+            .filter((s) => s.options.length > 0)
+            .slice(0, 30)
+        : [];
     } catch (_err) {
       state.options = [];
       state.history = [];
+      state.saves = [];
     }
   }
 
-  function save() {
+  function persist() {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ options: state.options, history: state.history })
+      JSON.stringify({
+        options: state.options,
+        history: state.history,
+        saves: state.saves
+      })
     );
   }
 
@@ -63,18 +120,49 @@
     }
   }
 
+  function optionLabel(opt) {
+    return typeof opt === "string" ? opt : opt.text;
+  }
+
+  function optionColor(opt, index) {
+    if (opt && isHexColor(opt.color)) return opt.color;
+    return defaultColor(index);
+  }
+
   function renderOptions() {
     ui.optionList.innerHTML = "";
     ui.optionEmpty.hidden = state.options.length > 0;
     ui.optionCount.textContent = GameI18n.t("optionCount", { n: state.options.length });
 
-    state.options.forEach((text, index) => {
+    state.options.forEach((opt, index) => {
       const li = document.createElement("li");
+
+      const colorWrap = document.createElement("label");
+      colorWrap.className = "color-wrap";
+      colorWrap.title = GameI18n.t("changeColor");
+
       const swatch = document.createElement("span");
       swatch.className = "swatch";
-      swatch.style.background = COLORS[index % COLORS.length];
+      swatch.style.background = optionColor(opt, index);
+
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = optionColor(opt, index);
+      colorInput.disabled = state.spinning;
+      colorInput.setAttribute("aria-label", GameI18n.t("changeColor"));
+      colorInput.addEventListener("input", () => {
+        if (state.spinning) return;
+        state.options[index].color = colorInput.value;
+        swatch.style.background = colorInput.value;
+        persist();
+        drawWheel();
+      });
+
+      colorWrap.append(swatch, colorInput);
+
       const label = document.createElement("span");
-      label.textContent = text;
+      label.textContent = optionLabel(opt);
+
       const del = document.createElement("button");
       del.type = "button";
       del.className = "btn-del";
@@ -84,12 +172,56 @@
       del.addEventListener("click", () => {
         if (state.spinning) return;
         state.options.splice(index, 1);
-        save();
+        persist();
         renderAll();
         drawWheel();
       });
-      li.append(swatch, label, del);
+
+      li.append(colorWrap, label, del);
       ui.optionList.appendChild(li);
+    });
+  }
+
+  function renderSaves() {
+    ui.savesList.innerHTML = "";
+    ui.savesEmpty.hidden = state.saves.length > 0;
+    ui.btnSaveWheel.disabled = state.spinning;
+    ui.saveNameInput.disabled = state.spinning;
+
+    state.saves.forEach((save) => {
+      const li = document.createElement("li");
+      const info = document.createElement("div");
+      info.className = "save-info";
+      const name = document.createElement("strong");
+      name.textContent = save.name;
+      const meta = document.createElement("small");
+      meta.textContent = GameI18n.t("saveMeta", {
+        n: save.options.length,
+        when: new Date(save.at).toLocaleString()
+      });
+      info.append(name, meta);
+
+      const actions = document.createElement("div");
+      actions.className = "save-actions";
+
+      const loadBtn = document.createElement("button");
+      loadBtn.type = "button";
+      loadBtn.className = "btn ghost small";
+      loadBtn.textContent = GameI18n.t("loadSave");
+      loadBtn.disabled = state.spinning;
+      loadBtn.addEventListener("click", () => loadSave(save.id));
+
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "btn-del";
+      delBtn.textContent = "×";
+      delBtn.title = GameI18n.t("deleteSave");
+      delBtn.disabled = state.spinning;
+      delBtn.addEventListener("click", () => deleteSave(save.id));
+
+      actions.append(loadBtn, delBtn);
+      li.append(info, actions);
+      ui.savesList.appendChild(li);
     });
   }
 
@@ -110,6 +242,7 @@
 
   function renderAll() {
     renderOptions();
+    renderSaves();
     renderHistory();
     ui.btnSpin.disabled = state.options.length < 1 || state.spinning;
     ui.optionInput.disabled = state.spinning;
@@ -122,11 +255,64 @@
       alert(GameI18n.t("alertMaxOptions"));
       return;
     }
-    state.options.push(text.slice(0, 48));
+    state.options.push({
+      text: text.slice(0, 48),
+      color: defaultColor(state.options.length)
+    });
     ui.optionInput.value = "";
-    save();
+    persist();
     renderAll();
     drawWheel();
+  }
+
+  function saveCurrentWheel() {
+    if (state.spinning) return;
+    if (!state.options.length) {
+      alert(GameI18n.t("alertNeedOptions"));
+      return;
+    }
+    const name = String(ui.saveNameInput.value || "").trim().slice(0, 32);
+    if (!name) {
+      alert(GameI18n.t("alertSaveName"));
+      return;
+    }
+    const existing = state.saves.findIndex(
+      (s) => s.name.toLowerCase() === name.toLowerCase()
+    );
+    const entry = {
+      id: existing >= 0 ? state.saves[existing].id : uid(),
+      name,
+      options: cloneOptions(state.options),
+      at: Date.now()
+    };
+    if (existing >= 0) state.saves[existing] = entry;
+    else state.saves.unshift(entry);
+    state.saves = state.saves.slice(0, 30);
+    ui.saveNameInput.value = "";
+    persist();
+    renderSaves();
+  }
+
+  function loadSave(id) {
+    if (state.spinning) return;
+    const save = state.saves.find((s) => s.id === id);
+    if (!save) return;
+    state.options = cloneOptions(save.options);
+    state.rotation = 0;
+    ui.winnerLine.textContent = "";
+    persist();
+    renderAll();
+    drawWheel();
+  }
+
+  function deleteSave(id) {
+    if (state.spinning) return;
+    const save = state.saves.find((s) => s.id === id);
+    if (!save) return;
+    if (!confirm(GameI18n.t("confirmDeleteSave", { name: save.name }))) return;
+    state.saves = state.saves.filter((s) => s.id !== id);
+    persist();
+    renderSaves();
   }
 
   function normalizeAngle(angle) {
@@ -135,22 +321,15 @@
     return a;
   }
 
-  /**
-   * El puntero está arriba (ángulo mundo -PI/2).
-   * Los sectores se dibujan desde arriba, en sentido horario.
-   */
   function winnerIndexFromRotation(rotation, count) {
     if (count <= 0) return 0;
     const slice = (Math.PI * 2) / count;
-    // Ángulo local bajo el puntero: qué parte de la ruleta queda arriba.
     const underPointer = normalizeAngle(-rotation);
     return Math.min(count - 1, Math.floor(underPointer / slice));
   }
 
   function rotationForIndex(index, count, offsetInsideSlice) {
     const slice = (Math.PI * 2) / count;
-    // underPointer = -rotation (mod 2PI) = index*slice + offset
-    // rotation = -(index*slice + offset)
     return -((index * slice) + offsetInsideSlice);
   }
 
@@ -179,14 +358,15 @@
       ctx.textBaseline = "middle";
       ctx.fillText(GameI18n.t("noOptions"), 0, 0);
     } else {
-      state.options.forEach((text, i) => {
+      state.options.forEach((opt, i) => {
         const start = -Math.PI / 2 + i * slice;
         const end = start + slice;
+        const text = optionLabel(opt);
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.arc(0, 0, radius, start, end);
         ctx.closePath();
-        ctx.fillStyle = COLORS[i % COLORS.length];
+        ctx.fillStyle = optionColor(opt, i);
         ctx.fill();
         ctx.strokeStyle = "rgba(0,0,0,0.28)";
         ctx.lineWidth = 2;
@@ -224,10 +404,11 @@
       renderAll();
       return;
     }
-    state.history.unshift({ text: winner, at: Date.now() });
+    const text = optionLabel(winner);
+    state.history.unshift({ text, at: Date.now() });
     state.history = state.history.slice(0, 50);
-    save();
-    ui.winnerLine.textContent = GameI18n.t("winner", { name: winner });
+    persist();
+    ui.winnerLine.textContent = GameI18n.t("winner", { name: text });
     renderAll();
   }
 
@@ -241,7 +422,11 @@
     state.spinning = true;
     ui.btnSpin.disabled = true;
     ui.optionInput.disabled = true;
+    ui.btnSaveWheel.disabled = true;
+    ui.saveNameInput.disabled = true;
     ui.winnerLine.textContent = GameI18n.t("spinning");
+    renderOptions();
+    renderSaves();
 
     const count = state.options.length;
     const slice = (Math.PI * 2) / count;
@@ -249,7 +434,6 @@
     const offsetInside = slice * (0.2 + Math.random() * 0.6);
     const baseTarget = rotationForIndex(winnerIndex, count, offsetInside);
 
-    // Girar varias vueltas hacia adelante hasta el ángulo objetivo.
     const current = normalizeAngle(state.rotation);
     const targetNorm = normalizeAngle(baseTarget);
     let forward = targetNorm - current;
@@ -275,7 +459,6 @@
         return;
       }
 
-      // Ajuste final exacto y ganador correcto según el triángulo.
       state.rotation = targetRotation;
       drawWheel();
       const idx = winnerIndexFromRotation(state.rotation, state.options.length);
@@ -300,15 +483,22 @@
       showScreen("Title");
     });
     document.getElementById("btnSpin").addEventListener("click", spin);
+    document.getElementById("btnSaveWheel").addEventListener("click", saveCurrentWheel);
     document.getElementById("btnClearHistory").addEventListener("click", () => {
       state.history = [];
-      save();
+      persist();
       renderHistory();
     });
     ui.optionInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
         if (!state.spinning) addOption(ui.optionInput.value);
+      }
+    });
+    ui.saveNameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveCurrentWheel();
       }
     });
     GameI18n.onChange(() => {
