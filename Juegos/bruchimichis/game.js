@@ -54,15 +54,30 @@
       colorBlackWhite: "Negro y blanco",
       colorWhiteBrown: "Blanco y café",
     };
-    ui.selectColor.innerHTML = "";
+    // No borrar opciones del HTML: solo actualizar textos y agregar las que falten.
+    const existing = new Map(
+      Array.from(ui.selectColor.options).map((opt) => [opt.value, opt])
+    );
     COLOR_VALUES.forEach(({ value, key }) => {
-      const opt = document.createElement("option");
-      opt.value = value;
+      let opt = existing.get(value);
+      if (!opt) {
+        opt = document.createElement("option");
+        opt.value = value;
+        ui.selectColor.appendChild(opt);
+      }
       const translated = GameI18n.t(key);
       opt.textContent = translated === key ? fallbacks[key] || value : translated;
-      ui.selectColor.appendChild(opt);
     });
-    ui.selectColor.value = COLOR_VALUES.some((c) => c.value === current) ? current : "blanco";
+    // Asegurar gris aunque un game.js viejo en caché no lo tenga en COLOR_VALUES.
+    if (!Array.from(ui.selectColor.options).some((o) => o.value === "gris")) {
+      const gris = document.createElement("option");
+      gris.value = "gris";
+      gris.textContent = "Gris";
+      ui.selectColor.insertBefore(gris, ui.selectColor.firstChild);
+    }
+    ui.selectColor.value = COLOR_VALUES.some((c) => c.value === current) || current === "gris"
+      ? current
+      : "blanco";
   }
 
   function refreshHints() {
