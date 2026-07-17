@@ -5,6 +5,7 @@
 
   const STORAGE_KEY = "cronometro-loco-v1";
   const DEFAULT_WAIT_MS = 1000;
+  const START_SECONDS = 10 * 60; // 10:00
 
   const EFFECT_DEFS = [
     { id: "plus1", labelKey: "fxPlus1", defaultChance: 10 },
@@ -26,7 +27,7 @@
       enabled: false,
       chance: def.defaultChance
     })),
-    seconds: 0,
+    seconds: START_SECONDS,
     running: false,
     waitMs: DEFAULT_WAIT_MS,
     freezeUntil: 0,
@@ -164,7 +165,7 @@
       input.step = "0.1";
       input.value = String(fx.chance);
       input.disabled = !fx.enabled;
-      input.title = "1% … 99.9%";
+      input.setAttribute("aria-label", "%");
       const pct = document.createElement("span");
       pct.textContent = "%";
       chanceBox.append(input, pct);
@@ -344,7 +345,7 @@
 
   function resetTimer() {
     stopTimer();
-    state.seconds = 0;
+    state.seconds = START_SECONDS;
     state.waitMs = DEFAULT_WAIT_MS;
     state.freezeUntil = 0;
     renderTimer();

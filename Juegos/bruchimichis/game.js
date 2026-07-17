@@ -44,7 +44,8 @@
   };
 
   function fillColorSelect() {
-    const current = ui.selectColor.value;
+    if (!ui.selectColor) return;
+    const current = ui.selectColor.value || "blanco";
     ui.selectColor.innerHTML = "";
     COLOR_VALUES.forEach(({ value, key }) => {
       const opt = document.createElement("option");
@@ -52,7 +53,7 @@
       opt.textContent = GameI18n.t(key);
       ui.selectColor.appendChild(opt);
     });
-    if (current) ui.selectColor.value = current;
+    ui.selectColor.value = COLOR_VALUES.some((c) => c.value === current) ? current : "blanco";
   }
 
   function refreshHints() {
@@ -71,6 +72,7 @@
       el.classList.toggle("active", el.id === `screen${name}`);
     });
     state.mode = name;
+    if (name === "Create") fillColorSelect();
     if (name === "Play") startPlayLoop();
     else if (name === "Race") startRace();
     else stopLoop();
