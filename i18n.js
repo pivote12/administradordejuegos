@@ -554,6 +554,14 @@
       waiting: L("Dale a Empezar.", "Press Start.", "Appuyez sur Démarrer.", "Drücke Start.", "Toque em Começar.", "Premi Avvia."),
       running: L("Corriendo…", "Running…", "En cours…", "Läuft…", "Rodando…", "In corso…"),
       paused: L("Pausado.", "Paused.", "En pause.", "Pausiert.", "Pausado.", "In pausa."),
+      tickPace: L(
+        "1 segundo del cronómetro tarda {n} s",
+        "1 stopwatch second takes {n} s",
+        "1 seconde du chronomètre dure {n} s",
+        "1 Stoppuhr-Sekunde dauert {n} s",
+        "1 segundo do cronômetro demora {n} s",
+        "1 secondo del cronometro dura {n} s"
+      ),
       chanceHint: L(
         "Si activás otra chance, se resta del 100% de \"baja 1 segundo\".",
         "If you enable another chance, it is subtracted from the 100% \"minus 1 second\".",

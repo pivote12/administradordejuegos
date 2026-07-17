@@ -40,6 +40,7 @@
     defaultChanceText: document.getElementById("defaultChanceText"),
     chanceWarn: document.getElementById("chanceWarn"),
     timerDisplay: document.getElementById("timerDisplay"),
+    tickPace: document.getElementById("tickPace"),
     eventLine: document.getElementById("eventLine"),
     btnToggle: document.getElementById("btnToggle"),
     chanceSummary: document.getElementById("chanceSummary")
@@ -213,8 +214,20 @@
     return `${mm}:${ss}`;
   }
 
+  function formatWaitSeconds(ms) {
+    const sec = Math.max(0.05, ms / 1000);
+    if (Number.isInteger(sec)) return String(sec);
+    return String(round1(sec));
+  }
+
+  function renderTickPace() {
+    if (!ui.tickPace) return;
+    ui.tickPace.textContent = GameI18n.t("tickPace", { n: formatWaitSeconds(state.waitMs) });
+  }
+
   function renderTimer() {
     ui.timerDisplay.textContent = formatTime(state.seconds);
+    renderTickPace();
   }
 
   function setEvent(text) {
@@ -394,6 +407,7 @@
       if (document.getElementById("screenSettings").classList.contains("active")) renderSettings();
       if (document.getElementById("screenPlay").classList.contains("active")) {
         renderSummary();
+        renderTickPace();
         updateToggleLabel();
         if (state.lastEvent) ui.eventLine.textContent = state.lastEvent;
       }
