@@ -14,7 +14,7 @@ Documento de referencia para asistentes de IA (Cursor, Copilot, ChatGPT, etc.) q
 
 Los juegos son apps front-end independientes dentro de `Juegos/<Nombre del juego>/`, cada una con su propio `index.html`.
 
-### Juegos actuales (8)
+### Juegos actuales (10)
 
 | ID (`games.json`) | Carpeta | Creador |
 |---|---|---|
@@ -26,6 +26,8 @@ Los juegos son apps front-end independientes dentro de `Juegos/<Nombre del juego
 | `bloc-de-notas` | Bloc De Notas | José Rafael Rodriguez Morillo |
 | `country-notes` | Country Notes | José Rafael Rodriguez Morillo |
 | `shape-bowl-race` | Shape Bowl Race | José Rafael Rodriguez Morillo |
+| `ruleta-especial` | Ruleta Especial | José Rafael Rodriguez Morillo |
+| `cronometro-loco` | Cronometro Loco | José Rafael Rodriguez Morillo |
 
 ---
 
@@ -111,7 +113,7 @@ Puerto típico en local: **8090** (convención del proyecto). En producción usa
 
 ### Comprobar que funciona
 
-1. `http://<host>/` muestra la biblioteca con 8 juegos.
+1. `http://<host>/` muestra la biblioteca con 10 juegos.
 2. Clic en «Jugar» abre el juego.
 3. Cambiar idioma en 🌐 traduce nombres/descripciones del menú.
 4. Dentro de un juego, «Volver al administrador» regresa al menú.

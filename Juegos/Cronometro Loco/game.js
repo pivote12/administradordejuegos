@@ -1,0 +1,376 @@
+(function () {
+  "use strict";
+
+  GameI18n.init("cronometro-loco");
+
+  const STORAGE_KEY = "cronometro-loco-v1";
+  const DEFAULT_WAIT_MS = 1000;
+
+  const EFFECT_DEFS = [
+    { id: "plus1", labelKey: "fxPlus1" },
+    { id: "double", labelKey: "fxDouble" },
+    { id: "swap", labelKey: "fxSwap" },
+    { id: "minus10", labelKey: "fxMinus10" },
+    { id: "half", labelKey: "fxHalf" },
+    { id: "freeze3", labelKey: "fxFreeze" },
+    { id: "waitHalf", labelKey: "fxWaitHalf" },
+    { id: "waitDouble", labelKey: "fxWaitDouble" },
+    { id: "waitNormal", labelKey: "fxWaitNormal" },
+    { id: "plus60", labelKey: "fxPlus60" }
+  ];
+
+  const state = {
+    effects: EFFECT_DEFS.map((def) => ({
+      id: def.id,
+      labelKey: def.labelKey,
+      enabled: false,
+      chance: 5
+    })),
+    seconds: 0,
+    running: false,
+    waitMs: DEFAULT_WAIT_MS,
+    freezeUntil: 0,
+    timerId: null,
+    lastEvent: ""
+  };
+
+  const ui = {
+    effectsList: document.getElementById("effectsList"),
+    defaultChanceText: document.getElementById("defaultChanceText"),
+    chanceWarn: document.getElementById("chanceWarn"),
+    timerDisplay: document.getElementById("timerDisplay"),
+    eventLine: document.getElementById("eventLine"),
+    btnToggle: document.getElementById("btnToggle"),
+    chanceSummary: document.getElementById("chanceSummary")
+  };
+
+  function clampChance(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 1;
+    return Math.min(99.9, Math.max(1, Math.round(n * 10) / 10));
+  }
+
+  function usedChance() {
+    return state.effects.reduce((sum, fx) => {
+      if (!fx.enabled) return sum;
+      return sum + clampChance(fx.chance);
+    }, 0);
+  }
+
+  function defaultChance() {
+    return Math.max(0, Math.round((100 - usedChance()) * 10) / 10);
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (!Array.isArray(data.effects)) return;
+      state.effects.forEach((fx) => {
+        const saved = data.effects.find((e) => e.id === fx.id);
+        if (!saved) return;
+        fx.enabled = !!saved.enabled;
+        fx.chance = clampChance(saved.chance ?? fx.chance);
+      });
+      normalizeChances();
+    } catch (_err) {
+      /* ignore */
+    }
+  }
+
+  function save() {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        effects: state.effects.map((fx) => ({
+          id: fx.id,
+          enabled: fx.enabled,
+          chance: fx.chance
+        }))
+      })
+    );
+  }
+
+  function normalizeChances() {
+    let used = usedChance();
+    if (used <= 100) {
+      ui.chanceWarn.hidden = true;
+      return;
+    }
+    ui.chanceWarn.hidden = false;
+    const enabled = state.effects.filter((fx) => fx.enabled);
+    while (used > 100 && enabled.length) {
+      const last = enabled[enabled.length - 1];
+      const overflow = used - 100;
+      last.chance = Math.max(1, Math.round((last.chance - overflow) * 10) / 10);
+      if (last.chance <= 1 && usedChance() > 100) {
+        last.enabled = false;
+      }
+      used = usedChance();
+      if (used <= 100) break;
+      if (!last.enabled) enabled.pop();
+    }
+  }
+
+  function showScreen(name) {
+    document.querySelectorAll(".screen").forEach((el) => {
+      el.classList.toggle("active", el.id === `screen${name}`);
+    });
+    if (name === "Settings") renderSettings();
+    if (name === "Play") {
+      renderTimer();
+      renderSummary();
+      updateToggleLabel();
+    }
+  }
+
+  function renderSettings() {
+    const rem = defaultChance();
+    ui.defaultChanceText.textContent = GameI18n.t("defaultChance", { n: rem });
+    ui.chanceWarn.hidden = usedChance() <= 100;
+    ui.effectsList.innerHTML = "";
+
+    state.effects.forEach((fx) => {
+      const row = document.createElement("div");
+      row.className = "effect-row";
+
+      const checkLabel = document.createElement("label");
+      checkLabel.className = "check";
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.checked = fx.enabled;
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = GameI18n.t(fx.labelKey);
+      checkLabel.append(check, name);
+
+      const chanceBox = document.createElement("div");
+      chanceBox.className = "chance-box";
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "1";
+      input.max = "99.9";
+      input.step = "0.1";
+      input.value = String(fx.chance);
+      input.disabled = !fx.enabled;
+      const pct = document.createElement("span");
+      pct.textContent = "%";
+      chanceBox.append(input, pct);
+
+      check.addEventListener("change", () => {
+        fx.enabled = check.checked;
+        if (fx.enabled) {
+          const room = 100 - (usedChance() - clampChance(fx.chance));
+          if (room < 1) {
+            fx.enabled = false;
+            check.checked = false;
+            alert(GameI18n.t("chanceOverflow"));
+            return;
+          }
+          fx.chance = Math.min(clampChance(fx.chance), Math.floor(room * 10) / 10);
+        }
+        normalizeChances();
+        save();
+        renderSettings();
+      });
+
+      input.addEventListener("change", () => {
+        const next = clampChance(input.value);
+        const others = usedChance() - (fx.enabled ? clampChance(fx.chance) : 0);
+        const room = 100 - others;
+        fx.chance = Math.min(next, Math.max(1, Math.floor(room * 10) / 10));
+        normalizeChances();
+        save();
+        renderSettings();
+      });
+
+      row.append(checkLabel, chanceBox);
+      ui.effectsList.appendChild(row);
+    });
+  }
+
+  function formatTime(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const mm = String(Math.floor(s / 60)).padStart(2, "0");
+    const ss = String(s % 60).padStart(2, "0");
+    return `${mm}:${ss}`;
+  }
+
+  function renderTimer() {
+    ui.timerDisplay.textContent = formatTime(state.seconds);
+  }
+
+  function setEvent(text) {
+    state.lastEvent = text;
+    ui.eventLine.textContent = text;
+  }
+
+  function renderSummary() {
+    const rem = defaultChance();
+    const lines = [`${rem}% → ${GameI18n.t("fxMinus1")}`];
+    state.effects.forEach((fx) => {
+      if (fx.enabled) {
+        lines.push(`${clampChance(fx.chance)}% → ${GameI18n.t(fx.labelKey)}`);
+      }
+    });
+    ui.chanceSummary.innerHTML = `<strong>${GameI18n.t("activeChances")}</strong><ul>${lines
+      .map((l) => `<li>${l}</li>`)
+      .join("")}</ul>`;
+  }
+
+  function pickEffect() {
+    const roll = Math.random() * 100;
+    let cursor = 0;
+    for (const fx of state.effects) {
+      if (!fx.enabled) continue;
+      cursor += clampChance(fx.chance);
+      if (roll < cursor) return fx.id;
+    }
+    return "minus1";
+  }
+
+  function applyEffect(id) {
+    switch (id) {
+      case "plus1":
+        state.seconds += 1;
+        setEvent(GameI18n.t("evtPlus1"));
+        break;
+      case "double":
+        state.seconds *= 2;
+        setEvent(GameI18n.t("evtDouble"));
+        break;
+      case "swap": {
+        const mm = Math.floor(state.seconds / 60);
+        const ss = state.seconds % 60;
+        state.seconds = ss * 60 + mm;
+        setEvent(GameI18n.t("evtSwap"));
+        break;
+      }
+      case "minus10":
+        state.seconds = Math.max(0, state.seconds - 10);
+        setEvent(GameI18n.t("evtMinus10"));
+        break;
+      case "half":
+        state.seconds = Math.floor(state.seconds / 2);
+        setEvent(GameI18n.t("evtHalf"));
+        break;
+      case "freeze3":
+        state.freezeUntil = Date.now() + 3000;
+        setEvent(GameI18n.t("evtFreeze"));
+        break;
+      case "waitHalf":
+        state.waitMs = DEFAULT_WAIT_MS / 2;
+        setEvent(GameI18n.t("evtWaitHalf"));
+        break;
+      case "waitDouble":
+        state.waitMs = DEFAULT_WAIT_MS * 2;
+        setEvent(GameI18n.t("evtWaitDouble"));
+        break;
+      case "waitNormal":
+        state.waitMs = DEFAULT_WAIT_MS;
+        setEvent(GameI18n.t("evtWaitNormal"));
+        break;
+      case "plus60":
+        state.seconds += 60;
+        setEvent(GameI18n.t("evtPlus60"));
+        break;
+      case "minus1":
+      default:
+        state.seconds = Math.max(0, state.seconds - 1);
+        setEvent(GameI18n.t("evtMinus1"));
+        break;
+    }
+    renderTimer();
+  }
+
+  function scheduleNext() {
+    clearTimeout(state.timerId);
+    if (!state.running) return;
+
+    const now = Date.now();
+    if (now < state.freezeUntil) {
+      state.timerId = setTimeout(scheduleNext, Math.min(100, state.freezeUntil - now));
+      return;
+    }
+
+    state.timerId = setTimeout(() => {
+      if (!state.running) return;
+      if (Date.now() < state.freezeUntil) {
+        scheduleNext();
+        return;
+      }
+      applyEffect(pickEffect());
+      scheduleNext();
+    }, Math.max(50, state.waitMs));
+  }
+
+  function startTimer() {
+    if (state.running) return;
+    state.running = true;
+    updateToggleLabel();
+    setEvent(GameI18n.t("running"));
+    scheduleNext();
+  }
+
+  function stopTimer() {
+    state.running = false;
+    clearTimeout(state.timerId);
+    state.timerId = null;
+    updateToggleLabel();
+    setEvent(GameI18n.t("paused"));
+  }
+
+  function resetTimer() {
+    stopTimer();
+    state.seconds = 0;
+    state.waitMs = DEFAULT_WAIT_MS;
+    state.freezeUntil = 0;
+    renderTimer();
+    setEvent(GameI18n.t("waiting"));
+  }
+
+  function updateToggleLabel() {
+    ui.btnToggle.textContent = state.running
+      ? GameI18n.t("pauseTimer")
+      : GameI18n.t("startTimer");
+  }
+
+  function setupBackAdmin() {
+    const btn = document.getElementById("btnBackAdmin");
+    if (!btn) return;
+    const path = decodeURIComponent(window.location.pathname).replace(/\\/g, "/");
+    btn.hidden = !/\/Juegos\//i.test(path);
+  }
+
+  function bind() {
+    setupBackAdmin();
+    document.getElementById("btnPlay").addEventListener("click", () => {
+      resetTimer();
+      showScreen("Play");
+    });
+    document.getElementById("btnSettings").addEventListener("click", () => showScreen("Settings"));
+    document.getElementById("btnBackFromSettings").addEventListener("click", () => showScreen("Title"));
+    document.getElementById("btnBackFromPlay").addEventListener("click", () => {
+      stopTimer();
+      showScreen("Title");
+    });
+    document.getElementById("btnToggle").addEventListener("click", () => {
+      if (state.running) stopTimer();
+      else startTimer();
+    });
+    document.getElementById("btnReset").addEventListener("click", resetTimer);
+    GameI18n.onChange(() => {
+      GameI18n.applyDom();
+      if (document.getElementById("screenSettings").classList.contains("active")) renderSettings();
+      if (document.getElementById("screenPlay").classList.contains("active")) {
+        renderSummary();
+        updateToggleLabel();
+        if (state.lastEvent) ui.eventLine.textContent = state.lastEvent;
+      }
+    });
+  }
+
+  load();
+  bind();
+})();

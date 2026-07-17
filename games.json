@@ -71,6 +71,24 @@
       "icon": "🥣",
       "tags": ["creator", "race", "balls"],
       "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "ruleta-especial",
+      "name": "Ruleta Especial",
+      "description": "Escribí opciones, girá la ruleta y guardá el historial de ganadores.",
+      "folder": "Ruleta Especial",
+      "icon": "🎡",
+      "tags": ["ruleta", "azar", "utilidad"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "cronometro-loco",
+      "name": "Cronómetro Loco",
+      "description": "Un cronómetro con chances locas en cada segundo.",
+      "folder": "Cronometro Loco",
+      "icon": "⏱️",
+      "tags": ["cronómetro", "azar", "minigame"],
+      "creator": "José Rafael Rodriguez Morillo"
     }
   ]
 }

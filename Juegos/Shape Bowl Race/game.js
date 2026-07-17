@@ -1141,11 +1141,14 @@
   }
 
   function stepBowlPhysics() {
-    if (state.bowl.drag) return;
+    const dragging = !!state.bowl.drag;
+    const dragVx = dragging ? state.bowl.drag.vx * 0.012 : 0;
+    const dragVy = dragging ? state.bowl.drag.vy * 0.012 : 0;
 
     state.bowl.balls.forEach((ball) => {
       if (!ball.active) return;
-      ball.vy += 0.22;
+      ball.vx += dragVx;
+      ball.vy += dragVy + 0.22;
       ball.vx *= 0.988;
       ball.vy *= 0.988;
       ball.x += ball.vx;

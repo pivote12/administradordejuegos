@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ruleta Especial</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg"></div>
+      <div class="title-card card">
+        <div class="logo-badge">🎡</div>
+        <h1 data-i18n="title">Ruleta Especial</h1>
+        <p class="subtitle" data-i18n="subtitle">Escribí opciones, girá la ruleta y mirá el historial de ganadores.</p>
+        <button type="button" class="btn primary" id="btnPlay" data-i18n="play">Jugar</button>
+        <a class="btn ghost" id="btnBackAdmin" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
+      </div>
+    </section>
+
+    <section id="screenGame" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackTitle">←</button>
+        <h2 data-i18n="title">Ruleta Especial</h2>
+        <span class="meta" id="optionCount">0</span>
+      </header>
+
+      <div class="game-layout">
+        <div class="wheel-col">
+          <div class="wheel-wrap">
+            <div class="pointer" aria-hidden="true"></div>
+            <canvas id="wheelCanvas" width="420" height="420"></canvas>
+          </div>
+          <button type="button" class="btn primary play-btn" id="btnSpin" data-i18n="spin">Jugar</button>
+          <p class="winner-line" id="winnerLine"></p>
+        </div>
+
+        <div class="side-col">
+          <div class="panel card">
+            <h3 data-i18n="options">Opciones</h3>
+            <p class="hint" data-i18n="optionsHint">Escribí una opción y dale Enter para agregarla.</p>
+            <input type="text" id="optionInput" maxlength="48" data-i18n-placeholder="optionPh" placeholder="Nueva opción…" />
+            <ul class="option-list" id="optionList"></ul>
+            <p class="empty" id="optionEmpty" data-i18n="noOptions">Todavía no hay opciones.</p>
+          </div>
+
+          <div class="panel card">
+            <header class="panel-mini">
+              <h3 data-i18n="history">Historial de ganadores</h3>
+              <button type="button" class="btn ghost small" id="btnClearHistory" data-i18n="clear">Limpiar</button>
+            </header>
+            <ul class="history-list" id="historyList"></ul>
+            <p class="empty" id="historyEmpty" data-i18n="noHistory">Aún no hay ganadores.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="../../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

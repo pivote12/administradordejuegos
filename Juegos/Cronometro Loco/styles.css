@@ -1,0 +1,240 @@
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+:root {
+  --bg: #07131f;
+  --card: rgb(14 28 44 / 0.94);
+  --border: rgb(72 202 228 / 0.28);
+  --text: #eef7ff;
+  --muted: #9bb4c9;
+  --accent: #48cae4;
+  --warn: #ff6b6b;
+  --ok: #80ed99;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+#app { min-height: 100vh; }
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.15rem;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.4);
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.65rem 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #00b4d8, #48cae4);
+  color: #042033;
+}
+
+.btn.accent {
+  background: linear-gradient(135deg, #ffd166, #f4a261);
+  color: #2a1a08;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid rgb(72 202 228 / 0.35);
+}
+
+.btn.icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border-radius: 0.65rem;
+  background: rgb(255 255 255 / 0.08);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+#screenTitle {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.title-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgb(0 180 216 / 0.28), transparent 55%),
+    radial-gradient(ellipse 45% 35% at 15% 85%, rgb(255 209 102 / 0.15), transparent 50%),
+    linear-gradient(180deg, #0b1c2c, #07131f);
+}
+
+.title-card {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2rem;
+  width: min(26rem, calc(100% - 2rem));
+}
+
+.logo-badge { font-size: 2.5rem; margin-bottom: 0.4rem; }
+.title-card h1 { margin: 0 0 0.4rem; }
+.subtitle { margin: 0 0 1rem; color: var(--muted); }
+
+.title-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  align-items: stretch;
+}
+
+.world-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: rgb(0 0 0 / 0.25);
+}
+
+.world-header h2 { margin: 0; flex: 1; font-size: 1.15rem; }
+
+#screenSettings,
+#screenPlay { flex-direction: column; }
+
+.settings-wrap {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.default-chance {
+  padding: 1rem 1.1rem;
+}
+
+.default-chance strong {
+  display: block;
+  font-size: 1.15rem;
+  color: var(--ok);
+  margin-bottom: 0.35rem;
+}
+
+.hint { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+.effects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.effect-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--border);
+  background: rgb(0 0 0 / 0.22);
+}
+
+.effect-row label.check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+}
+
+.effect-row .name { font-weight: 600; font-size: 0.92rem; }
+
+.chance-box {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.chance-box input {
+  width: 4.5rem;
+  padding: 0.4rem 0.45rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: rgb(0 0 0 / 0.3);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.chance-box span { color: var(--muted); font-size: 0.9rem; }
+
+.warn {
+  margin: 0;
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.play-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.timer {
+  font-size: clamp(3rem, 12vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 1.2rem 1.8rem;
+  min-width: min(20rem, 90vw);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.event-line {
+  margin: 0;
+  min-height: 1.5rem;
+  text-align: center;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.play-actions { display: flex; gap: 0.75rem; }
+
+.chance-summary {
+  width: min(36rem, 100%);
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.chance-summary ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+
+@media (max-width: 640px) {
+  .effect-row {
+    grid-template-columns: 1fr;
+  }
+}

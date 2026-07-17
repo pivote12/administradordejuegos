@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cronómetro Loco</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg"></div>
+      <div class="title-card card">
+        <div class="logo-badge">⏱️</div>
+        <h1 data-i18n="title">Cronómetro Loco</h1>
+        <p class="subtitle" data-i18n="subtitle">Un cronómetro con chances locas en cada segundo.</p>
+        <div class="title-actions">
+          <button type="button" class="btn primary" id="btnPlay" data-i18n="play">Jugar</button>
+          <button type="button" class="btn accent" id="btnSettings" data-i18n="settings">Configuraciones</button>
+          <a class="btn ghost" id="btnBackAdmin" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenSettings" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackFromSettings">←</button>
+        <h2 data-i18n="settings">Configuraciones</h2>
+      </header>
+      <div class="settings-wrap">
+        <div class="default-chance card">
+          <strong id="defaultChanceText">100% chance baja 1 segundo</strong>
+          <p class="hint" data-i18n="chanceHint">Si activás otra chance, se resta del 100% de “baja 1 segundo”.</p>
+        </div>
+        <div class="effects-list" id="effectsList"></div>
+        <p class="warn" id="chanceWarn" hidden data-i18n="chanceOverflow">La suma de chances no puede superar 100%.</p>
+      </div>
+    </section>
+
+    <section id="screenPlay" class="screen">
+      <header class="world-header">
+        <button type="button" class="btn icon" id="btnBackFromPlay">←</button>
+        <h2 data-i18n="title">Cronómetro Loco</h2>
+        <button type="button" class="btn ghost" id="btnReset" data-i18n="reset">Reiniciar</button>
+      </header>
+      <div class="play-wrap">
+        <div class="timer card" id="timerDisplay">00:00</div>
+        <p class="event-line" id="eventLine" data-i18n="waiting">Dale a Empezar.</p>
+        <div class="play-actions">
+          <button type="button" class="btn primary" id="btnToggle" data-i18n="startTimer">Empezar</button>
+        </div>
+        <div class="chance-summary card" id="chanceSummary"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="../../i18n.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

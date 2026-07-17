@@ -11,6 +11,7 @@
     { value: "negro", key: "colorBlack" },
     { value: "blanco", key: "colorWhite" },
     { value: "cafe", key: "colorBrown" },
+    { value: "gris", key: "colorGray" },
     { value: "negro y blanco", key: "colorBlackWhite" },
     { value: "blanco y cafe", key: "colorWhiteBrown" },
   ];
@@ -19,6 +20,7 @@
     negro: { a: "#1a1a1a", b: "#1a1a1a" },
     blanco: { a: "#f2f2f2", b: "#f2f2f2" },
     cafe: { a: "#8b5a2b", b: "#8b5a2b" },
+    gris: { a: "#8a8a8a", b: "#8a8a8a" },
     "negro y blanco": { a: "#1a1a1a", b: "#f2f2f2" },
     "blanco y cafe": { a: "#f2f2f2", b: "#8b5a2b" },
   };
