@@ -36,7 +36,9 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const data = JSON.parse(raw);
-      state.options = Array.isArray(data.options) ? data.options.map(String).filter(Boolean).slice(0, 40) : [];
+      state.options = Array.isArray(data.options)
+        ? data.options.map((o) => String(o).trim()).filter(Boolean).slice(0, 40)
+        : [];
       state.history = Array.isArray(data.history) ? data.history.slice(0, 50) : [];
     } catch (_err) {
       state.options = [];
@@ -78,6 +80,7 @@
       del.className = "btn-del";
       del.textContent = "×";
       del.title = GameI18n.t("remove");
+      del.disabled = state.spinning;
       del.addEventListener("click", () => {
         if (state.spinning) return;
         state.options.splice(index, 1);
@@ -108,7 +111,8 @@
   function renderAll() {
     renderOptions();
     renderHistory();
-    ui.btnSpin.disabled = state.options.length < 2 || state.spinning;
+    ui.btnSpin.disabled = state.options.length < 1 || state.spinning;
+    ui.optionInput.disabled = state.spinning;
   }
 
   function addOption(raw) {
@@ -123,6 +127,31 @@
     save();
     renderAll();
     drawWheel();
+  }
+
+  function normalizeAngle(angle) {
+    let a = angle % (Math.PI * 2);
+    if (a < 0) a += Math.PI * 2;
+    return a;
+  }
+
+  /**
+   * El puntero está arriba (ángulo mundo -PI/2).
+   * Los sectores se dibujan desde arriba, en sentido horario.
+   */
+  function winnerIndexFromRotation(rotation, count) {
+    if (count <= 0) return 0;
+    const slice = (Math.PI * 2) / count;
+    // Ángulo local bajo el puntero: qué parte de la ruleta queda arriba.
+    const underPointer = normalizeAngle(-rotation);
+    return Math.min(count - 1, Math.floor(underPointer / slice));
+  }
+
+  function rotationForIndex(index, count, offsetInsideSlice) {
+    const slice = (Math.PI * 2) / count;
+    // underPointer = -rotation (mod 2PI) = index*slice + offset
+    // rotation = -(index*slice + offset)
+    return -((index * slice) + offsetInsideSlice);
   }
 
   function drawWheel() {
@@ -145,7 +174,7 @@
       ctx.arc(0, 0, radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = "#b9a8cf";
-      ctx.font = "bold 18px Segoe UI, sans-serif";
+      ctx.font = "bold 16px Segoe UI, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(GameI18n.t("noOptions"), 0, 0);
@@ -159,87 +188,98 @@
         ctx.closePath();
         ctx.fillStyle = COLORS[i % COLORS.length];
         ctx.fill();
-        ctx.strokeStyle = "rgba(0,0,0,0.25)";
+        ctx.strokeStyle = "rgba(0,0,0,0.28)";
         ctx.lineWidth = 2;
         ctx.stroke();
 
         ctx.save();
         ctx.rotate(start + slice / 2);
         ctx.fillStyle = "#1a1020";
-        ctx.font = `bold ${Math.max(11, Math.min(16, 120 / n))}px Segoe UI, sans-serif`;
+        ctx.font = `bold ${Math.max(11, Math.min(16, 130 / n))}px Segoe UI, sans-serif`;
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         const label = text.length > 14 ? `${text.slice(0, 13)}…` : text;
-        ctx.fillText(label, radius - 14, 0);
+        ctx.fillText(label, radius - 16, 0);
         ctx.restore();
       });
     }
 
     ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
+    ctx.arc(0, 0, 16, 0, Math.PI * 2);
     ctx.fillStyle = "#fff6e0";
     ctx.fill();
     ctx.restore();
 
     ctx.beginPath();
-    ctx.arc(cx, cy, radius + 4, 0, Math.PI * 2);
-    ctx.strokeStyle = "rgba(255, 209, 102, 0.55)";
+    ctx.arc(cx, cy, radius + 3, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255, 209, 102, 0.6)";
     ctx.lineWidth = 8;
     ctx.stroke();
   }
 
-  function winnerIndexFromRotation(rotation, count) {
-    const slice = (Math.PI * 2) / count;
-    const pointerAngle = -Math.PI / 2;
-    let angle = (pointerAngle - rotation) % (Math.PI * 2);
-    if (angle < 0) angle += Math.PI * 2;
-    const fromTop = (angle + Math.PI / 2) % (Math.PI * 2);
-    return Math.floor(fromTop / slice) % count;
+  function finishSpin(winnerIndex) {
+    state.spinning = false;
+    const winner = state.options[winnerIndex];
+    if (!winner) {
+      renderAll();
+      return;
+    }
+    state.history.unshift({ text: winner, at: Date.now() });
+    state.history = state.history.slice(0, 50);
+    save();
+    ui.winnerLine.textContent = GameI18n.t("winner", { name: winner });
+    renderAll();
   }
 
   function spin() {
-    if (state.spinning || state.options.length < 2) {
-      if (state.options.length < 2) alert(GameI18n.t("alertNeedOptions"));
+    if (state.spinning) return;
+    if (state.options.length < 1) {
+      alert(GameI18n.t("alertNeedOptions"));
       return;
     }
 
     state.spinning = true;
     ui.btnSpin.disabled = true;
+    ui.optionInput.disabled = true;
     ui.winnerLine.textContent = GameI18n.t("spinning");
 
-    const extraTurns = 4 + Math.random() * 4;
-    const targetSlice = Math.floor(Math.random() * state.options.length);
-    const slice = (Math.PI * 2) / state.options.length;
-    const landOffset = (Math.random() * 0.7 + 0.15) * slice;
-    const targetRotation = state.rotation + extraTurns * Math.PI * 2 +
-      ((Math.PI * 2) - (targetSlice * slice + landOffset));
+    const count = state.options.length;
+    const slice = (Math.PI * 2) / count;
+    const winnerIndex = Math.floor(Math.random() * count);
+    const offsetInside = slice * (0.2 + Math.random() * 0.6);
+    const baseTarget = rotationForIndex(winnerIndex, count, offsetInside);
+
+    // Girar varias vueltas hacia adelante hasta el ángulo objetivo.
+    const current = normalizeAngle(state.rotation);
+    const targetNorm = normalizeAngle(baseTarget);
+    let forward = targetNorm - current;
+    if (forward <= 0.01) forward += Math.PI * 2;
+    const extraTurns = 5 + Math.floor(Math.random() * 3);
+    const targetRotation = state.rotation + forward + extraTurns * Math.PI * 2;
 
     const start = state.rotation;
     const delta = targetRotation - start;
-    const duration = 3800 + Math.random() * 1200;
+    const duration = 4200 + Math.random() * 1000;
     const t0 = performance.now();
 
-    function easeOutCubic(t) {
+    function easeOut(t) {
       return 1 - Math.pow(1 - t, 3);
     }
 
     function frame(now) {
       const t = Math.min(1, (now - t0) / duration);
-      state.rotation = start + delta * easeOutCubic(t);
+      state.rotation = start + delta * easeOut(t);
       drawWheel();
       if (t < 1) {
         state.animId = requestAnimationFrame(frame);
         return;
       }
 
-      state.spinning = false;
+      // Ajuste final exacto y ganador correcto según el triángulo.
+      state.rotation = targetRotation;
+      drawWheel();
       const idx = winnerIndexFromRotation(state.rotation, state.options.length);
-      const winner = state.options[idx];
-      state.history.unshift({ text: winner, at: Date.now() });
-      state.history = state.history.slice(0, 50);
-      save();
-      ui.winnerLine.textContent = GameI18n.t("winner", { name: winner });
-      renderAll();
+      finishSpin(idx);
     }
 
     state.animId = requestAnimationFrame(frame);
@@ -255,7 +295,10 @@
   function bind() {
     setupBackAdmin();
     document.getElementById("btnPlay").addEventListener("click", () => showScreen("Game"));
-    document.getElementById("btnBackTitle").addEventListener("click", () => showScreen("Title"));
+    document.getElementById("btnBackTitle").addEventListener("click", () => {
+      if (state.spinning) return;
+      showScreen("Title");
+    });
     document.getElementById("btnSpin").addEventListener("click", spin);
     document.getElementById("btnClearHistory").addEventListener("click", () => {
       state.history = [];

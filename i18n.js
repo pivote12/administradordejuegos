@@ -534,7 +534,7 @@
       optionCount: L("{n} opciones", "{n} options", "{n} options", "{n} Optionen", "{n} opções", "{n} opzioni"),
       spinning: L("Girando…", "Spinning…", "Ça tourne…", "Dreht…", "Girando…", "Gira…"),
       winner: L("¡Ganó: {name}!", "Winner: {name}!", "Gagnant : {name} !", "Gewinner: {name}!", "Venceu: {name}!", "Ha vinto: {name}!"),
-      alertNeedOptions: L("Agregá al menos 2 opciones.", "Add at least 2 options.", "Ajoutez au moins 2 options.", "Mindestens 2 Optionen.", "Adicione pelo menos 2 opções.", "Aggiungi almeno 2 opzioni."),
+      alertNeedOptions: L("Agregá al menos 1 opción.", "Add at least 1 option.", "Ajoutez au moins 1 option.", "Mindestens 1 Option.", "Adicione pelo menos 1 opção.", "Aggiungi almeno 1 opzione."),
       alertMaxOptions: L("Máximo 40 opciones.", "Maximum 40 options.", "Maximum 40 options.", "Maximal 40 Optionen.", "Máximo 40 opções.", "Massimo 40 opzioni."),
     },
     "cronometro-loco": {

@@ -7,16 +7,16 @@
   const DEFAULT_WAIT_MS = 1000;
 
   const EFFECT_DEFS = [
-    { id: "plus1", labelKey: "fxPlus1" },
-    { id: "double", labelKey: "fxDouble" },
-    { id: "swap", labelKey: "fxSwap" },
-    { id: "minus10", labelKey: "fxMinus10" },
-    { id: "half", labelKey: "fxHalf" },
-    { id: "freeze3", labelKey: "fxFreeze" },
-    { id: "waitHalf", labelKey: "fxWaitHalf" },
-    { id: "waitDouble", labelKey: "fxWaitDouble" },
-    { id: "waitNormal", labelKey: "fxWaitNormal" },
-    { id: "plus60", labelKey: "fxPlus60" }
+    { id: "plus1", labelKey: "fxPlus1", defaultChance: 10 },
+    { id: "double", labelKey: "fxDouble", defaultChance: 5 },
+    { id: "swap", labelKey: "fxSwap", defaultChance: 5 },
+    { id: "minus10", labelKey: "fxMinus10", defaultChance: 5 },
+    { id: "half", labelKey: "fxHalf", defaultChance: 5 },
+    { id: "freeze3", labelKey: "fxFreeze", defaultChance: 5 },
+    { id: "waitHalf", labelKey: "fxWaitHalf", defaultChance: 5 },
+    { id: "waitDouble", labelKey: "fxWaitDouble", defaultChance: 5 },
+    { id: "waitNormal", labelKey: "fxWaitNormal", defaultChance: 5 },
+    { id: "plus60", labelKey: "fxPlus60", defaultChance: 5 }
   ];
 
   const state = {
@@ -24,7 +24,7 @@
       id: def.id,
       labelKey: def.labelKey,
       enabled: false,
-      chance: 5
+      chance: def.defaultChance
     })),
     seconds: 0,
     running: false,
@@ -44,21 +44,29 @@
     chanceSummary: document.getElementById("chanceSummary")
   };
 
+  function round1(n) {
+    return Math.round(n * 10) / 10;
+  }
+
   function clampChance(value) {
     const n = Number(value);
     if (!Number.isFinite(n)) return 1;
-    return Math.min(99.9, Math.max(1, Math.round(n * 10) / 10));
+    return Math.min(99.9, Math.max(1, round1(n)));
   }
 
-  function usedChance() {
+  function othersChance(exceptId) {
     return state.effects.reduce((sum, fx) => {
-      if (!fx.enabled) return sum;
+      if (!fx.enabled || fx.id === exceptId) return sum;
       return sum + clampChance(fx.chance);
     }, 0);
   }
 
-  function defaultChance() {
-    return Math.max(0, Math.round((100 - usedChance()) * 10) / 10);
+  function usedChance() {
+    return othersChance(null);
+  }
+
+  function residualChance() {
+    return Math.max(0, round1(100 - usedChance()));
   }
 
   function load() {
@@ -73,7 +81,7 @@
         fx.enabled = !!saved.enabled;
         fx.chance = clampChance(saved.chance ?? fx.chance);
       });
-      normalizeChances();
+      enforceBudget();
     } catch (_err) {
       /* ignore */
     }
@@ -92,25 +100,27 @@
     );
   }
 
-  function normalizeChances() {
+  function enforceBudget() {
     let used = usedChance();
     if (used <= 100) {
       ui.chanceWarn.hidden = true;
-      return;
+      return true;
     }
     ui.chanceWarn.hidden = false;
-    const enabled = state.effects.filter((fx) => fx.enabled);
-    while (used > 100 && enabled.length) {
-      const last = enabled[enabled.length - 1];
+    // Recorta desde el final hasta entrar en 100%.
+    for (let i = state.effects.length - 1; i >= 0 && used > 100; i -= 1) {
+      const fx = state.effects[i];
+      if (!fx.enabled) continue;
       const overflow = used - 100;
-      last.chance = Math.max(1, Math.round((last.chance - overflow) * 10) / 10);
-      if (last.chance <= 1 && usedChance() > 100) {
-        last.enabled = false;
+      const next = round1(fx.chance - overflow);
+      if (next < 1) {
+        fx.enabled = false;
+      } else {
+        fx.chance = next;
       }
       used = usedChance();
-      if (used <= 100) break;
-      if (!last.enabled) enabled.pop();
     }
+    return usedChance() <= 100;
   }
 
   function showScreen(name) {
@@ -126,7 +136,7 @@
   }
 
   function renderSettings() {
-    const rem = defaultChance();
+    const rem = residualChance();
     ui.defaultChanceText.textContent = GameI18n.t("defaultChance", { n: rem });
     ui.chanceWarn.hidden = usedChance() <= 100;
     ui.effectsList.innerHTML = "";
@@ -154,33 +164,38 @@
       input.step = "0.1";
       input.value = String(fx.chance);
       input.disabled = !fx.enabled;
+      input.title = "1% … 99.9%";
       const pct = document.createElement("span");
       pct.textContent = "%";
       chanceBox.append(input, pct);
 
       check.addEventListener("change", () => {
-        fx.enabled = check.checked;
-        if (fx.enabled) {
-          const room = 100 - (usedChance() - clampChance(fx.chance));
+        if (check.checked) {
+          const room = round1(100 - othersChance(fx.id));
           if (room < 1) {
-            fx.enabled = false;
             check.checked = false;
+            fx.enabled = false;
             alert(GameI18n.t("chanceOverflow"));
             return;
           }
-          fx.chance = Math.min(clampChance(fx.chance), Math.floor(room * 10) / 10);
+          fx.enabled = true;
+          fx.chance = Math.min(clampChance(fx.chance), room);
+          input.value = String(fx.chance);
+          input.disabled = false;
+        } else {
+          fx.enabled = false;
+          input.disabled = true;
         }
-        normalizeChances();
+        enforceBudget();
         save();
         renderSettings();
       });
 
       input.addEventListener("change", () => {
-        const next = clampChance(input.value);
-        const others = usedChance() - (fx.enabled ? clampChance(fx.chance) : 0);
-        const room = 100 - others;
-        fx.chance = Math.min(next, Math.max(1, Math.floor(room * 10) / 10));
-        normalizeChances();
+        if (!fx.enabled) return;
+        const room = round1(100 - othersChance(fx.id));
+        fx.chance = Math.min(clampChance(input.value), Math.max(1, room));
+        enforceBudget();
         save();
         renderSettings();
       });
@@ -207,7 +222,7 @@
   }
 
   function renderSummary() {
-    const rem = defaultChance();
+    const rem = residualChance();
     const lines = [`${rem}% → ${GameI18n.t("fxMinus1")}`];
     state.effects.forEach((fx) => {
       if (fx.enabled) {
@@ -284,13 +299,20 @@
     renderTimer();
   }
 
+  function clearTick() {
+    if (state.timerId) {
+      clearTimeout(state.timerId);
+      state.timerId = null;
+    }
+  }
+
   function scheduleNext() {
-    clearTimeout(state.timerId);
+    clearTick();
     if (!state.running) return;
 
     const now = Date.now();
     if (now < state.freezeUntil) {
-      state.timerId = setTimeout(scheduleNext, Math.min(100, state.freezeUntil - now));
+      state.timerId = setTimeout(scheduleNext, Math.min(120, state.freezeUntil - now));
       return;
     }
 
@@ -315,8 +337,7 @@
 
   function stopTimer() {
     state.running = false;
-    clearTimeout(state.timerId);
-    state.timerId = null;
+    clearTick();
     updateToggleLabel();
     setEvent(GameI18n.t("paused"));
   }
@@ -336,6 +357,13 @@
       : GameI18n.t("startTimer");
   }
 
+  function openPlay(autoStart) {
+    resetTimer();
+    renderSummary();
+    showScreen("Play");
+    if (autoStart) startTimer();
+  }
+
   function setupBackAdmin() {
     const btn = document.getElementById("btnBackAdmin");
     if (!btn) return;
@@ -345,10 +373,7 @@
 
   function bind() {
     setupBackAdmin();
-    document.getElementById("btnPlay").addEventListener("click", () => {
-      resetTimer();
-      showScreen("Play");
-    });
+    document.getElementById("btnPlay").addEventListener("click", () => openPlay(true));
     document.getElementById("btnSettings").addEventListener("click", () => showScreen("Settings"));
     document.getElementById("btnBackFromSettings").addEventListener("click", () => showScreen("Title"));
     document.getElementById("btnBackFromPlay").addEventListener("click", () => {
@@ -359,7 +384,10 @@
       if (state.running) stopTimer();
       else startTimer();
     });
-    document.getElementById("btnReset").addEventListener("click", resetTimer);
+    document.getElementById("btnReset").addEventListener("click", () => {
+      resetTimer();
+      renderSummary();
+    });
     GameI18n.onChange(() => {
       GameI18n.applyDom();
       if (document.getElementById("screenSettings").classList.contains("active")) renderSettings();

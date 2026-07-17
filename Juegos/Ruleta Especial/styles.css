@@ -133,6 +133,7 @@ html, body {
   position: relative;
   width: min(420px, 100%);
   aspect-ratio: 1;
+  margin-top: 1.1rem;
 }
 
 #wheelCanvas {
@@ -145,14 +146,14 @@ html, body {
 .pointer {
   position: absolute;
   left: 50%;
-  top: -8px;
+  top: -22px;
   z-index: 3;
   width: 0;
   height: 0;
   transform: translateX(-50%);
-  border-left: 16px solid transparent;
-  border-right: 16px solid transparent;
-  border-top: 42px solid #ffd166;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 44px solid #ffd166;
   filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.45));
   pointer-events: none;
 }

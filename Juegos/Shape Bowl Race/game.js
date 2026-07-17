@@ -1027,7 +1027,7 @@
     const dx = pos.x - drag.lastX;
     const dy = pos.y - drag.lastY;
     const now = performance.now();
-    const dt = Math.max(0.001, (now - drag.lastT) / 1000);
+    const dt = Math.max(0.008, (now - drag.lastT) / 1000);
 
     drag.vx = dx / dt;
     drag.vy = dy / dt;
@@ -1035,32 +1035,34 @@
     drag.lastY = pos.y;
     drag.lastT = now;
 
+    // Solo mueve el tazón. Las pelotitas siguen con física y reaccionan a las paredes.
     state.bowl.offsetX += dx;
     state.bowl.offsetY += dy;
 
+    const impulseScale = 0.045;
     state.bowl.balls.forEach((ball) => {
-      if (ball.active) {
-        ball.x += dx;
-        ball.y += dy;
-      }
+      if (!ball.active) return;
+      ball.vx += dx * impulseScale;
+      ball.vy += dy * impulseScale;
     });
   }
 
   function onBowlPointerUp(event) {
-    if (!state.bowl.drag || event.pointerId !== state.bowl.drag.pointerId) return;
+    if (!state.bowl.drag) return;
+    if (event && event.pointerId !== state.bowl.drag.pointerId) return;
 
     const drag = state.bowl.drag;
     state.bowl.balls.forEach((ball) => {
       if (ball.active) {
-        ball.vx += drag.vx * 0.07;
-        ball.vy += drag.vy * 0.07;
+        ball.vx += drag.vx * 0.05;
+        ball.vy += drag.vy * 0.05;
       }
     });
 
     state.bowl.drag = null;
     ui.bowlCanvas.style.cursor = "default";
     try {
-      ui.bowlCanvas.releasePointerCapture(event.pointerId);
+      if (event) ui.bowlCanvas.releasePointerCapture(event.pointerId);
     } catch (_err) {
       /* ignore */
     }
@@ -1142,15 +1144,16 @@
 
   function stepBowlPhysics() {
     const dragging = !!state.bowl.drag;
-    const dragVx = dragging ? state.bowl.drag.vx * 0.012 : 0;
-    const dragVy = dragging ? state.bowl.drag.vy * 0.012 : 0;
+    const bowlVx = dragging ? state.bowl.drag.vx * 0.00035 : 0;
+    const bowlVy = dragging ? state.bowl.drag.vy * 0.00035 : 0;
 
     state.bowl.balls.forEach((ball) => {
       if (!ball.active) return;
-      ball.vx += dragVx;
-      ball.vy += dragVy + 0.22;
-      ball.vx *= 0.988;
-      ball.vy *= 0.988;
+      // Mientras arrastrás, las pelotas siguen cayendo/rebotando y reciben el movimiento del tazón.
+      ball.vx += bowlVx;
+      ball.vy += bowlVy + 0.28;
+      ball.vx *= 0.986;
+      ball.vy *= 0.986;
       ball.x += ball.vx;
       ball.y += ball.vy;
       resolveBowlWall(ball);
@@ -1348,7 +1351,6 @@
     ui.bowlCanvas.addEventListener("pointermove", onBowlPointerMove);
     ui.bowlCanvas.addEventListener("pointerup", onBowlPointerUp);
     ui.bowlCanvas.addEventListener("pointercancel", onBowlPointerUp);
-    ui.bowlCanvas.addEventListener("pointerleave", onBowlPointerUp);
 
     ui.worldArena.addEventListener("pointerdown", (event) => {
       if (state.drag) return;
