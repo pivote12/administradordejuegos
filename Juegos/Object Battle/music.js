@@ -34,13 +34,19 @@
   const btnMusicPrev = document.getElementById("btnMusicPrev");
   const btnMusicNext = document.getElementById("btnMusicNext");
 
+  // Controles siempre visibles para que se note que hay música.
+  if (nowPlayingEl) nowPlayingEl.hidden = false;
+  if (nowPlayingTitleEl && !nowPlayingTitleEl.textContent.trim()) {
+    nowPlayingTitleEl.textContent = "—";
+  }
+
   function pickStartIndex() {
     return Math.floor(Math.random() * PLAYLIST.length);
   }
 
   function updateStopButton() {
     if (!btnMusicStop) return;
-    const paused = music.audio.paused;
+    const paused = !music.started || music.audio.paused;
     btnMusicStop.textContent = paused ? "▶" : "⏸";
     btnMusicStop.title = paused ? "Play song" : "Pause song";
   }
@@ -57,9 +63,11 @@
 
   function updateNowPlaying() {
     if (music.unavailable) return;
-    const title = PLAYLIST[music.index]?.title || "—";
+    const title = music.started
+      ? (PLAYLIST[music.index]?.title || "—")
+      : "—";
     if (nowPlayingTitleEl) nowPlayingTitleEl.textContent = title;
-    if (nowPlayingEl) nowPlayingEl.hidden = !music.started;
+    if (nowPlayingEl) nowPlayingEl.hidden = false;
     updateStopButton();
   }
 
@@ -142,6 +150,7 @@
     music.pausedByVisibility = false;
     if (music.started) {
       if (music.audio.paused) playCurrent();
+      updateStopButton();
       return;
     }
     music.started = true;
@@ -205,5 +214,12 @@
     link.addEventListener("click", stopMusic);
   });
 
-  window.GameMusic = { start: startMusic, stop: stopMusic };
+  updateStopButton();
+  updateNowPlaying();
+
+  window.GameMusic = {
+    start: startMusic,
+    stop: stopMusic,
+    playlist: PLAYLIST.slice()
+  };
 })();
