@@ -619,7 +619,10 @@
   }
 
   function bindEvents() {
-    document.getElementById("btnGoPartidas").addEventListener("click", () => showScreen("partidas"));
+    document.getElementById("btnGoPartidas").addEventListener("click", () => {
+      if (window.GameMusic) window.GameMusic.start();
+      showScreen("partidas");
+    });
     document.getElementById("btnBackTitle").addEventListener("click", () => showScreen("title"));
     document.getElementById("formNewPartida").addEventListener("submit", (e) => {
       e.preventDefault();

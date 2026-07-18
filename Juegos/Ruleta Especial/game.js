@@ -477,7 +477,10 @@
 
   function bind() {
     setupBackAdmin();
-    document.getElementById("btnPlay").addEventListener("click", () => showScreen("Game"));
+    document.getElementById("btnPlay").addEventListener("click", () => {
+      if (window.GameMusic) window.GameMusic.start();
+      showScreen("Game");
+    });
     document.getElementById("btnBackTitle").addEventListener("click", () => {
       if (state.spinning) return;
       showScreen("Title");

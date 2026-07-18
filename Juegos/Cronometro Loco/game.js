@@ -387,7 +387,10 @@
 
   function bind() {
     setupBackAdmin();
-    document.getElementById("btnPlay").addEventListener("click", () => openPlay(true));
+    document.getElementById("btnPlay").addEventListener("click", () => {
+      if (window.GameMusic) window.GameMusic.start();
+      openPlay(true);
+    });
     document.getElementById("btnSettings").addEventListener("click", () => showScreen("Settings"));
     document.getElementById("btnBackFromSettings").addEventListener("click", () => showScreen("Title"));
     document.getElementById("btnBackFromPlay").addEventListener("click", () => {

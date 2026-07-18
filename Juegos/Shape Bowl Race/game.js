@@ -1314,6 +1314,7 @@
     setupBackToAdminButton();
 
     document.getElementById("btnGoPartidas").addEventListener("click", () => {
+      if (window.GameMusic) window.GameMusic.start();
       if (state.currentPartidaId && getCurrentPartida()) {
         if (!state.activePartidaSessionId) loadBallsFromPartida();
         const partida = getCurrentPartida();

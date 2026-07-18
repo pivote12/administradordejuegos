@@ -55,7 +55,20 @@
     </section>
   </div>
 
-  <script src="../../i18n.js?v=tick1"></script>
-  <script src="game.js?v=tick1"></script>
+  <div class="now-playing" id="nowPlaying" hidden>
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">⏸</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label" data-i18n="songPlaying">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../i18n.js?v=music1"></script>
+  <script src="music.js?v=music1"></script>
+  <script src="game.js?v=music1"></script>
 </body>
 </html>
