@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Decimal Explorer</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
   <div id="app">
@@ -54,7 +55,7 @@
     </section>
   </div>
 
-  <div class="now-playing" id="nowPlaying" hidden>
+  <div class="now-playing" id="nowPlaying">
     <div class="now-playing-controls">
       <button type="button" class="music-btn" id="btnMusicStop" data-i18n-title="pauseSong" title="Pause song">⏸</button>
       <button type="button" class="music-btn" id="btnMusicPrev" data-i18n-title="prevSong" title="Previous song">⏮</button>
@@ -67,7 +68,7 @@
   </div>
 
   <script src="../../i18n.js"></script>
-  <script src="music.js?v=stopbg1"></script>
+  <script src="../../shared-music.js?v=global1"></script>
   <script src="decimal-explorer.js"></script>
 </body>
 </html>

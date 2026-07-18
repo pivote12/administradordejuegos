@@ -324,6 +324,83 @@ body {
   color: #e2e8f0;
 }
 
+.btn.music-toggle {
+  border: 1px solid rgb(125 211 252 / 0.35);
+  background: rgb(15 23 42 / 0.75);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn.music-toggle[aria-pressed="true"] {
+  background: linear-gradient(135deg, #38bdf8, #a78bfa);
+  color: #0f172a;
+  border-color: transparent;
+}
+
+.now-playing {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  max-width: min(92vw, 28rem);
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.now-playing-info {
+  margin: 0;
+  text-align: right;
+  padding: 0.35rem 0.15rem 0;
+  pointer-events: none;
+}
+
+.now-playing-controls {
+  display: flex;
+  gap: 0.25rem;
+  pointer-events: auto;
+}
+
+.music-btn {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgb(125 211 252 / 0.35);
+  border-radius: 50%;
+  background: rgb(15 23 42 / 0.85);
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.music-btn:hover {
+  background: rgb(56 189 248 / 0.25);
+}
+
+.now-playing-label {
+  color: #94a3b8;
+}
+
+.now-playing-title {
+  font-weight: 600;
+  color: #7dd3fc;
+  word-break: break-word;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
