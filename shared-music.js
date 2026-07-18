@@ -316,5 +316,4 @@
   window.SharedMusic = api;
   window.GameMusic = api;
   window.AlgicosathlonMusic = api;
-  window.Creator2DMusic = api;
 })();
