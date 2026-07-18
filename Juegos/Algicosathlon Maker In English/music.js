@@ -21,7 +21,8 @@
     unavailable: false,
     errorSkipLock: false,
     triedTracks: new Set(),
-    volume: 0.45
+    volume: 0.45,
+    pausedByVisibility: false
   };
 
   music.audio.volume = music.volume;
@@ -89,6 +90,9 @@
     if (music.unavailable) {
       return;
     }
+    if (document.hidden) {
+      return;
+    }
     music.audio.play().catch(() => {
       /* autoplay blocked until user interaction */
     });
@@ -127,6 +131,7 @@
     if (music.unavailable) {
       return;
     }
+    music.pausedByVisibility = false;
     if (!music.started) {
       startMusic();
       return;
@@ -176,6 +181,7 @@
     if (music.unavailable) {
       return;
     }
+    music.pausedByVisibility = false;
     if (music.started) {
       if (music.audio.paused) {
         playCurrent();
@@ -188,6 +194,32 @@
     loadTrack(music.index);
     updateNowPlaying();
     playCurrent();
+  }
+
+  function stopMusic() {
+    music.pausedByVisibility = false;
+    music.audio.pause();
+    try {
+      music.audio.currentTime = 0;
+    } catch (_err) {
+      /* ignore */
+    }
+    updateStopButton();
+  }
+
+  function pauseForBackground() {
+    if (!music.started || music.unavailable) return;
+    if (!music.audio.paused) {
+      music.pausedByVisibility = true;
+      music.audio.pause();
+      updateStopButton();
+    }
+  }
+
+  function resumeFromBackground() {
+    if (!music.pausedByVisibility) return;
+    music.pausedByVisibility = false;
+    if (music.started && !music.unavailable) playCurrent();
   }
 
   music.audio.addEventListener("ended", onTrackEnded);
@@ -211,8 +243,19 @@
     });
   }
 
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseForBackground();
+    else resumeFromBackground();
+  });
+  window.addEventListener("pagehide", stopMusic);
+  window.addEventListener("beforeunload", stopMusic);
+  document.querySelectorAll('a[href*="index.html"]').forEach((link) => {
+    link.addEventListener("click", stopMusic);
+  });
+
   window.AlgicosathlonMusic = {
     start: startMusic,
+    stop: stopMusic,
     getCurrentTitle() {
       if (music.unavailable) {
         return "";

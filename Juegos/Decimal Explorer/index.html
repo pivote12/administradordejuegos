@@ -1,73 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Decimal Explorer</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div id="app">
-    <section id="screenTitle" class="screen active">
-      <div class="title-bg" aria-hidden="true"></div>
-      <div class="title-card card">
-        <div class="logo-badge">🔢</div>
-        <h1 data-i18n="title">Decimal Explorer</h1>
-        <p class="subtitle" data-i18n="subtitle">Discover which famous numbers share the same starting digits.</p>
-        <div class="title-actions">
-          <button type="button" class="btn primary" id="btnPlay" data-i18n="play">Play</button>
-          <a class="btn ghost" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="screenPlay" class="screen">
-      <div class="panel card wide decimal-panel">
-        <header class="panel-header">
-          <button type="button" class="btn icon" id="btnBackTitle">←</button>
-          <h2 data-i18n="title">Decimal Explorer</h2>
-        </header>
-
-        <div id="decimalExplorerIntro">
-          <p class="hint" data-i18n="subtitle">Discover which famous numbers share the same starting digits.</p>
-          <button type="button" class="btn primary" id="btnDecimalPlay" data-i18n="play">Play</button>
-        </div>
-
-        <div id="decimalExplorerPlay" class="decimal-play" hidden>
-          <p class="hint" data-i18n="digitHint">Enter one whole digit and one decimal digit (for example 3 and 1 → 3.1).</p>
-          <form class="decimal-form" id="formDecimalSearch">
-            <label class="field decimal-field">
-              <span data-i18n="wholeDigit">Whole digit</span>
-              <input type="text" inputmode="numeric" id="inputDecimalWhole" maxlength="1" pattern="[0-9]" placeholder="0–9" required />
-            </label>
-            <label class="field decimal-field">
-              <span data-i18n="decimalDigit">Decimal digit</span>
-              <input type="text" inputmode="numeric" id="inputDecimalFrac" maxlength="1" pattern="[0-9]" placeholder="0–9" required />
-            </label>
-            <button type="submit" class="btn primary" data-i18n="explore">Explore</button>
-          </form>
-          <p class="decimal-prefix" id="decimalSearchPrefix" hidden></p>
-          <ul class="decimal-results" id="decimalResults"></ul>
-          <p class="empty" id="decimalNoResults" hidden data-i18n="noResults">No numbers start with that prefix.</p>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <div class="now-playing" id="nowPlaying" hidden>
-    <div class="now-playing-controls">
-      <button type="button" class="music-btn" id="btnMusicStop" data-i18n-title="pauseSong" title="Pause song">⏸</button>
-      <button type="button" class="music-btn" id="btnMusicPrev" data-i18n-title="prevSong" title="Previous song">⏮</button>
-      <button type="button" class="music-btn" id="btnMusicNext" data-i18n-title="nextSong" title="Next song">⏭</button>
-    </div>
-    <p class="now-playing-info">
-      <span class="now-playing-label" data-i18n="songPlaying">Song playing:</span>
-      <span class="now-playing-title" id="nowPlayingTitle">—</span>
-    </p>
-  </div>
-
-  <script src="../../i18n.js"></script>
-  <script src="music.js"></script>
-  <script src="decimal-explorer.js"></script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decimal Explorer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-bg" aria-hidden="true"></div>
+      <div class="title-card card">
+        <div class="logo-badge">🔢</div>
+        <h1 data-i18n="title">Decimal Explorer</h1>
+        <p class="subtitle" data-i18n="subtitle">Discover which famous numbers share the same starting digits.</p>
+        <div class="title-actions">
+          <button type="button" class="btn primary" id="btnPlay" data-i18n="play">Play</button>
+          <a class="btn ghost" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenPlay" class="screen">
+      <div class="panel card wide decimal-panel">
+        <header class="panel-header">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <h2 data-i18n="title">Decimal Explorer</h2>
+        </header>
+
+        <div id="decimalExplorerIntro">
+          <p class="hint" data-i18n="subtitle">Discover which famous numbers share the same starting digits.</p>
+          <button type="button" class="btn primary" id="btnDecimalPlay" data-i18n="play">Play</button>
+        </div>
+
+        <div id="decimalExplorerPlay" class="decimal-play" hidden>
+          <p class="hint" data-i18n="digitHint">Enter one whole digit and one decimal digit (for example 3 and 1 → 3.1).</p>
+          <form class="decimal-form" id="formDecimalSearch">
+            <label class="field decimal-field">
+              <span data-i18n="wholeDigit">Whole digit</span>
+              <input type="text" inputmode="numeric" id="inputDecimalWhole" maxlength="1" pattern="[0-9]" placeholder="0–9" required />
+            </label>
+            <label class="field decimal-field">
+              <span data-i18n="decimalDigit">Decimal digit</span>
+              <input type="text" inputmode="numeric" id="inputDecimalFrac" maxlength="1" pattern="[0-9]" placeholder="0–9" required />
+            </label>
+            <button type="submit" class="btn primary" data-i18n="explore">Explore</button>
+          </form>
+          <p class="decimal-prefix" id="decimalSearchPrefix" hidden></p>
+          <ul class="decimal-results" id="decimalResults"></ul>
+          <p class="empty" id="decimalNoResults" hidden data-i18n="noResults">No numbers start with that prefix.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="now-playing" id="nowPlaying" hidden>
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" data-i18n-title="pauseSong" title="Pause song">⏸</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" data-i18n-title="prevSong" title="Previous song">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" data-i18n-title="nextSong" title="Next song">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label" data-i18n="songPlaying">Song playing:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../i18n.js"></script>
+  <script src="music.js?v=stopbg1"></script>
+  <script src="decimal-explorer.js"></script>
+</body>
+</html>
