@@ -498,6 +498,54 @@
     };
   }
 
+  function loadSharedPacks() {
+    return window.SharedPacks ? SharedPacks.load() : [];
+  }
+
+  function placeSharedPack(pack) {
+    if (!pack || !Array.isArray(pack.marbles) || !pack.marbles.length) return;
+    if (!getCurrentPartida()) return;
+    resetAllWins();
+    pack.marbles.forEach((marble) => {
+      state.balls.push(hydrateBall({
+        name: marble.name,
+        color: marble.color,
+        color2: marble.color,
+        x: 80 + Math.random() * (WORLD_W - 160),
+        y: 80 + Math.random() * (WORLD_H - 160),
+        vx: (Math.random() - 0.5) * 2.5,
+        vy: (Math.random() - 0.5) * 2.5
+      }));
+    });
+    save();
+    renderWorld();
+  }
+
+  function renderSharedPacks() {
+    const list = document.getElementById("packPlacementList");
+    const empty = document.getElementById("noPacksForSave");
+    if (!list) return;
+    const packs = loadSharedPacks();
+    list.innerHTML = "";
+    if (empty) empty.hidden = packs.length > 0;
+    packs.forEach((pack) => {
+      const row = document.createElement("div");
+      row.className = "pack-place-row";
+      const n = (pack.marbles && pack.marbles.length) || 0;
+      row.innerHTML = "<div><strong></strong><span></span></div>";
+      row.querySelector("strong").textContent = pack.name;
+      row.querySelector("span").textContent = GameI18n.t("packBalls", { n });
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn ghost";
+      btn.textContent = GameI18n.t("placePack");
+      btn.disabled = !n;
+      btn.addEventListener("click", () => placeSharedPack(pack));
+      row.appendChild(btn);
+      list.appendChild(row);
+    });
+  }
+
   function renderWorld() {
     const { scale } = getArenaLayout();
     const count = state.balls.length;
@@ -519,6 +567,7 @@
       outer.appendChild(wrap);
       ui.worldBalls.appendChild(outer);
     });
+    renderSharedPacks();
   }
 
   function updateBallNodePosition(ball) {

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Marble Escape</title>
+  <link rel="stylesheet" href="styles.css?v=marble158" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global2" />
+</head>
+<body>
+  <main id="app">
+    <section id="slotScreen" class="screen active">
+      <div class="slot-card">
+        <div class="logo" aria-hidden="true">🔵</div>
+        <p class="eyebrow">MARBLE LAB</p>
+        <h1 data-i18n="title">Marble Escape</h1>
+        <p class="subtitle" data-i18n="subtitle">Mapas infinitos con rutas y trampas diferentes. El progreso se guarda automáticamente.</p>
+        <div class="slot-heading">
+          <strong data-i18n="savedGames">Partidas guardadas</strong>
+          <span id="slotCounter">0 / 5 slots</span>
+        </div>
+        <div id="slotList" class="slot-list"></div>
+        <button id="showTopMarbleButtonSlots" class="button secondary js-show-top-marble" type="button" data-i18n="showTopMarble">Mostrar mejor pelota</button>
+        <div id="topMarbleShowcaseSlots" class="top-marble-showcase" hidden></div>
+        <button id="createFoodButtonSlots" class="button secondary" type="button" data-i18n="createFood">Crear Comida</button>
+        <button id="createDrinkButtonSlots" class="button secondary" type="button" data-i18n="createDrink">Crear Bebida</button>
+        <button id="openPacksButton" class="button secondary" type="button" hidden data-i18n="openPacks">📦 Crear / editar packs</button>
+        <a class="button ghost" href="../../index.html" data-i18n="backToAdmin">Volver al administrador</a>
+      </div>
+    </section>
+
+    <section id="menuScreen" class="screen">
+      <div class="menu-card">
+        <div class="menu-topline">
+          <button id="backToSlots" class="back-button inline" type="button" data-i18n-title="backToSaves" title="Volver a partidas" aria-label="Volver a partidas">←</button>
+          <div>
+            <p class="eyebrow" data-i18n="currentSave">PARTIDA ACTUAL</p>
+            <div class="save-name-row">
+              <h1 id="saveName">Marble Escape</h1>
+              <button id="renameSaveButton" class="rename-save" type="button" data-i18n-title="renameSave" title="Renombrar partida" aria-label="Renombrar partida">✎</button>
+            </div>
+          </div>
+          <span id="roundBadge" class="round-badge">Ronda 1</span>
+        </div>
+
+        <div class="inventory-summary">
+          <span data-i18n="inventory">Inventario</span>
+          <strong id="marbleCount">0 marbles</strong>
+        </div>
+        <div id="marbleList" class="marble-list"></div>
+        <p id="emptyInventory" class="empty" data-i18n="emptyInventory">Todavía no tienes marbles.</p>
+        <section id="savePairPanel" class="pair-panel" hidden>
+          <div class="section-heading">
+            <h2 data-i18n="pairTitle">💑 Parejas</h2>
+            <span data-i18n="pairHint">Opcional. Un chico + una chica.</span>
+          </div>
+          <p class="pack-gender-lead" data-i18n="saveGenderTitle">Elegí el género de cada pelota. Después podés armar parejas.</p>
+          <div id="saveGenderList" class="pack-gender-list"></div>
+          <div id="savePairList" class="pair-list"></div>
+          <div id="savePairForm" class="pair-form"></div>
+        </section>
+
+        <div class="menu-actions">
+          <button id="playButton" class="button primary" type="button" data-i18n="playRound">Jugar ronda</button>
+          <button id="minigamesButton" class="button mini" type="button" data-i18n="minigames">🎮 Minijuegos</button>
+          <button id="textAnimButton" class="button secondary" type="button" data-i18n="textAnim">✨ Texto a animación</button>
+          <button id="createMapButton" class="button secondary" type="button" data-i18n="createMap">Crear mapa</button>
+          <div id="customMapList" class="roleplay-face-list menu-face-list"></div>
+          <button id="createMinigameButton" class="button secondary" type="button" hidden data-i18n="createMinigame">Crear minijuego</button>
+          <div id="customMiniList" class="roleplay-face-list menu-face-list" hidden></div>
+          <button id="roleplayButton" class="button roleplay" type="button" data-i18n="roleplay">Roleplay</button>
+          <button id="createFaceButtonMenu" class="button secondary" type="button" data-i18n="createFace">Crear Cara</button>
+          <div id="menuFaceList" class="roleplay-face-list menu-face-list"></div>
+          <button id="createFoodButtonMenu" class="button secondary" type="button" data-i18n="createFood">Crear Comida</button>
+          <div id="menuFoodList" class="roleplay-face-list menu-face-list"></div>
+          <button id="createDrinkButtonMenu" class="button secondary" type="button" data-i18n="createDrink">Crear Bebida</button>
+          <div id="menuDrinkList" class="roleplay-face-list menu-face-list"></div>
+          <button id="feedAllButtonMenu" class="button compact feed-all-drop" type="button" data-feed-all="1" data-i18n="feedAllFood">Todos prueban la comida</button>
+          <button id="foodLikesButton" class="button secondary" type="button" data-i18n="foodLikes">A quién le gusta</button>
+          <button id="foodHatesButton" class="button secondary" type="button" data-i18n="foodHates">A quién NO le gusta</button>
+          <button id="rejoinButton" class="button secondary" type="button" hidden>Rejoin</button>
+          <button id="createButton" class="button secondary" type="button" data-i18n="createMarble">Crear Marble</button>
+        </div>
+        <p id="minigamesNeed" class="requirement" hidden data-i18n="minigamesNeedAlive">Necesitás al menos 1 pelota viva para los minijuegos.</p>
+        <section id="eliminatedPanel" class="eliminated-panel" hidden>
+          <div class="section-heading">
+            <h2 data-i18n="eliminated">Eliminadas</h2>
+            <span data-i18n="pickDeadMarble">Clic para devolverla</span>
+          </div>
+          <div id="eliminatedList" class="marble-list"></div>
+        </section>
+        <p id="playRequirement" class="requirement" data-i18n="needThree">Necesitas al menos 3 marbles para jugar.</p>
+        <p id="creationLocked" class="requirement warning" hidden data-i18n="creationLocked">La creación se cerró al comenzar la ronda 1.</p>
+
+        <section id="packPlacementPanel" class="pack-placement">
+          <div class="section-heading">
+            <h2 data-i18n="packsAvailable">📦 Packs disponibles</h2>
+            <span data-i18n="placeBeforeRound1">Colocalos antes de la ronda 1</span>
+          </div>
+          <div id="packPlacementList" class="pack-placement-list"></div>
+          <p id="noPacksForSave" class="empty" data-i18n="noPacksYet">Todavía no creaste packs.</p>
+        </section>
+
+        <section class="leaderboard-panel">
+          <div class="section-heading">
+            <h2 data-i18n="leaderboard">🏆 Leaderboard</h2>
+            <span data-i18n="roundsSurvived">Rondas sobrevividas</span>
+          </div>
+          <button id="showTopMarbleButton" class="button secondary compact js-show-top-marble" type="button" data-i18n="showTopMarble">Mostrar mejor pelota</button>
+          <div id="topMarbleShowcase" class="top-marble-showcase" hidden></div>
+          <ol id="leaderboard" class="leaderboard"></ol>
+        </section>
+      </div>
+    </section>
+
+    <section id="createScreen" class="screen">
+      <form id="createForm" class="create-card">
+        <button id="cancelCreateTop" class="back-button" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+        <p class="eyebrow">MARBLE LAB</p>
+        <h2 data-i18n="createMarble">Crear Marble</h2>
+        <div id="marblePreview" class="marble preview"><span>?</span></div>
+        <label>
+          <span data-i18n="name">Nombre</span>
+          <input id="marbleName" maxlength="100" autocomplete="off" required data-i18n-placeholder="namePlaceholder" placeholder="Ej.: Rayo" />
+        </label>
+        <label>
+          <span data-i18n="color">Color</span>
+          <input id="marbleColor" type="color" value="#55d6ff" />
+        </label>
+        <div class="create-gender">
+          <span data-i18n="packGender">⚧ Género</span>
+          <p class="pack-gender-lead" data-i18n="packGenderTitle">Elegí el género de cada pelota. Es obligatorio para salir.</p>
+          <p id="createGenderNeed" class="pack-gender-need" hidden></p>
+          <div class="create-gender-picks">
+            <button id="createGenderMale" class="pack-gender-pick" type="button">♂ Masculino</button>
+            <button id="createGenderFemale" class="pack-gender-pick" type="button">♀ Femenino</button>
+          </div>
+        </div>
+        <div id="createPairBox" class="create-pair" hidden>
+          <span data-i18n="pairTitle">💑 Parejas</span>
+          <p class="pack-gender-lead" data-i18n="pairHint">Opcional. Un chico + una chica.</p>
+          <select id="createPairSelect"></select>
+        </div>
+        <div class="form-actions">
+          <button id="cancelCreate" class="button ghost" type="button" data-i18n="cancel">Cancelar</button>
+          <button class="button primary" type="submit" data-i18n="saveMarble">Guardar Marble</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="packsScreen" class="screen">
+      <div class="pack-card">
+        <div class="menu-topline">
+          <button id="backFromPacks" class="back-button inline" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+          <div>
+            <p class="eyebrow" data-i18n="packsGlobal">PACKS GLOBALES</p>
+            <h1 data-i18n="myPacks">Mis packs</h1>
+          </div>
+          <button id="newPackButton" class="button primary compact" type="button" data-i18n="createPack">+ Crear Pack</button>
+        </div>
+        <p class="subtitle" data-i18n="packsHint">Guardá grupos de pelotas y editalos cuando quieras.</p>
+        <div id="packList" class="pack-list"></div>
+        <p id="emptyPacks" class="empty" data-i18n="emptyPacks">No hay packs todavía.</p>
+      </div>
+    </section>
+
+    <section id="packEditorScreen" class="screen">
+      <div class="pack-editor-card">
+        <div class="menu-topline">
+          <button id="cancelPackEditor" class="back-button inline" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+          <div>
+            <p class="eyebrow" data-i18n="packEditor">EDITOR DE PACK</p>
+            <h1 id="packEditorTitle" data-i18n="createPack">Crear Pack</h1>
+          </div>
+          <div class="pack-editor-actions">
+            <button id="packGenderButton" class="button secondary compact" type="button" data-i18n="packGender">⚧ Género</button>
+            <button id="savePackButton" class="button primary compact" type="button" data-i18n="savePack">Guardar Pack</button>
+          </div>
+        </div>
+        <label class="pack-name-field">
+          <span data-i18n="packName">Nombre del pack</span>
+          <input id="packName" maxlength="24" data-i18n-placeholder="packNamePlaceholder" placeholder="Ej.: Equipo Arcoíris" />
+        </label>
+        <form id="packMarbleForm" class="pack-marble-form">
+          <input id="packMarbleName" maxlength="100" required data-i18n-placeholder="marbleNamePlaceholder" placeholder="Nombre de la pelota" />
+          <input id="packMarbleColor" type="color" value="#55d6ff" data-i18n-title="marbleColor" title="Color de la pelota" aria-label="Color de la pelota" />
+          <button class="button secondary compact" type="submit" data-i18n="addMarble">+ Agregar pelota</button>
+        </form>
+        <p id="packGenderNeed" class="pack-gender-need" hidden></p>
+        <section id="packGenderPanel" class="pack-gender-panel" hidden>
+          <p class="pack-gender-lead" data-i18n="packGenderTitle">Elegí el género de cada pelota. Es obligatorio para salir.</p>
+          <div id="packGenderList" class="pack-gender-list"></div>
+        </section>
+        <section id="packPairPanel" class="pair-panel" hidden>
+          <p class="pack-gender-lead" data-i18n="pairTitle">💑 Parejas</p>
+          <p class="pack-gender-lead" data-i18n="pairHint">Opcional. Un chico + una chica.</p>
+          <div id="packPairList" class="pair-list"></div>
+          <div id="packPairForm" class="pair-form"></div>
+        </section>
+        <div id="packDraftList" class="pack-draft-list"></div>
+        <p id="emptyPackDraft" class="empty" data-i18n="emptyPackDraft">Agregá todas las pelotas que quieras.</p>
+      </div>
+    </section>
+
+    <section id="faceEditorScreen" class="screen">
+      <div class="face-editor-card">
+        <div class="menu-topline">
+          <button id="cancelFaceEditor" class="back-button inline" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+          <div>
+            <p class="eyebrow" data-i18n="faceEditor">MENÚ DE ANIMACIÓN</p>
+            <h1 id="faceEditorTitle" data-i18n="createFace">Crear Cara</h1>
+          </div>
+          <button id="saveFaceButton" class="button primary compact" type="button" data-i18n="saveFace">Guardar</button>
+        </div>
+        <p id="faceEditorHint" class="subtitle" data-i18n="faceEditorHint">Dibujá solo en negro. A: frame anterior. D: siguiente frame. Ctrl+Z deshace. Ctrl+Y rehace. Ctrl+C copia. Ctrl+V pega.</p>
+        <div id="foodMetaWrap" class="food-meta-wrap" hidden>
+          <label class="food-name-wrap">
+            <span id="foodNameLabel" data-i18n="foodName">Nombre de la comida</span>
+            <input id="foodName" maxlength="100" autocomplete="off" required data-i18n-placeholder="foodNamePlaceholder" placeholder="Ej.: Pizza" />
+          </label>
+          <label id="faceColorWrap" class="face-color-wrap">
+            <span data-i18n="foodColor">Color</span>
+            <input id="faceColor" type="color" value="#f97316" />
+          </label>
+          <div id="foodVariantWrap" class="food-variant-bar">
+            <label class="food-name-wrap">
+              <span data-i18n="foodVariantName">Nombre de la variante</span>
+              <input id="foodVariantName" maxlength="100" autocomplete="off" data-i18n-placeholder="foodVariantPlaceholder" placeholder="Ej.: extra queso" />
+            </label>
+            <button id="foodAddVariant" class="button secondary compact" type="button" data-i18n="foodAddVariant">Añadir variante</button>
+            <button id="foodDelVariant" class="button ghost compact" type="button" data-i18n="foodDelVariant">Borrar variante</button>
+          </div>
+        </div>
+        <div id="faceToolBar" class="face-toolbar">
+          <button type="button" class="button secondary compact face-tool active" data-face-tool="draw" data-i18n="faceDraw">Lápiz</button>
+          <button type="button" class="button secondary compact face-tool" data-face-tool="line" data-i18n="faceLine">Línea</button>
+          <button type="button" class="button secondary compact face-tool" data-face-tool="square" data-i18n="faceSquare">Cuadrado</button>
+          <button type="button" class="button secondary compact face-tool" data-face-tool="circle" data-i18n="faceCircle">Círculo</button>
+          <button type="button" class="button secondary compact face-tool" data-face-tool="fill" data-i18n="faceFill">Rellenar</button>
+          <button type="button" class="button secondary compact face-tool" data-face-tool="move" data-i18n="faceMove">Mover</button>
+          <button type="button" class="button secondary compact" id="faceGrow" data-i18n="faceGrow">Agrandar</button>
+          <button type="button" class="button secondary compact" id="faceShrink" data-i18n="faceShrink">Achicar</button>
+          <button type="button" class="button secondary compact" id="faceRotate" data-i18n="faceRotate">Rotar</button>
+          <button type="button" class="button secondary compact" id="faceUndo" data-i18n="faceUndo">Deshacer</button>
+          <button type="button" class="button secondary compact" id="faceRedo" data-i18n="faceRedo">Rehacer</button>
+        </div>
+        <div class="face-editor-stage">
+          <canvas id="faceCanvas" width="256" height="256"></canvas>
+        </div>
+        <p id="faceFrameLabel" class="face-frame-label">0 / 0</p>
+        <div class="face-editor-keys">
+          <span id="faceFrameShortcuts">
+            <span><b>A</b> <span data-i18n="facePrev">Anterior</span></span>
+            <span><b>D</b> <span data-i18n="faceNext">Siguiente</span></span>
+          </span>
+          <button id="copyFaceFrame" class="button secondary compact" type="button" data-i18n="copyFace">Copiar</button>
+          <button id="pasteFaceFrame" class="button secondary compact" type="button" data-i18n="pasteFace">Pegar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="foodLikesScreen" class="screen">
+      <div class="food-likes-card">
+        <div class="menu-topline">
+          <button id="backFromFoodLikes" class="back-button inline" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+          <div>
+            <p class="eyebrow" data-i18n="foodLikesEyebrow">COMIDAS</p>
+            <h1 id="foodLikesTitle" data-i18n="foodLikes">A quién le gusta</h1>
+          </div>
+          <button id="createFoodButtonLikes" class="button primary compact" type="button" data-i18n="createFood">Crear Comida</button>
+          <button id="createDrinkButtonLikes" class="button secondary compact" type="button" data-i18n="createDrink">Crear Bebida</button>
+        </div>
+        <p id="foodLikesHintText" class="subtitle" data-i18n="foodLikesHint">Solo aparecen las pelotas que probaron esa comida y les gustó.</p>
+        <div id="foodLikesList" class="food-likes-list"></div>
+        <p id="emptyFoods" class="empty" hidden data-i18n="emptyFoods">Todavía no creaste comidas.</p>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen">
+      <header class="game-header">
+        <button id="backToMenu" class="button ghost compact" type="button" data-i18n="exit">Salir</button>
+        <div>
+          <h2 id="levelTitle">Ronda 1 · Mapa creado #1</h2>
+          <p id="gameStatus">—</p>
+        </div>
+        <div class="header-right">
+          <button id="recordButton" class="button rec compact" type="button" data-i18n="recStart">Grabar</button>
+          <span id="modeBadge" class="difficulty-badge">EASY DEMON</span>
+        </div>
+      </header>
+      <div id="campaignLegend" class="legend">
+        <span><i class="legend-block blue"></i><b data-i18n="blueHint">Clic: desaparece</b></span>
+        <span><i class="legend-block lava"></i><b data-i18n="lavaHint">Lava: elimina el marble</b></span>
+        <span><i class="legend-block good-lava"></i><b data-i18n="goodLavaHint">Lava buena: vuelve al inicio</b></span>
+        <span><i class="legend-block jump-pad"></i><b data-i18n="jumpPadHint">Pad: impulso hacia arriba</b></span>
+        <span><i class="legend-block safe"></i><b data-i18n="safeHint">Verde: a salvo</b></span>
+        <span><i class="legend-block hazard"></i><b data-i18n="hazardHint">Peligro móvil</b></span>
+      </div>
+      <div id="minigameLegend" class="legend" hidden>
+        <span><b id="minigameHint">Clic para jugar. Perder no cambia la partida.</b></span>
+      </div>
+      <div id="splitPairNav" class="split-pair-nav" hidden>
+        <button id="splitPairBack" type="button" class="button ghost compact" data-i18n="miniSplitBack">← Arena</button>
+        <div id="splitPairRooms" class="split-pair-rooms"></div>
+      </div>
+      <div id="teamSpikeNav" class="split-pair-nav" hidden>
+        <button id="teamSpikePrev" type="button" class="button ghost compact" aria-label="Área anterior">←</button>
+        <strong id="teamSpikeLabel">Equipo 1</strong>
+        <button id="teamSpikeNext" type="button" class="button ghost compact" aria-label="Área siguiente">→</button>
+      </div>
+      <div id="roleplayLegend" class="legend" hidden>
+        <span><b data-i18n="roleplayHint">Arrastrá las pelotas. Clic para ponerle cara. Arrastrá el fondo para mover el mapa.</b></span>
+      </div>
+      <div id="roleplayFaces" class="roleplay-faces" hidden>
+        <button id="roleplaySaveButton" class="button secondary compact" type="button" data-i18n="roleplaySave">Guardar pelotas</button>
+        <button id="createFaceButton" class="button primary compact" type="button" data-i18n="createFace">Crear Cara</button>
+        <button id="createFoodButton" class="button secondary compact" type="button" data-i18n="createFood">Crear Comida</button>
+        <button id="createDrinkButton" class="button secondary compact" type="button" data-i18n="createDrink">Crear Bebida</button>
+        <button id="addHouseButton" class="button secondary compact" type="button" data-i18n="addHouse">Añadir casa</button>
+        <strong data-i18n="roleplayFaceLabel">Cara</strong>
+        <div id="roleplayFaceList" class="roleplay-face-list"></div>
+        <strong data-i18n="roleplayFoodLabel">Comida</strong>
+        <div id="roleplayFoodList" class="roleplay-face-list"></div>
+        <strong data-i18n="roleplayDrinkLabel">Bebida</strong>
+        <div id="roleplayDrinkList" class="roleplay-face-list"></div>
+        <button id="feedAllButtonRoleplay" class="button compact feed-all-drop" type="button" data-feed-all="1" data-i18n="feedAllFood">Todos prueban la comida</button>
+        <button id="marbleChatButton" class="button primary compact marble-chat-open" type="button" data-i18n="marbleChat">Marblechat</button>
+      </div>
+      <div id="houseNav" class="house-nav" hidden>
+        <button type="button" class="button ghost compact" data-house-room="sala" data-i18n="houseSala">Sala</button>
+        <button type="button" class="button ghost compact" data-house-room="cocina" data-i18n="houseKitchen">Cocina</button>
+        <button type="button" class="button ghost compact" data-house-room="bano" data-i18n="houseBath">Baño</button>
+        <button type="button" class="button ghost compact" data-house-room="dorm1" data-i18n="houseBed1">Dormitorio 1</button>
+        <button type="button" class="button ghost compact" data-house-room="dorm2" data-i18n="houseBed2">Dormitorio 2</button>
+        <button id="leaveHouseButton" class="button secondary compact" type="button" data-i18n="leaveHouse">Afuera</button>
+        <strong data-i18n="houseMarbles">Pelotas en la casa</strong>
+        <div id="houseMarbleList" class="house-marble-list"></div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="gameCanvas" width="1000" height="600" data-i18n-title="canvasLabel" title="Nivel de Marble Escape" aria-label="Nivel de Marble Escape"></canvas>
+        <span id="recordBadge" class="record-badge" hidden>REC</span>
+      </div>
+      <div id="marbleChatPanel" class="marble-chat" hidden>
+        <aside class="marble-chat-groups">
+          <strong data-i18n="marbleChatGroups">Grupos</strong>
+          <div id="marbleChatGroupList" class="marble-chat-group-list"></div>
+          <button id="marbleChatAddGroup" class="button secondary compact" type="button" data-i18n="marbleChatAddGroup">Añadir grupo</button>
+        </aside>
+        <section class="marble-chat-main">
+          <header class="marble-chat-head">
+            <button id="marbleChatBack" class="back-button inline" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+            <h2 id="marbleChatTitle">Marbles</h2>
+          </header>
+          <div id="marbleChatMessages" class="marble-chat-messages"></div>
+          <form id="marbleChatForm" class="marble-chat-compose">
+            <label class="marble-chat-sender">
+              <span data-i18n="marbleChatSender">Envía</span>
+              <select id="marbleChatSender"></select>
+            </label>
+            <input id="marbleChatInput" maxlength="200" autocomplete="off" data-i18n-placeholder="marbleChatPlaceholder" placeholder="Escribí un mensaje…" />
+            <button id="marbleChatSend" class="button primary compact" type="submit" data-i18n="marbleChatSend">Enviar</button>
+          </form>
+        </section>
+      </div>
+    </section>
+
+    <section id="textAnimScreen" class="screen">
+      <div class="text-anim-card">
+        <div class="menu-topline">
+          <button id="backFromTextAnim" class="back-button inline" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+          <div>
+            <p class="eyebrow" data-i18n="textAnimEyebrow">TEXTO A ANIMACIÓN</p>
+            <h1 data-i18n="textAnim">✨ Texto a animación</h1>
+          </div>
+        </div>
+        <p class="subtitle" data-i18n="textAnimHint">Escribí un texto. Verbos y acciones se detectan. Un mensaje va entre comillas: "Hola!!". Secreto antes del texto lo dice en una nube. Marblechat = piso gris y fondo blanco. Real = piso verde y cielo claro. Linda = más realista. Fea = pixelada.</p>
+        <label class="pack-name-field">
+          <span data-i18n="textAnimLabel">Tu texto</span>
+          <textarea id="textAnimInput" rows="5" maxlength="3600000" data-i18n-placeholder="textAnimPlaceholder" placeholder='Ej.: Rayo "Hola!!" y Luna corre feliz. Luna "vamos al parque".'></textarea>
+        </label>
+        <label class="pack-name-field text-anim-duration-field">
+          <span data-i18n="textAnimDuration">Duración (10 s – 1 h)</span>
+          <input id="textAnimDuration" type="number" min="10" max="3600" step="1" value="10" />
+        </label>
+        <div class="form-actions">
+          <button id="textAnimConvert" class="button primary" type="button" data-i18n="textAnimConvert">Convertir</button>
+          <button id="textAnimCheck" class="button secondary" type="button" data-i18n="textAnimCheck">Pegar y revisar</button>
+        </div>
+        <div id="textAnimLibrary" class="text-anim-library">
+          <p class="eyebrow" data-i18n="textAnimLibrary">Tus textos</p>
+          <label class="pack-name-field">
+            <span data-i18n="textAnimSaveName">Nombre</span>
+            <input id="textAnimSaveName" maxlength="40" autocomplete="off" data-i18n-placeholder="textAnimSaveNamePh" placeholder="Mi película" />
+          </label>
+          <div class="form-actions">
+            <button id="textAnimSave" class="button secondary" type="button" data-i18n="textAnimSave">Guardar texto</button>
+          </div>
+          <div id="textAnimSavedList" class="text-anim-saved"></div>
+        </div>
+        <div id="textAnimCheckPanel" class="text-anim-check" hidden>
+          <p class="text-anim-check-hint" data-i18n="textAnimCheckHint">Las palabras de color ya se detectan. Las rojas hay que corregirlas para que también se iluminen.</p>
+          <div id="textAnimCheckPreview" class="text-anim-check-preview"></div>
+          <div id="textAnimCheckFixes" class="text-anim-check-fixes"></div>
+        </div>
+        <p id="textAnimScan" class="text-anim-scan" hidden></p>
+        <div class="text-anim-stage">
+          <canvas id="textAnimCanvas" width="1000" height="600"></canvas>
+        </div>
+        <div id="textAnimResult" class="text-anim-result" hidden>
+          <p data-i18n="textAnimReady">Animación lista.</p>
+          <div class="form-actions">
+            <button id="textAnimReplay" class="button secondary compact" type="button" data-i18n="textAnimReplay">Ver de nuevo</button>
+            <a id="textAnimDownload" class="button primary compact" href="#" download="marble-animacion.webm" data-i18n="textAnimDownload">Descargar</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="levelEditorScreen" class="screen">
+      <div class="level-editor-card">
+        <div class="menu-topline">
+          <button id="cancelLevelEditor" class="back-button inline" type="button" data-i18n-title="back" title="Volver" aria-label="Volver">←</button>
+          <div>
+            <p class="eyebrow" id="levelEditorEyebrow" data-i18n="levelEditor">EDITOR</p>
+            <h1 id="levelEditorTitle" data-i18n="createMap">Crear mapa</h1>
+          </div>
+          <button id="levelEditorNext" class="button primary compact" type="button" data-i18n="levelNext">Siguiente</button>
+        </div>
+        <p id="levelEditorHint" class="subtitle" data-i18n="levelPlaceHint">Colocá las partes. Clic para poner, arrastrá para mover.</p>
+        <div id="levelEditorPlace">
+          <div class="level-transform-tools">
+            <button id="levelGrowX" class="button secondary compact" type="button" data-i18n="levelGrowX">Agrandar X</button>
+            <button id="levelShrinkX" class="button secondary compact" type="button" data-i18n="levelShrinkX">Achicar X</button>
+            <button id="levelGrowY" class="button secondary compact" type="button" data-i18n="levelGrowY">Agrandar Y</button>
+            <button id="levelShrinkY" class="button secondary compact" type="button" data-i18n="levelShrinkY">Achicar Y</button>
+            <button id="levelRotate" class="button secondary compact" type="button" data-i18n="levelRotate">Rotar</button>
+            <button id="levelEraser" class="button secondary compact" type="button" data-i18n="levelEraser">Borrador</button>
+            <button id="levelDeletePart" class="button ghost compact" type="button" data-i18n="levelDeletePart">Borrar parte</button>
+            <button id="levelEditScript" class="button primary compact" type="button" hidden data-i18n="levelEditScript">EDITAR</button>
+          </div>
+          <div id="scriptEditPanel" class="script-edit-panel" hidden>
+            <strong id="scriptEditTitle">Script</strong>
+            <div id="scriptEditFields" class="script-edit-fields"></div>
+            <button id="scriptEditDone" class="button secondary compact" type="button" data-i18n="scriptEditDone">Listo</button>
+          </div>
+          <canvas id="levelEditorCanvas" width="1000" height="600"></canvas>
+          <div class="level-part-groups">
+            <div>
+              <strong data-i18n="levelParts">Partes</strong>
+              <div id="levelPartList" class="level-part-list"></div>
+            </div>
+            <div id="levelInvisibleWrap" hidden>
+              <strong data-i18n="levelInvisible">Scripts</strong>
+              <p class="empty" data-i18n="levelInvisibleHint">Al colocarlos cambian TODO el minijuego. Comida = comida aleatoria por todos lados.</p>
+              <div id="levelInvisibleList" class="level-part-list"></div>
+            </div>
+          </div>
+        </div>
+        <div id="levelEditorName" hidden>
+          <label class="pack-name-field">
+            <span data-i18n="levelName">Nombre</span>
+            <input id="levelNameInput" maxlength="100" autocomplete="off" data-i18n-placeholder="levelNamePlaceholder" placeholder="Ej.: Mi fábrica" />
+          </label>
+        </div>
+        <div id="levelEditorDiff" hidden>
+          <label class="pack-name-field">
+            <span id="levelDiffLabel">Dificultad: 10 · medio</span>
+            <input id="levelDiffInput" type="range" min="1" max="20" value="10" />
+          </label>
+          <button id="levelFinishButton" class="button primary" type="button" data-i18n="levelFinish">¡TERMINASTE!</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="minigameModal" class="modal" hidden>
+    <div class="modal-card minigame-picker">
+      <div class="modal-icon">🎮</div>
+      <h2 data-i18n="minigames">Minijuegos</h2>
+      <p id="minigameCatalogHint" data-i18n="minigamesHint">Solo juegan las pelotas vivas. Perder no cambia la partida.</p>
+      <div id="minigameBrowse">
+        <div class="minigame-toolbar">
+          <input id="minigameSearch" type="search" maxlength="40" autocomplete="off" data-i18n-placeholder="miniSearch" placeholder="Buscar minijuego…" />
+          <button id="minigameRandom" class="button mini compact" type="button" data-i18n="miniRandom">🎲 Aleatorio</button>
+        </div>
+        <div id="minigameList" class="minigame-list"></div>
+        <div class="minigame-pager">
+          <button id="minigamePrev" class="button ghost compact" type="button">←</button>
+          <span id="minigamePageInfo">1 / 1</span>
+          <button id="minigameNext" class="button ghost compact" type="button">→</button>
+        </div>
+      </div>
+      <div id="foodFeastMode" hidden>
+        <p id="foodFeastModeHint" data-i18n="miniFoodModeHint">Elegí un modo para Banquete.</p>
+        <div class="minigame-list food-mode-list">
+          <button id="foodFeastLimited" class="minigame-choice" type="button">
+            <span class="mini-icon">🎯</span>
+            <strong data-i18n="miniFoodLimited">Con límite</strong>
+            <span data-i18n="miniFoodLimitedHint">Hay que comer 100. Cuando una pelota llega a 100, desaparece.</span>
+          </button>
+          <button id="foodFeastUnlimited" class="minigame-choice" type="button">
+            <span class="mini-icon">∞</span>
+            <strong data-i18n="miniFoodUnlimited">Sin límite</strong>
+            <span data-i18n="miniFoodUnlimitedHint">Comen sin tope. Nadie desaparece por comer.</span>
+          </button>
+        </div>
+        <div class="modal-actions">
+          <button id="foodFeastModeBack" class="button ghost" type="button" data-i18n="miniFoodModeBack">Volver</button>
+        </div>
+      </div>
+      <div class="modal-actions" id="minigameCloseRow">
+        <button id="closeMinigamePicker" class="button ghost" type="button" data-i18n="close">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="messageModal" class="modal" hidden>
+    <div class="modal-card">
+      <div id="messageIcon" class="modal-icon">🏁</div>
+      <h2 id="messageTitle"></h2>
+      <p id="messageText"></p>
+      <div id="modalRejoin" class="modal-rejoin" hidden>
+        <button id="modalRejoinButton" class="button secondary" type="button">Rejoin</button>
+        <div id="modalRejoinPicker" hidden>
+          <p class="requirement" data-i18n="pickDeadMarble">Clic para devolverla</p>
+          <div id="modalRejoinList" class="marble-list"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="nextRoundButton" class="button primary" type="button" data-i18n="nextRound">Siguiente ronda</button>
+        <button id="messageButton" class="button ghost" type="button" data-i18n="backToMenu">Volver al menú</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicList" data-i18n-title="pickSong" title="Elegir canción" aria-label="Elegir canción">♫</button>
+      <button type="button" class="music-btn" id="btnMusicStop" data-i18n-title="pauseSong" title="Pausar" aria-label="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" data-i18n-title="prevSong" title="Canción anterior" aria-label="Canción anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" data-i18n-title="nextSong" title="Siguiente canción" aria-label="Siguiente canción">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label" data-i18n="songPlaying">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <div id="songPicker" class="song-picker" hidden>
+    <strong data-i18n="songs">Canciones</strong>
+    <div id="songList" class="song-list"></div>
+  </div>
+  <div id="recToast" class="secret-toast rec-toast" hidden></div>
+
+  <script src="../../i18n.js?v=marble160"></script>
+  <script src="../../shared-packs.js?v=packs1"></script>
+  <script src="../../shared-music.js?v=global2"></script>
+  <script src="game.js?v=marble161"></script>
+</body>
+</html>

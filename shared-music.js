@@ -304,13 +304,31 @@
     true
   );
 
+  function playIndex(index) {
+    if (music.unavailable || !PLAYLIST[index]) return;
+    setEnabled(true);
+    music.pausedByVisibility = false;
+    music.started = true;
+    music.triedTracks.clear();
+    loadTrack(index);
+    playCurrent();
+  }
+
   const api = {
     start: () => startMusic(true),
     stop: () => stopMusic(true),
     toggle: toggleMusic,
     isEnabled,
     resumeIfEnabled: tryResumeFromFlag,
-    STORAGE_KEY
+    STORAGE_KEY,
+    getAudio: () => music.audio,
+    getPlaylist: () => PLAYLIST.map((track) => track.title),
+    getIndex: () => music.index,
+    playIndex,
+    getCurrentTitle() {
+      if (music.unavailable) return "";
+      return PLAYLIST[music.index]?.title || "";
+    }
   };
 
   window.SharedMusic = api;

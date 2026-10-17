@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 .env
 .env.*
+__pycache__/
+session-store.json
+Juegos/Marble Escape/saves-backup.json

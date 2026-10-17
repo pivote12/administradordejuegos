@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Packs</title>
+  <link rel="stylesheet" href="Juegos/Marble Escape/styles.css?v=marble123" />
+  <style>
+    body { min-height: 100vh; }
+    .pack-home { width: min(720px, calc(100% - 2rem)); margin: 1.5rem auto 3rem; }
+    .pack-home .pack-card, .pack-home .pack-editor-card { display: block; }
+  </style>
+</head>
+<body>
+  <main class="pack-home">
+    <section id="packsScreen" class="screen active">
+      <div class="pack-card">
+        <div class="menu-topline">
+          <a class="back-button inline" href="index.html" title="Volver">←</a>
+          <div>
+            <p class="eyebrow">PACKS GLOBALES</p>
+            <h1>Mis packs</h1>
+          </div>
+          <button id="newPackButton" class="button primary compact" type="button">+ Crear Pack</button>
+        </div>
+        <p class="subtitle">Estos packs se usan en Marble Escape, Algicosathlon Maker y Shape Bowl Race. No se borran solos.</p>
+        <div id="packList" class="pack-list"></div>
+        <p id="emptyPacks" class="empty">No hay packs todavía.</p>
+      </div>
+    </section>
+
+    <section id="packEditorScreen" class="screen">
+      <div class="pack-editor-card">
+        <div class="menu-topline">
+          <button id="cancelPackEditor" class="back-button inline" type="button" title="Volver">←</button>
+          <div>
+            <p class="eyebrow">EDITOR DE PACK</p>
+            <h1 id="packEditorTitle">Crear Pack</h1>
+          </div>
+          <div class="pack-editor-actions">
+            <button id="packGenderButton" class="button secondary compact" type="button">⚧ Género</button>
+            <button id="savePackButton" class="button primary compact" type="button">Guardar Pack</button>
+          </div>
+        </div>
+        <label class="pack-name-field">
+          <span>Nombre del pack</span>
+          <input id="packName" maxlength="24" placeholder="Ej.: Equipo Arcoíris" />
+        </label>
+        <form id="packMarbleForm" class="pack-marble-form">
+          <input id="packMarbleName" maxlength="100" required placeholder="Nombre de la pelota" />
+          <input id="packMarbleColor" type="color" value="#55d6ff" title="Color" />
+          <button class="button secondary compact" type="submit">+ Agregar pelota</button>
+        </form>
+        <p id="packGenderNeed" class="pack-gender-need" hidden></p>
+        <section id="packGenderPanel" class="pack-gender-panel" hidden>
+          <p class="pack-gender-lead">Elegí el género de cada pelota. Es obligatorio para guardar.</p>
+          <div id="packGenderList" class="pack-gender-list"></div>
+        </section>
+        <div id="packDraftList" class="pack-draft-list"></div>
+        <p id="emptyPackDraft" class="empty">Agregá todas las pelotas que quieras.</p>
+      </div>
+    </section>
+  </main>
+  <script src="shared-packs.js?v=packs1"></script>
+  <script src="packs.js?v=packs1"></script>
+</body>
+</html>

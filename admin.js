@@ -33,6 +33,7 @@ const UI = {
     langLabel: "Idioma",
     gamesCount: (n) => `${n} juego${n === 1 ? "" : "s"}`,
     gamesCountFiltered: (v, t) => `${v} de ${t}`,
+    packsBtn: "📦 Packs",
   },
   en: {
     pageTitle: "Game Manager",
@@ -51,6 +52,7 @@ const UI = {
     langLabel: "Language",
     gamesCount: (n) => `${n} game${n === 1 ? "" : "s"}`,
     gamesCountFiltered: (v, t) => `${v} of ${t}`,
+    packsBtn: "📦 Packs",
   },
   fr: {
     pageTitle: "Gestionnaire de jeux",
@@ -375,6 +377,34 @@ const GAME_I18N = {
     ja: { name: "クレイジー秒時計", description: "毎秒クレイジーな確率があるストップウォッチ。" },
     ko: { name: "미친 스톱워치", description: "매초 미친 확률이 있는 스톱워치." },
   },
+  "marble-escape": {
+    es: { name: "Marble Escape", description: "Creá marbles y guialos por una fábrica difícil con bloques, lava y una zona segura." },
+    en: { name: "Marble Escape", description: "Create marbles and guide them through a hard factory with blocks, lava, and a safe zone." },
+    fr: { name: "Marble Escape", description: "Créez des billes et guidez-les dans une usine difficile pleine de lave." },
+    de: { name: "Marble Escape", description: "Erstelle Murmeln und führe sie durch eine schwierige Fabrik voller Lava." },
+    pt: { name: "Marble Escape", description: "Crie bolinhas e guie-as por uma fábrica difícil cheia de lava." },
+    it: { name: "Marble Escape", description: "Crea biglie e guidale in una fabbrica difficile piena di lava." },
+    ru: { name: "Marble Escape", description: "Создавайте шарики и ведите их через сложную фабрику с лавой." },
+    pl: { name: "Marble Escape", description: "Twórz kulki i prowadź je przez trudną fabrykę pełną lawy." },
+    nl: { name: "Marble Escape", description: "Maak knikkers en leid ze door een moeilijke fabriek vol lava." },
+    zh: { name: "Marble Escape", description: "创建弹珠，引导它们穿过充满熔岩的困难工厂。" },
+    ja: { name: "Marble Escape", description: "ビー玉を作り、溶岩だらけの難しい工場を進もう。" },
+    ko: { name: "Marble Escape", description: "구슬을 만들고 용암이 가득한 어려운 공장을 통과하세요." },
+  },
+  "tipo-knowledge": {
+    es: { name: "Tipo Knowledge", description: "Creá Lugares De Tipo, armá equipos con logo y asigná un tipo a cada pelotita." },
+    en: { name: "Tipo Knowledge", description: "Create Type Places, build teams with a logo, and give every marble a type." },
+    fr: { name: "Tipo Knowledge", description: "Crée des Lieux de Type, des équipes avec logo, et donne un type à chaque bille." },
+    de: { name: "Tipo Knowledge", description: "Erstelle Typ-Orte, Teams mit Logo, und gib jeder Murmel einen Typ." },
+    pt: { name: "Tipo Knowledge", description: "Crie Lugares de Tipo, equipes com logo, e dê um tipo a cada bolinha." },
+    it: { name: "Tipo Knowledge", description: "Crea Luoghi di Tipo, squadre con logo, e assegna un tipo a ogni biglia." },
+    ru: { name: "Tipo Knowledge", description: "Создавайте места типов, команды с логотипом и дайте тип каждому шарику." },
+    pl: { name: "Tipo Knowledge", description: "Twórz miejsca typów, drużyny z logo i nadaj typ każdej kulce." },
+    nl: { name: "Tipo Knowledge", description: "Maak typeplekken, teams met logo, en geef elke knikker een type." },
+    zh: { name: "Tipo Knowledge", description: "创建类型地点，带标志的队伍，并给每颗弹珠一个类型。" },
+    ja: { name: "Tipo Knowledge", description: "タイプの場所を作り、ロゴ付きチームを用意して、ビー玉にタイプを付けよう。" },
+    ko: { name: "Tipo Knowledge", description: "타입 장소를 만들고, 로고가 있는 팀을 만든 뒤, 구슬마다 타입을 주세요." },
+  },
 };
 
 const FALLBACK_GAMES = [
@@ -468,6 +498,24 @@ const FALLBACK_GAMES = [
     tags: ["cronómetro", "azar", "minigame"],
     creator: "José Rafael Rodriguez Morillo",
   },
+  {
+    id: "marble-escape",
+    name: "Marble Escape",
+    description: "Creá marbles y guialos por una fábrica difícil con bloques, lava y una zona segura.",
+    folder: "Marble Escape",
+    icon: "🔵",
+    tags: ["marbles", "física", "plataformas"],
+    creator: "José Rafael Rodriguez Morillo",
+  },
+  {
+    id: "tipo-knowledge",
+    name: "Tipo Knowledge",
+    description: "Creá Lugares De Tipo, armá equipos con logo y asigná un tipo a cada pelotita.",
+    folder: "Tipo Knowledge",
+    icon: "🧠",
+    tags: ["tipos", "preguntas", "pelotitas"],
+    creator: "José Rafael Rodriguez Morillo",
+  },
 ];
 
 const gameGrid = document.getElementById("gameGrid");
@@ -488,6 +536,11 @@ let visibleGames = [];
 
 function t() {
   return UI[currentLang] || UI.es;
+}
+
+function uiText(key) {
+  const cur = UI[currentLang] || UI.es;
+  return cur[key] || UI.es[key] || UI.en[key] || key;
 }
 
 function gamePath(folder) {
@@ -532,6 +585,8 @@ function applyStaticTranslations() {
   footerText.innerHTML = strings.footer
     .replace("Juegos/", "<code>Juegos/</code>")
     .replace("games.json", "<code>games.json</code>");
+  const packsBtn = document.getElementById("packsBtn");
+  if (packsBtn) packsBtn.textContent = uiText("packsBtn");
 }
 
 function updateGameCount() {

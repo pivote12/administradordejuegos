@@ -10,4 +10,5 @@ echo  Cierra esta ventana para detener el servidor.
 echo.
 
 start "" "http://localhost:8090"
-python -m http.server 8090
+python serve.py
+if errorlevel 1 python -m http.server 8090

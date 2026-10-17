@@ -89,6 +89,24 @@
       "icon": "⏱️",
       "tags": ["cronómetro", "azar", "minigame"],
       "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "marble-escape",
+      "name": "Marble Escape",
+      "description": "Crea marbles y guíalos por una fábrica difícil llena de bloques, lava y una zona segura.",
+      "folder": "Marble Escape",
+      "icon": "🔵",
+      "tags": ["marbles", "física", "plataformas"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "tipo-knowledge",
+      "name": "Tipo Knowledge",
+      "description": "Creá Lugares De Tipo, armá equipos con logo y asigná un tipo a cada pelotita.",
+      "folder": "Tipo Knowledge",
+      "icon": "🧠",
+      "tags": ["tipos", "preguntas", "pelotitas"],
+      "creator": "José Rafael Rodriguez Morillo"
     }
   ]
 }

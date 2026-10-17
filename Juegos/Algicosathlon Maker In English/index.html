@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Algicosathlon Maker In English</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=packs2" />
   <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
@@ -93,6 +93,14 @@
         </div>
         <p class="world-hint" id="worldHint" data-i18n="dragBalls">Drag and drop the balls.</p>
       </div>
+      <section class="shared-pack-panel">
+        <div class="section-heading">
+          <h2 data-i18n="packsAvailable">📦 Packs disponibles</h2>
+          <span data-i18n="placePackHint">Colocalos en esta partida</span>
+        </div>
+        <div id="packPlacementList" class="pack-placement-list"></div>
+        <p id="noPacksForSave" class="empty" data-i18n="noPacksYet">Todavía no creaste packs.</p>
+      </section>
     </section>
 
     <section id="screenAlgicosathlon" class="screen">
@@ -269,8 +277,9 @@
 
   <div class="save-toast" id="saveToast" hidden>Saved</div>
 
-  <script src="../../i18n.js"></script>
+  <script src="../../i18n.js?v=marble123"></script>
+  <script src="../../shared-packs.js?v=packs1"></script>
   <script src="../../shared-music.js?v=global1"></script>
-  <script src="game.js"></script>
+  <script src="game.js?v=packs1"></script>
 </body>
 </html>
