@@ -193,7 +193,7 @@
 
   async function openPublicados() {
     publicadosEmpty.hidden = true;
-    publicadosEmpty.textContent = "Cargando idiomas publicados…";
+    publicadosEmpty.textContent = "Cargando idiomas guardados…";
     show("screenPublicados");
     await refreshPublishedFromCloud();
     renderPublicados();
@@ -298,7 +298,7 @@
   function renderPublicados() {
     publicadosList.innerHTML = "";
     publicadosEmpty.hidden = published.length > 0;
-    publicadosEmpty.textContent = "Todavía no hay idiomas publicados. Creá uno desde Idiomas → Crear.";
+    publicadosEmpty.textContent = "Todavía no hay idiomas guardados. Creá uno desde Idiomas → Crear.";
 
     published
       .slice()
@@ -311,7 +311,7 @@
         info.className = "lang-item-info";
         info.innerHTML =
           "<strong>" + lang.name + "</strong>" +
-          "<span>Original: " + sourceName(lang.sourceLang) + " · " + lang.entries.length + " palabras · Publicado para todos</span>";
+          "<span>Original: " + sourceName(lang.sourceLang) + " · " + lang.entries.length + " palabras · Guardado</span>";
 
         const actions = document.createElement("div");
         actions.style.display = "flex";
@@ -329,7 +329,7 @@
         delBtn.className = "btn danger";
         delBtn.textContent = "Borrar";
         delBtn.addEventListener("click", async () => {
-          const ok = window.confirm('¿Borrar el idioma publicado "' + lang.name + '"?');
+          const ok = window.confirm('¿Borrar el idioma guardado "' + lang.name + '"?');
           if (!ok) return;
           await deleteFromCloud(lang.id);
           renderPublicados();
@@ -346,7 +346,7 @@
   async function openUsarPicker() {
     await refreshPublishedFromCloud();
     if (!published.length) {
-      window.alert("Todavía no hay idiomas publicados. Creá uno primero.");
+      window.alert("Todavía no hay idiomas guardados. Creá uno primero.");
       show("screenIdiomasMenu");
       return;
     }
@@ -406,7 +406,7 @@
     await refreshPublishedFromCloud();
     if (published.some((item) => item.name.toLowerCase() === name.toLowerCase())) {
       createError.hidden = false;
-      createError.textContent = "Ya hay un idioma publicado con ese nombre.";
+      createError.textContent = "Ya hay un idioma guardado con ese nombre.";
       return;
     }
 
@@ -431,34 +431,29 @@
 
     const btn = document.getElementById("btnPublish");
     btn.disabled = true;
-    btn.textContent = "Publicando…";
+    btn.textContent = "Guardando…";
     let result;
     try {
       result = await publishToCloud(lang);
     } catch (err) {
       createError.hidden = false;
-      createError.textContent = err.message || "No se pudo publicar.";
+      createError.textContent = err.message || "No se pudo guardar.";
       btn.disabled = false;
-      btn.textContent = "Enviar y publicar";
+      btn.textContent = "Enviar y guardar";
       return;
     }
     btn.disabled = false;
-    btn.textContent = "Enviar y publicar";
+    btn.textContent = "Enviar y guardar";
 
     await refreshPublishedFromCloud();
     renderPublicados();
     show("screenPublicados");
     if (result.shared) {
       window.alert(
-        '"' + name + '" quedó publicado para todos (celulares, laptops y consolas). ' +
-        "Cualquiera puede traducir desde " + sourceName(sourceLang) + "."
+        '"' + name + '" quedó guardado. Cualquiera puede traducir desde ' + sourceName(sourceLang) + "."
       );
     } else {
-      window.alert(
-        '"' + name + '" se guardó acá, pero no hubo servidor compartido. ' +
-        "Abrí el juego con JUGAR.bat (http://...:8090) para publicarlo a todos, " +
-        "y después subí data/idiomas-publicados.json a git."
-      );
+      window.alert('"' + name + '" quedó guardado en este dispositivo.');
     }
   });
 

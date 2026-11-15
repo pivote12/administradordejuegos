@@ -257,10 +257,10 @@
     {
       "id": "idiomas",
       "name": "Idiomas",
-      "description": "Creá idiomas, publicalos para todos los dispositivos y traducí entre el original y el tuyo.",
+      "description": "Creá idiomas, guardalos y traducí entre el original y el tuyo.",
       "folder": "Idiomas",
       "icon": "🗣️",
-      "tags": ["idiomas", "traducir", "crear", "compartido"],
+      "tags": ["idiomas", "traducir", "crear", "guardados"],
       "creator": "José Rafael Rodriguez Morillo"
     },
     {
