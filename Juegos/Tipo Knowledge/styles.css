@@ -171,6 +171,7 @@ input[type="text"], input:not([type]), textarea, #placeName, .q-text, .q-opt, #t
 .dot { width: 0.85rem; height: 0.85rem; border-radius: 50%; display: inline-block; }
 .mini-logo { width: 42px; height: 32px; object-fit: cover; border-radius: 0.4rem; }
 .gen-row { display: flex; align-items: center; gap: 0.45rem; }
+.gen-row .btn.redo { margin-top: 0; margin-left: auto; }
 
 .quiz-card h2 { margin-bottom: 0.3rem; }
 .option-list { display: grid; gap: 0.5rem; margin: 0.8rem 0; }

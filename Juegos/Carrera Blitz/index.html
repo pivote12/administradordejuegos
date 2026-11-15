@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrera Blitz</title>
+  <link rel="stylesheet" href="styles.css?v=blitz1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-card">
+        <div class="logo">🏁</div>
+        <h1>Carrera Blitz</h1>
+        <p class="subtitle">Una pista neón para romper récords o cruzar primero la meta.</p>
+        <p class="creator">Creador: Reddo</p>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnStart">Jugar</button>
+          <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenMenu" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <div>
+            <h2>Menú principal</h2>
+            <p class="hint" id="menuRecord"></p>
+          </div>
+        </header>
+        <div class="mode-list">
+          <button type="button" class="mode" id="btnSolo">
+            <strong>⏱️ Modo Solo Speedrun</strong>
+            <span>Contra el reloj. Elegí una pelotita y rompé tu récord o el de la tripulación.</span>
+          </button>
+          <button type="button" class="mode" id="btnRace">
+            <strong>🏎️ Modo Carrera de Creadores</strong>
+            <span>1 vs 1 contra la IA, o todos contra todos con las pelotitas del mismo pack.</span>
+          </button>
+          <button type="button" class="mode" id="btnShop">
+            <strong>🪙 Tienda Blitz</strong>
+            <span>Gastá monedas de velocidad en rastros nuevos.</span>
+          </button>
+        </div>
+        <p class="hint controls-hint">En la pista: A y D se mueven, W salta, S cae rápido. Espacio dispara el Hyper Boost cuando la barra está llena.</p>
+      </div>
+    </section>
+
+    <section id="screenPick" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackMenu">←</button>
+          <div>
+            <h2 id="pickTitle">Elegí tu pelotita</h2>
+            <p class="hint" id="pickHint"></p>
+          </div>
+        </header>
+        <div id="marbleList" class="marble-list"></div>
+      </div>
+    </section>
+
+    <section id="screenRival" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackPick">←</button>
+          <div>
+            <h2>¿Contra quién?</h2>
+            <p class="hint" id="rivalHint"></p>
+          </div>
+        </header>
+        <div class="mode-list">
+          <button type="button" class="mode" id="btnDuel">
+            <strong>1 vs 1</strong>
+            <span>Una rival de la IA en la misma pista.</span>
+          </button>
+          <button type="button" class="mode" id="btnAll">
+            <strong>Todos contra todos</strong>
+            <span>El resto de las pelotitas del pack de la que elegiste.</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenShop" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnShopBack">←</button>
+          <div>
+            <h2>Tienda Blitz</h2>
+            <p class="hint" id="shopCoins"></p>
+          </div>
+        </header>
+        <div id="shopList" class="shop-list"></div>
+      </div>
+    </section>
+
+    <section id="screenPlay" class="screen">
+      <div class="hud">
+        <div>
+          <span class="hud-label">Tiempo</span>
+          <strong id="hudTime">00:00.000</strong>
+        </div>
+        <div>
+          <span class="hud-label">Velocidad</span>
+          <strong id="hudSpeed">0 km/h</strong>
+        </div>
+        <div class="nitro-box">
+          <span class="hud-label">Nitro Blitz</span>
+          <div class="nitro"><span id="nitroFill"></span></div>
+        </div>
+      </div>
+      <p id="playStatus" class="status">A y D mueven. W salta. S cae. Espacio es el Hyper Boost.</p>
+      <div class="table-wrap">
+        <canvas id="track" width="960" height="480"></canvas>
+      </div>
+      <div class="controls">
+        <button type="button" class="btn flip" id="btnLeft">A</button>
+        <button type="button" class="btn primary" id="btnJump">Salto</button>
+        <button type="button" class="btn accent" id="btnHyper">Hyper</button>
+        <button type="button" class="btn flip" id="btnRight">D</button>
+      </div>
+    </section>
+
+    <section id="screenResult" class="screen">
+      <div class="panel result-card">
+        <h2 id="resultTitle">Meta</h2>
+        <p class="medal" id="resultMedal"></p>
+        <ul class="stats" id="resultStats"></ul>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnAgain">Otra vez</button>
+          <button type="button" class="btn secondary" id="btnToShop">Tienda</button>
+          <button type="button" class="btn ghost" id="btnToMenu">Menú</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="game.js?v=blitz2"></script>
+</body>
+</html>

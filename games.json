@@ -28,6 +28,15 @@
       "creator": "Lourdes Roulier"
     },
     {
+      "id": "neymarmichis",
+      "name": "Neymarmichis",
+      "description": "Creá gatos futbolistas con camiseta y stats, cuidalos y jugá Fuchibol contra la IA.",
+      "folder": "Neymarmichis",
+      "icon": "🐱",
+      "tags": ["gatos", "fútbol", "creator"],
+      "creator": "Lourdes Roulier"
+    },
+    {
       "id": "creador-2d",
       "name": "Creador 2D",
       "description": "Crea tu propio mundo en 2D con un editor de bloques.",
@@ -106,6 +115,161 @@
       "folder": "Tipo Knowledge",
       "icon": "🧠",
       "tags": ["tipos", "preguntas", "pelotitas"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "pinball",
+      "name": "Pinball",
+      "description": "Elegí pelotitas de tus packs y jugá en una mesa con túnel, círculos de punto y círculos de dinero.",
+      "folder": "Pinball",
+      "icon": "🎱",
+      "tags": ["pinball", "pelotitas", "packs"],
+      "creator": [
+        "José Rafael Rodriguez Morillo",
+        "Reddo",
+        "Pinki",
+        "Yeller",
+        "Bifer",
+        "Bifer3000",
+        "PinVilet"
+      ]
+    },
+    {
+      "id": "carrera-blitz",
+      "name": "Carrera Blitz",
+      "description": "Elegí una pelotita de tus packs y corré una pista neón: speedrun contra el reloj o carrera contra la IA y tu pack.",
+      "folder": "Carrera Blitz",
+      "icon": "🏁",
+      "tags": ["carrera", "pelotitas", "packs"],
+      "creator": "Reddo"
+    },
+    {
+      "id": "pinki-glamour",
+      "name": "Pinki's Glamour Rush: ¡El Desfile de Plataforma!",
+      "description": "Elegí una pelotita, cruzá 50 pasarelas al ritmo y juntá estilo. También hay carrera contra 3 rivales y una tienda de accesorios.",
+      "folder": "Pinki Glamour Rush",
+      "icon": "🎀",
+      "tags": ["pasarela", "pelotitas", "packs"],
+      "creator": "Pinki"
+    },
+    {
+      "id": "yeller-jackpot",
+      "name": "Yeller's Lucky Jackpot: ¡El Desafío de la Suerte Dorada!",
+      "description": "Elegí una pelotita, tirá el dado de 12 caras y cruzá 20 tableros de suerte. En el Royale, 4 pelotitas compiten por 1.000 monedas o por el Jackpot.",
+      "folder": "Yeller Lucky Jackpot",
+      "icon": "🪙",
+      "tags": ["suerte", "pelotitas", "packs"],
+      "creator": "Yeller"
+    },
+    {
+      "id": "bifer-cyber",
+      "name": "Bifer & Bifer3000's Cyber-Matrix: ¡El Hackeo Cósmico!",
+      "description": "Elegí una pelotita como núcleo de datos, girá espejos y conectá el láser en 40 nodos. En la Matriz, 4 pelotitas compiten por hackear el servidor.",
+      "folder": "Bifer Cyber Matrix",
+      "icon": "🧠",
+      "tags": ["hackeo", "pelotitas", "packs"],
+      "creator": [
+        "Bifer",
+        "Bifer3000"
+      ]
+    },
+    {
+      "id": "pinvilet-font",
+      "name": "PinVilet's Font-Chaos: ¡La Batalla de las Letras Gigantes!",
+      "description": "Elegí una pelotita y una fuente, y rebotá por 30 mapas de letras gigantes. En la sopa de letras, 4 pelotitas compiten por la palabra más larga.",
+      "folder": "PinVilet Font Chaos",
+      "icon": "🟣",
+      "tags": ["letras", "pelotitas", "packs"],
+      "creator": "PinVilet"
+    },
+    {
+      "id": "platafacido",
+      "name": "PlatafAcido",
+      "description": "Elegí un pack y sobreviví en una plataforma 3D sobre ácido. La última pelotita en pie gana.",
+      "folder": "PlatafAcido",
+      "icon": "🧪",
+      "tags": ["ácido", "pelotitas", "packs"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "temperatura",
+      "name": "Temperatura",
+      "description": "Buscá la temperatura y el clima reales de tu zona, hora por hora hasta el día 22, hora 24.",
+      "folder": "Temperatura",
+      "icon": "🌡️",
+      "tags": ["clima", "temperatura", "utilidad"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "grupos",
+      "name": "Grupos",
+      "description": "Elegí un pack, tocá un divisor y formá equipos respetando amistades, enemistades, grupos y familias.",
+      "folder": "Grupos",
+      "icon": "🧩",
+      "tags": ["packs", "equipos", "pelotitas"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "colegio-creado",
+      "name": "Colegio Creado",
+      "description": "Armá tu colegio con packs o pelotitas, mandalas a aulas y dá clase corrigiendo trabajos con A o F.",
+      "folder": "Colegio Creado",
+      "icon": "🏫",
+      "tags": ["colegio", "pelotitas", "packs", "clases"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "carrera-y-ruleta-rusa",
+      "name": "Carrera y Ruleta Rusa",
+      "description": "Elegí un pack y sobreviví en un pinball de dos destinos. Completá todos los packs, jugá el Final y ganá medallas.",
+      "folder": "Carrera y Ruleta Rusa",
+      "icon": "🎰",
+      "tags": ["packs", "pinball", "eliminación"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "universe-maker",
+      "name": "Universe Maker",
+      "description": "Creá universos con un pack, acelerá los eones, formá estrellas, planetas y vida.",
+      "folder": "Universe Maker",
+      "icon": "🌌",
+      "tags": ["universo", "packs", "simulación"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "surprise-huevo",
+      "name": "Surprise Huevo",
+      "description": "Comprá huevos en la tienda, abrí zonas y coleccioná figuras sorpresa.",
+      "folder": "Surprise Huevo",
+      "icon": "🥚",
+      "tags": ["sorpresa", "huevo", "tienda", "colección"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "tiempo-anti-2038",
+      "name": "Tiempo Anti-2038",
+      "description": "Contador de segundos con fecha real, Unix y 210 luces binarias que no se rompe en 2038.",
+      "folder": "Tiempo Anti-2038",
+      "icon": "⏳",
+      "tags": ["tiempo", "unix", "contador", "binario"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "idiomas",
+      "name": "Idiomas",
+      "description": "Creá idiomas, publicalos y traducí entre el idioma original y el tuyo.",
+      "folder": "Idiomas",
+      "icon": "🗣️",
+      "tags": ["idiomas", "traducir", "crear"],
+      "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "shape-battle",
+      "name": "Shape Battle",
+      "description": "Batallas con círculos matemáticos o Obstacle Course con cuadrados RGB.",
+      "folder": "Shape Battle",
+      "icon": "⬡",
+      "tags": ["batalla", "formas", "obstáculos"],
       "creator": "José Rafael Rodriguez Morillo"
     }
   ]

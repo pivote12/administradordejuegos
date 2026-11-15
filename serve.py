@@ -3,8 +3,11 @@
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from datetime import datetime, timezone
+import json
 import os
 import sys
+import time
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PORT = int(os.environ.get("PORT", "8090"))
@@ -17,7 +20,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def end_headers(self):
         path = self.path.split("?", 1)[0].lower()
-        if self.path.startswith("/ollama"):
+        if self.path.startswith("/ollama") or path == "/time":
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
             self.send_header("Access-Control-Allow-Headers", "Content-Type")
@@ -28,17 +31,37 @@ class Handler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_OPTIONS(self):
-        if self.path.startswith("/ollama"):
+        path = self.path.split("?", 1)[0]
+        if self.path.startswith("/ollama") or path == "/time":
             self.send_response(204)
             self.end_headers()
             return
         self.send_error(404)
 
     def do_GET(self):
+        path = self.path.split("?", 1)[0]
+        if path == "/time":
+            self.send_time()
+            return
         if self.path.startswith("/ollama"):
             self.proxy()
             return
         super().do_GET()
+
+    def send_time(self):
+        now = time.time()
+        unix_ms = int(now * 1000)
+        payload = {
+            "unix": int(now),
+            "unixMs": unix_ms,
+            "iso": datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+            "source": "serve.py",
+        }
+        body = json.dumps(payload).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_POST(self):
         if self.path.startswith("/ollama"):
@@ -94,6 +117,7 @@ if __name__ == "__main__":
     os.chdir(ROOT)
     server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print("Administrador en http://localhost:%s" % PORT)
+    print("Hora confiable: /time")
     print("Proxy Ollama: /ollama -> %s" % OLLAMA)
     try:
         server.serve_forever()

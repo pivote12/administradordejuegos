@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Surprise Huevo</title>
+  <link rel="stylesheet" href="styles.css?v=sh4" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🥚</p>
+      <h1>Surprise Huevo</h1>
+      <p>Comprá huevos en la tienda, abrí zonas y descubrí figuras sorpresa.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnPlay">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenAccount" class="screen">
+    <div class="card account-card">
+      <button type="button" class="btn ghost back-mini" id="btnBackFromAccount">←</button>
+      <h1>Tu cuenta</h1>
+      <p class="hint">Necesitás una cuenta para jugar. Podés crear o borrar todas las que quieras.</p>
+
+      <div id="accountListWrap" class="account-list-wrap" hidden>
+        <h3>Entrar con una cuenta</h3>
+        <div id="accountList" class="account-list"></div>
+      </div>
+
+      <form id="loginForm" class="account-form" hidden>
+        <h3 id="loginTitle">Entrar</h3>
+        <p class="hint" id="loginUserHint"></p>
+        <label>
+          Contraseña
+          <input type="password" id="loginPassword" autocomplete="current-password" required />
+        </label>
+        <p class="form-error" id="loginError" hidden></p>
+        <div class="form-actions">
+          <button type="submit" class="btn primary">Entrar</button>
+          <button type="button" class="btn ghost" id="btnCancelLogin">Cancelar</button>
+        </div>
+      </form>
+
+      <form id="createForm" class="account-form">
+        <h3>Crear cuenta nueva</h3>
+        <label>
+          Nombre de usuario
+          <input type="text" id="createName" maxlength="24" autocomplete="username" required />
+        </label>
+        <label>
+          Contraseña
+          <input type="password" id="createPassword" autocomplete="new-password" required />
+        </label>
+        <p class="form-error" id="createError" hidden></p>
+        <button type="submit" class="btn primary">Crear y jugar</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="screenHub" class="screen">
+    <header class="hub-bar">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <div class="hub-titles">
+        <h2>Surprise Huevo</h2>
+        <p class="money-line">
+          <span id="userLabel">Jugador</span> ·
+          💰 <strong id="moneyLabel">$0</strong> ·
+          <span id="dailyLabel">Diario listo</span>
+        </p>
+      </div>
+      <button type="button" class="btn ghost" id="btnLogout">Salir</button>
+    </header>
+
+    <nav class="zone-nav" id="zoneNav" aria-label="Zonas"></nav>
+
+    <div class="zone-panel active" id="zoneShop" data-zone="shop">
+      <div class="zone-head">
+        <h3>🛒 Tienda de huevos</h3>
+        <p class="hint">Cada día, todas las cuentas ganan $10.000. Comprá huevos y abrilos en su zona.</p>
+      </div>
+      <div class="shop-grid" id="shopGrid"></div>
+    </div>
+
+    <div id="eggZones"></div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=sh4"></script>
+</body>
+</html>

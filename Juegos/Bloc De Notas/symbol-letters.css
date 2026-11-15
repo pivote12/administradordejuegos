@@ -1,0 +1,33 @@
+/* Letras tipográficas (fuente SymbolismLetters), no imágenes */
+.sym-glyph,
+.letter-chip {
+  font-family: var(--symbolism-font, "SymbolismLetters", "Segoe UI Symbol", monospace);
+  font-weight: 400;
+  line-height: 1;
+  color: inherit;
+}
+
+.sym-glyph--face {
+  font-size: 88px;
+  line-height: 1;
+  display: block;
+}
+
+.letter-chip {
+  font-size: 36px;
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(148 163 184 / 0.35);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.06);
+  color: #e2e8f0;
+  cursor: pointer;
+  padding: 0;
+}
+
+#notesArea {
+  font-family: var(--symbolism-font, "SymbolismLetters", "Cascadia Code", Consolas, monospace) !important;
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pinball</title>
+  <link rel="stylesheet" href="styles.css?v=pin6" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-card">
+        <div class="logo">🎱</div>
+        <h1>Pinball</h1>
+        <p class="subtitle">La mesa entra entera en la pantalla, con un túnel que cambia de letra y círculos que dan dinero.</p>
+        <ul class="creators">
+          <li>José Rafael Rodriguez Morillo</li>
+          <li>Reddo</li>
+          <li>Pinki</li>
+          <li>Yeller</li>
+          <li>Bifer</li>
+          <li>Bifer3000</li>
+          <li>PinVilet</li>
+        </ul>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnStart">Jugar</button>
+          <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenSlots" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <div>
+            <h2>Partidas</h2>
+            <p class="hint">Hay 4 slots. Al crear una, elegís el nombre y los packs. Después no se pueden crear más pelotitas.</p>
+          </div>
+        </header>
+        <div id="slotList" class="slot-list"></div>
+      </div>
+    </section>
+
+    <section id="screenCreate" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnCancelCreate">←</button>
+          <div>
+            <h2>Nueva partida</h2>
+            <p class="hint">El nombre y los packs se eligen ahora. Esas pelotitas son las únicas de la partida.</p>
+          </div>
+        </header>
+        <form id="createForm" class="create-form">
+          <label>
+            Nombre
+            <input id="saveName" maxlength="24" required placeholder="Ej.: Mesa de José" />
+          </label>
+          <div>
+            <p class="lead">Packs de pelotitas</p>
+            <div id="packChoices" class="pack-choices"></div>
+            <p id="packEmpty" class="hint" hidden>No hay packs con pelotitas. Creálos en Packs y volvé.</p>
+          </div>
+          <p id="createError" class="error" hidden></p>
+          <button type="submit" class="btn primary">Crear partida</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="screenLobby" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackSlots">←</button>
+          <div>
+            <h2 id="lobbyTitle">Partida</h2>
+            <p class="hint" id="lobbyMeta"></p>
+          </div>
+          <button type="button" class="btn ghost" id="btnDelete">Borrar</button>
+        </header>
+        <div class="stats">
+          <span id="statMoney">Dinero: 0</span>
+          <span id="statLetter">Túnel: A</span>
+          <span id="statDup">Duplicar: 0%</span>
+          <span id="statLevel">Círculos de dinero: nivel 1</span>
+        </div>
+        <button type="button" class="btn accent" id="btnUpgrade">Mejorar círculos de dinero</button>
+        <div class="gift-row">
+          <button type="button" class="btn accent" id="btnUpgrade10">Mejorar ×10</button>
+          <button type="button" class="btn accent" id="btnUpgrade100">Mejorar ×100</button>
+        </div>
+        <div id="giftBox" class="gift-box">
+          <p class="hint" id="giftHint"></p>
+          <div id="giftUse" class="gift-row">
+            <select id="giftMarble"></select>
+            <button type="button" class="btn accent" id="btnGift">Sumar 10%</button>
+          </div>
+          <button type="button" class="btn ghost" id="btnGiftRefill" hidden>Comprar un uso más</button>
+        </div>
+        <div class="roster-head">
+          <h3>¿Quién juega?</h3>
+          <button type="button" class="btn secondary" id="btnAll">Elegir todas</button>
+          <button type="button" class="btn ghost" id="btnNone">Seleccionar ninguna</button>
+        </div>
+        <div id="roster" class="roster"></div>
+        <button type="button" class="btn primary play" id="btnPlay">Jugar Pinball</button>
+      </div>
+    </section>
+
+    <section id="screenPlay" class="screen">
+      <header class="play-top">
+        <button type="button" class="btn icon" id="btnLeavePlay">←</button>
+        <div class="play-stats">
+          <strong id="playMoney">$0</strong>
+          <span id="playLetter">Túnel A</span>
+          <span id="playDup">Duplicar 0%</span>
+        </div>
+        <button type="button" class="btn accent" id="btnUpgradePlay">Mejorar</button>
+        <button type="button" class="btn accent" id="btnUpgradePlay10">×10</button>
+        <button type="button" class="btn accent" id="btnUpgradePlay100">×100</button>
+      </header>
+      <p id="playStatus" class="status">Flechas o A y D mueven las paletas. Espacio lanza.</p>
+      <div class="table-wrap">
+        <canvas id="table" width="520" height="700"></canvas>
+      </div>
+      <div class="controls">
+        <button type="button" class="btn flip" id="btnLeft">Paleta izquierda</button>
+        <button type="button" class="btn primary" id="btnLaunch">Lanzar</button>
+        <button type="button" class="btn accent" id="btnRelease">Sacar todas</button>
+        <button type="button" class="btn flip" id="btnRight">Paleta derecha</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="game.js?v=pin16"></script>
+</body>
+</html>

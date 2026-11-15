@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Temperatura</title>
+  <link rel="stylesheet" href="styles.css?v=temp3" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <header class="top">
+    <a class="btn ghost" href="../../index.html">← Menú</a>
+    <div>
+      <h1>Temperatura</h1>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+    </div>
+  </header>
+
+  <main>
+    <section id="now" class="now" aria-live="polite"></section>
+    <p id="placeLine" class="hint"></p>
+
+    <section>
+      <h2>Clima por hora, hasta el día 22, hora 24</h2>
+      <div id="hours" class="hours"></div>
+    </section>
+  </main>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=temp10"></script>
+</body>
+</html>

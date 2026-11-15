@@ -1,10 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bloc De Notas</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=bloc10" />
+  <link rel="stylesheet" href="symbol-letters.css?v=let6" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
   <div id="app">
@@ -25,13 +27,32 @@
         <h2 data-i18n="title">Bloc De Notas</h2>
         <button type="button" class="btn primary" id="btnSave" data-i18n="save">Guardar</button>
       </header>
+      <div class="symbol-bar" id="symbolBar" hidden>
+        <p class="hint">Letras personalizadas (tocá para escribirla):</p>
+        <div id="symbolInsertList" class="symbol-insert-list"></div>
+      </div>
       <div class="notes-wrap">
         <textarea id="notesArea" data-i18n-placeholder="placeholder" placeholder="Escribí tus anotaciones aquí..."></textarea>
       </div>
       <p class="hint saved-hint" id="savedHint" hidden data-i18n="saved">Guardado.</p>
     </section>
   </div>
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
   <script src="../../i18n.js"></script>
-  <script src="game.js"></script>
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="../../vendor/opentype.min.js"></script>
+  <script src="symbol-letters.js?v=let6"></script>
+  <script src="game.js?v=bloc10"></script>
 </body>
 </html>

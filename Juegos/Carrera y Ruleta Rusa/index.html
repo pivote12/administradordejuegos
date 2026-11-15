@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrera y Ruleta Rusa</title>
+  <link rel="stylesheet" href="styles.css?v=crr1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🎰</p>
+      <h1>Carrera y Ruleta Rusa</h1>
+      <p>Elegí un pack, tirás pelotitas en un pinball de dos destinos: seguir o quedar eliminado. Sobreviví en todos los packs para desbloquear el Final.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnPlay">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenHub" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnHubTitle">←</button>
+      <div class="topline">
+        <div>
+          <h2>Hub</h2>
+          <p class="hint">Cada pack tiene su propia partida. Completá todos para desbloquear Final.</p>
+        </div>
+        <p id="medalCount" class="medals">🏅 0</p>
+      </div>
+      <div id="packList" class="pack-list"></div>
+      <p id="hubStatus" class="status"></p>
+      <button type="button" class="btn primary" id="btnFinal" disabled>Final</button>
+      <p class="hint">Gastar 2 medallas da una segunda vida en una partida (se activa al quedar eliminado).</p>
+    </div>
+  </section>
+
+  <section id="screenMatch" class="screen">
+    <div class="card wide match-card">
+      <button type="button" class="btn ghost" id="btnMatchBack">← Hub</button>
+      <div class="topline">
+        <div>
+          <h2 id="matchTitle">Partida</h2>
+          <p id="matchHint" class="hint"></p>
+        </div>
+        <p id="matchMedals" class="medals">🏅 0</p>
+      </div>
+      <div id="aliveList" class="alive-list"></div>
+      <p id="matchStatus" class="status"></p>
+      <div class="table-wrap">
+        <canvas id="table" width="420" height="640" aria-label="Mapa de pinball"></canvas>
+      </div>
+      <div class="actions" id="matchActions"></div>
+    </div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=crr1"></script>
+</body>
+</html>

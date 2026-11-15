@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlatafAcido</title>
+  <link rel="stylesheet" href="styles.css?v=acido6" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🧪</p>
+      <h1>PlatafAcido</h1>
+      <p>El ácido se lleva a quien se cae. La última pelotita gana.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnStart">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenPacks" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <h2>Elegí un pack</h2>
+      <p>Entran todas las pelotitas del pack, hasta 100, en una plataforma de 200 × 200.</p>
+      <div id="packList" class="pack-list"></div>
+    </div>
+  </section>
+
+  <section id="screenPlay" class="screen">
+    <div id="view"></div>
+    <div class="hud">
+      <button type="button" class="btn" id="btnControl">Control</button>
+      <button type="button" class="btn" id="btnCraft">Mesa de crafteo</button>
+      <button type="button" class="btn ghost" id="btnLeave">Salir</button>
+      <p id="playStatus">Clic izquierdo y arrastrar gira la cámara. E duerme.</p>
+    </div>
+    <div id="controlList" class="panel" hidden></div>
+    <div id="roomPick" class="panel" hidden>
+      <p id="roomPickTitle">¿Quién tiene esta habitación? Podés elegir varias.</p>
+      <div id="roomPickList"></div>
+      <div class="room-actions">
+        <button type="button" class="btn primary" id="btnRoomDone">Listo</button>
+        <button type="button" class="btn ghost" id="btnRoomCancel">Cancelar</button>
+      </div>
+    </div>
+    <aside id="inventory" class="panel side"></aside>
+    <div id="craftPanel" class="panel craft" hidden>
+      <h3>Mesa de crafteo</h3>
+      <div id="craftGrid" class="craft-grid"></div>
+      <div class="room-actions">
+        <button type="button" class="btn primary" id="btnDoCraft">Crear</button>
+        <button type="button" class="btn ghost" id="btnClearCraft">Vaciar</button>
+      </div>
+      <div id="craftList" class="craft-list"></div>
+    </div>
+    <div id="chestPanel" class="panel craft" hidden>
+      <h3>Cofre <span id="chestCount"></span></h3>
+      <div id="chestSlots" class="craft-grid chest-grid"></div>
+      <button type="button" class="btn ghost" id="btnCloseChest">Cerrar</button>
+    </div>
+  </section>
+
+  <section id="screenResult" class="screen">
+    <div class="card">
+      <h2 id="resultTitle">PlatafAcido</h2>
+      <p id="resultText"></p>
+      <button type="button" class="btn primary" id="btnAgain">Otro pack</button>
+      <a class="btn ghost" href="../../index.html">Menú</a>
+    </div>
+  </section>
+
+  <p id="bootError" class="boot-error" hidden>No se pudo abrir la plataforma 3D. Recargá con Ctrl+F5.</p>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="three.global.js?v=acido5"></script>
+  <script src="game.js?v=acido16"></script>
+  <script>
+    if (!window.PlatafAcidoReady) {
+      var boot = document.getElementById("bootError");
+      boot.hidden = false;
+      boot.textContent = "No se pudo abrir la plataforma 3D. Recargá con Ctrl+F5.";
+    }
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Packs</title>
-  <link rel="stylesheet" href="Juegos/Marble Escape/styles.css?v=marble123" />
+  <link rel="stylesheet" href="Juegos/Marble Escape/styles.css?v=marble175" />
   <style>
     body { min-height: 100vh; }
     .pack-home { width: min(720px, calc(100% - 2rem)); margin: 1.5rem auto 3rem; }
@@ -39,6 +39,7 @@
           </div>
           <div class="pack-editor-actions">
             <button id="packGenderButton" class="button secondary compact" type="button">⚧ Género</button>
+            <button id="packIntelButton" class="button secondary compact" type="button">🧠 Inteligencia</button>
             <button id="savePackButton" class="button primary compact" type="button">Guardar Pack</button>
           </div>
         </div>
@@ -56,12 +57,47 @@
           <p class="pack-gender-lead">Elegí el género de cada pelota. Es obligatorio para guardar.</p>
           <div id="packGenderList" class="pack-gender-list"></div>
         </section>
+        <section id="packIntelPanel" class="pack-gender-panel" hidden>
+          <p class="pack-gender-lead">🧠 Inteligencia</p>
+          <p class="pack-gender-lead">Del 0 al 100. 0–25 tonto · 26–50 normal · 51–75 inteligente · 76–99 genio · 100 SUPER GENIO.</p>
+          <div id="packIntelList" class="pack-gender-list"></div>
+        </section>
+        <section id="packPairPanel" class="pair-panel">
+          <p class="pack-gender-lead">💑 Parejas</p>
+          <p class="pack-gender-lead">Opcional. Un chico + una chica.</p>
+          <div id="packPairList" class="pair-list"></div>
+          <div id="packPairForm" class="pair-form"></div>
+        </section>
+        <section id="packFriendPanel" class="pair-panel">
+          <p class="pack-gender-lead">👥 Grupos de amistad</p>
+          <p class="pack-gender-lead">Opcional. Un nombre y al menos 2 pelotas. Cada pelota va en un solo grupo.</p>
+          <div id="packFriendList" class="pair-list"></div>
+          <div id="packFriendForm" class="friend-form"></div>
+        </section>
+        <section id="packFamilyPanel" class="pair-panel">
+          <p class="pack-gender-lead">👪 Familias</p>
+          <p class="pack-gender-lead">Opcional. Un nombre y al menos 2 pelotas. Cada pelota va en una sola familia.</p>
+          <div id="packFamilyList" class="pair-list"></div>
+          <div id="packFamilyForm" class="friend-form"></div>
+        </section>
+        <section id="packBuddyPanel" class="pair-panel">
+          <p class="pack-gender-lead">🤝 Amistades</p>
+          <p class="pack-gender-lead">Opcional. Sin nombre. Mínimo 2 pelotas y sin máximo. Una pelota puede estar en varias amistades.</p>
+          <div id="packBuddyList" class="pair-list"></div>
+          <div id="packBuddyForm" class="friend-form"></div>
+        </section>
+        <section id="packEnemyPanel" class="pair-panel">
+          <p class="pack-gender-lead">💢 Enemigos</p>
+          <p class="pack-gender-lead">Opcional. Sin nombre. Mínimo 2 pelotas y sin máximo. Son enemigos, no amigos, y se pelean muy fácil. Una pelota puede tener varios enemigos.</p>
+          <div id="packEnemyList" class="pair-list"></div>
+          <div id="packEnemyForm" class="friend-form"></div>
+        </section>
         <div id="packDraftList" class="pack-draft-list"></div>
         <p id="emptyPackDraft" class="empty">Agregá todas las pelotas que quieras.</p>
       </div>
     </section>
   </main>
-  <script src="shared-packs.js?v=packs1"></script>
-  <script src="packs.js?v=packs1"></script>
+  <script src="shared-packs.js?v=packs5"></script>
+  <script src="packs.js?v=packs10"></script>
 </body>
 </html>

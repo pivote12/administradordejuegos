@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neymarmichis</title>
+  <link rel="stylesheet" href="styles.css?v=ney2" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🐱</p>
+      <h1>Neymarmichis</h1>
+      <p>Creá gatos futbolistas, cuidalos y jugá un Fuchibol contra la IA.</p>
+      <p class="creator">Creador: Lourdes Roulier</p>
+      <button type="button" class="btn primary" id="btnOpenSaves">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenSaves" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <div class="topline">
+        <div>
+          <h2>Partidas</h2>
+          <p class="hint">Podés crear partidas ilimitadas y se guardan solas.</p>
+        </div>
+        <button type="button" class="btn primary" id="btnNewSave">+ Nueva partida</button>
+      </div>
+      <div id="saveList" class="save-list"></div>
+      <p id="emptySaves" class="empty">Todavía no hay partidas.</p>
+    </div>
+  </section>
+
+  <section id="screenCreate" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackSaves">←</button>
+      <h2>Nueva partida</h2>
+      <label class="field">
+        <span>Nombre de la partida</span>
+        <input id="saveName" maxlength="40" placeholder="Ej.: Liga Michi" />
+      </label>
+
+      <h3>Crear gatos</h3>
+      <p class="hint">Nombre, raza y camiseta. El nombre y el número de camiseta no se pueden repetir. Podés copiar stats de un jugador real.</p>
+
+      <div class="cat-form">
+        <label class="field">
+          <span>Nombre del gato</span>
+          <input id="catName" maxlength="24" placeholder="Ej.: MichiNey" />
+        </label>
+        <label class="field">
+          <span>Raza</span>
+          <input id="catBreed" maxlength="32" list="razasList" placeholder="Ej.: Persa, Siames…" />
+          <datalist id="razasList">
+            <option value="Persa"></option>
+            <option value="Siames"></option>
+            <option value="Maine Coon"></option>
+            <option value="Bengalí"></option>
+            <option value="Mestizo"></option>
+            <option value="Angora"></option>
+            <option value="Ragdoll"></option>
+          </datalist>
+        </label>
+        <label class="field">
+          <span>Nombre en la camiseta</span>
+          <input id="jerseyName" maxlength="16" placeholder="Ej.: NEYMAR" />
+        </label>
+        <label class="field">
+          <span>Número</span>
+          <input id="jerseyNumber" type="number" min="1" max="99" placeholder="10" />
+        </label>
+        <label class="field">
+          <span>Stats de jugador real (opcional)</span>
+          <select id="playerStats">
+            <option value="">Sin plantilla</option>
+            <option value="Neymar">Neymar</option>
+            <option value="Messi">Messi</option>
+            <option value="Cristiano">Cristiano</option>
+            <option value="Mbappe">Mbappe</option>
+            <option value="Haaland">Haaland</option>
+            <option value="Pedri">Pedri</option>
+          </select>
+        </label>
+        <button type="button" class="btn secondary" id="btnAddCat">+ Agregar gato</button>
+      </div>
+
+      <div id="createCatList" class="cat-list"></div>
+      <p id="createStatus" class="status"></p>
+      <button type="button" class="btn primary" id="btnStartSave">Empezar partida</button>
+    </div>
+  </section>
+
+  <section id="screenHub" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnHubBack">← Partidas</button>
+      <h2 id="hubTitle">Partida</h2>
+      <p id="hubHint" class="hint"></p>
+
+      <h3>Tus gatos</h3>
+      <div id="hubCatList" class="cat-list"></div>
+
+      <h3>Cuidarlos</h3>
+      <p class="hint">Elegí un gato y después una acción. Antes del Fuchibol, cuidalos bien.</p>
+      <div class="care-row" id="careActions">
+        <button type="button" class="btn care" data-care="pet" disabled>Acariciar</button>
+        <button type="button" class="btn care" data-care="feed" disabled>Dar de comer</button>
+        <button type="button" class="btn care" data-care="drink" disabled>Dar de beber</button>
+        <button type="button" class="btn care" data-care="play" disabled>Jugar</button>
+      </div>
+      <p id="careStatus" class="status"></p>
+
+      <h3>Fuchibol</h3>
+      <p class="hint">Jugá contra la IA. El equipo que gana se hace más realista.</p>
+      <button type="button" class="btn primary" id="btnFootball">Jugar Fuchibol vs IA</button>
+      <p id="hubStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="screenMatch" class="screen">
+    <div class="card wide match-card">
+      <button type="button" class="btn ghost" id="btnBackHubMatch">←</button>
+      <h2>Fuchibol</h2>
+      <p id="matchScore" class="scoreline">0 — 0</p>
+      <p id="matchClock" class="hint">0'</p>
+      <canvas id="pitch" width="720" height="360" aria-label="Cancha de fútbol"></canvas>
+      <p id="matchLog" class="match-log"></p>
+      <div class="actions" id="matchActions">
+        <button type="button" class="btn primary" id="btnKickOff">Sacar</button>
+      </div>
+      <p id="matchStatus" class="status"></p>
+    </div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=ney3"></script>
+</body>
+</html>

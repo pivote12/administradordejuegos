@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shape Battle</title>
+  <link rel="stylesheet" href="styles.css?v=sb2" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">⬡</p>
+      <h1>Shape Battle</h1>
+      <p>Batallas con círculos matemáticos o carrera de obstáculos con cuadrados.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnPlay">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenChoose" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <h2>Elegí forma</h2>
+    </header>
+    <div class="hub-grid">
+      <button type="button" class="hub-card" id="btnCircles">
+        <span class="hub-icon">⚪</span>
+        <strong>Círculos</strong>
+        <span>Creá al menos 10 y peleá en duelos</span>
+      </button>
+      <button type="button" class="hub-card" id="btnSquares">
+        <span class="hub-icon">◼</span>
+        <strong>Cuadrados</strong>
+        <span>Obstacle Course con color RGB</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="screenCircleCreate" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromCircleCreate">←</button>
+      <div class="bar-titles">
+        <h2>Crear círculos</h2>
+        <p class="hint">Mínimo 10 · cantidad par para batallar · <span id="circleCount">0</span> creados</p>
+      </div>
+      <button type="button" class="btn primary" id="btnStartCircleBattle" disabled>Batalla</button>
+    </header>
+    <div class="panel create-layout">
+      <form id="circleForm" class="create-form">
+        <label class="field">Nombre<input type="text" id="cName" maxlength="24" required /></label>
+        <label class="field">Color<input type="color" id="cColor" value="#38bdf8" /></label>
+        <label class="field">Texto (máx. 3)<input type="text" id="cText" maxlength="3" required /></label>
+        <div class="field">
+          <span>Ataque (cuenta matemática)</span>
+          <div class="attack-tools" id="attackTools"></div>
+          <input type="text" id="cAttack" class="mono" placeholder="ej: 10+pi*2" required />
+        </div>
+        <p class="form-error" id="circleError" hidden></p>
+        <button type="submit" class="btn primary">Agregar círculo</button>
+      </form>
+      <div class="created-list" id="circleList"></div>
+    </div>
+  </section>
+
+  <section id="screenCircleBracket" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromBracket">←</button>
+      <div class="bar-titles">
+        <h2>Batalla circular</h2>
+        <p class="hint" id="bracketHint">Tocá un grupo de dos para pelear</p>
+      </div>
+    </header>
+    <div class="panel">
+      <div id="pairList" class="pair-list"></div>
+      <div id="winnerBox" class="winner-box" hidden></div>
+    </div>
+  </section>
+
+  <section id="screenCircleFight" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromFight" hidden>←</button>
+      <div class="bar-titles">
+        <h2 id="fightTitle">Duelo</h2>
+        <p class="hint" id="fightHint">Destruí todos los bloques</p>
+      </div>
+    </header>
+    <div class="fight-grid" id="fightGrid"></div>
+  </section>
+
+  <section id="screenSquareCreate" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromSquareCreate">←</button>
+      <div class="bar-titles">
+        <h2>Cuadrados RGB</h2>
+        <p class="hint">Solo color · <span id="squareCount">0</span> listos</p>
+      </div>
+      <button type="button" class="btn primary" id="btnStartSquareRace" disabled>Obstacle Course</button>
+    </header>
+    <div class="panel create-layout">
+      <form id="squareForm" class="create-form">
+        <label class="field">Rojo (0-255)<input type="number" id="sR" min="0" max="255" value="56" required /></label>
+        <label class="field">Verde (0-255)<input type="number" id="sG" min="0" max="255" value="189" required /></label>
+        <label class="field">Azul (0-255)<input type="number" id="sB" min="0" max="255" value="248" required /></label>
+        <div class="rgb-preview" id="rgbPreview"></div>
+        <p class="form-error" id="squareError" hidden></p>
+        <button type="submit" class="btn primary">Agregar cuadrado</button>
+      </form>
+      <div class="created-list" id="squareList"></div>
+    </div>
+  </section>
+
+  <section id="screenSquareRace" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromRace">←</button>
+      <div class="bar-titles">
+        <h2>Obstacle Course</h2>
+        <p class="hint" id="raceHint">Llegá a la meta verde · el último pierde</p>
+      </div>
+    </header>
+    <canvas id="raceCanvas" width="900" height="520"></canvas>
+    <div id="raceResult" class="winner-box" hidden></div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=sb2"></script>
+</body>
+</html>

@@ -30,6 +30,7 @@ Los juegos son apps front-end independientes dentro de `Juegos/<Nombre del juego
 | `cronometro-loco` | Cronometro Loco | José Rafael Rodriguez Morillo |
 | `marble-escape` | Marble Escape | José Rafael Rodriguez Morillo |
 | `tipo-knowledge` | Tipo Knowledge | José Rafael Rodriguez Morillo |
+| `joseias` | JoseIAs | José Rafael Rodriguez Morillo |
 
 ---
 
@@ -114,8 +115,8 @@ Es un sitio **100 % estático**. Opciones:
 Puerto típico en local: **8090** (convención del proyecto). En producción usar 80/443 del hosting.
 
 ### Comprobar que funciona
-
 1. `http://<host>/` muestra la biblioteca con 12 juegos.
+1. `http://<host>/` muestra la biblioteca con 10 juegos.
 2. Clic en «Jugar» abre el juego.
 3. Cambiar idioma en 🌐 traduce nombres/descripciones del menú.
 4. Dentro de un juego, «Volver al administrador» regresa al menú.

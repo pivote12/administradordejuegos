@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bifer &amp; Bifer3000's Cyber-Matrix</title>
+  <link rel="stylesheet" href="styles.css?v=cyber1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-card">
+        <div class="logo">🧠</div>
+        <h1>Bifer &amp; Bifer3000's Cyber-Matrix</h1>
+        <p class="subtitle">¡El Hackeo Cósmico!</p>
+        <p class="creator">Creadores: Bifer y Bifer3000</p>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnStart">Jugar</button>
+          <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenMenu" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <div>
+            <h2>Terminal de datos</h2>
+            <p class="hint" id="menuInfo"></p>
+          </div>
+        </header>
+        <div class="mode-list">
+          <button type="button" class="mode" id="btnSolo">
+            <strong>🧩 Modo Hackeo de Nodos</strong>
+            <span>Campaña de 40 circuitos. Protegé el láser de troyanos, arañas glitch y puertas encriptadas.</span>
+          </button>
+          <button type="button" class="mode" id="btnRace">
+            <strong>🌐 Modo Matriz Cibernética</strong>
+            <span>4 pelotitas en la misma red, en vivo. La primera en conectar los nodos y desencriptar el servidor es el Hacker Supremo.</span>
+          </button>
+          <button type="button" class="mode" id="btnShop">
+            <strong>🛠️ Taller Cyber-Shop</strong>
+            <span>Skins robóticas, láseres de colores y efectos de hackeo con tus Bits de Neón.</span>
+          </button>
+        </div>
+        <p class="hint controls-hint">A y D giran el espejo. Las flechas lo mueven. Shift congela los virus. Espacio pone el cortafuegos.</p>
+      </div>
+    </section>
+
+    <section id="screenPick" class="screen">
+      <div class="panel scroll">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackMenu">←</button>
+          <div>
+            <h2>Elegí tu Data-Core</h2>
+            <p class="hint">Tu pelotita se convierte en el núcleo de datos de la red.</p>
+          </div>
+        </header>
+        <div id="marbleList" class="marble-list"></div>
+      </div>
+    </section>
+
+    <section id="screenLevels" class="screen">
+      <div class="panel scroll">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackPick">←</button>
+          <div>
+            <h2 id="levelTitle">Nodos</h2>
+            <p class="hint" id="levelHint"></p>
+          </div>
+        </header>
+        <div id="levelGrid" class="level-grid"></div>
+      </div>
+    </section>
+
+    <section id="screenShop" class="screen">
+      <div class="panel scroll">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnShopBack">←</button>
+          <div>
+            <h2>Taller Cyber-Shop</h2>
+            <p class="hint" id="shopBits"></p>
+          </div>
+        </header>
+        <div id="shopList"></div>
+      </div>
+    </section>
+
+    <section id="screenPlay" class="screen">
+      <div class="hud">
+        <div>
+          <span class="hud-label">Nodo</span>
+          <strong id="hudLevel">1</strong>
+        </div>
+        <div>
+          <span class="hud-label">Conexión</span>
+          <strong id="hudNodes">0/0</strong>
+        </div>
+        <div>
+          <span class="hud-label">RAM</span>
+          <strong id="hudHeat">0%</strong>
+        </div>
+        <div>
+          <span class="hud-label">Data-Core</span>
+          <strong id="hudCore">—</strong>
+        </div>
+      </div>
+      <div class="heat"><span id="heatFill"></span></div>
+      <p id="playStatus" class="status">Girar el espejo conecta el láser.</p>
+      <div class="table-wrap">
+        <canvas id="grid" width="960" height="540"></canvas>
+        <div id="puzzle" class="puzzle hidden">
+          <p class="puzzle-kicker">Puerta encriptada</p>
+          <p id="puzzleAsk"></p>
+          <p id="puzzleTime">5.0 s</p>
+          <div id="puzzleOptions" class="puzzle-options"></div>
+        </div>
+      </div>
+      <div class="controls">
+        <button type="button" class="btn" id="btnCycle">Espejo</button>
+        <button type="button" class="btn primary" id="btnRotateL">A</button>
+        <button type="button" class="btn primary" id="btnRotateR">D</button>
+        <button type="button" class="btn" id="btnLeft">←</button>
+        <button type="button" class="btn" id="btnRight">→</button>
+        <button type="button" class="btn" id="btnUp">↑</button>
+        <button type="button" class="btn" id="btnDown">↓</button>
+        <button type="button" class="btn accent" id="btnOver">Shift</button>
+        <button type="button" class="btn accent" id="btnFire">Escudo</button>
+        <button type="button" class="btn ghost" id="btnAbort">Menú</button>
+      </div>
+    </section>
+
+    <section id="screenResult" class="screen">
+      <div class="panel result-card">
+        <h2 id="resultTitle">Red</h2>
+        <p class="medal" id="resultMedal"></p>
+        <ul class="stats" id="resultStats"></ul>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnAgain">Otra vez</button>
+          <button type="button" class="btn secondary" id="btnNext">Siguiente nodo</button>
+          <button type="button" class="btn secondary" id="btnToShop">Taller</button>
+          <button type="button" class="btn ghost" id="btnToMenu">Menú</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="game.js?v=cyber1"></script>
+</body>
+</html>

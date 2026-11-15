@@ -11,6 +11,43 @@
   }
 
   const BASE = musicBase();
+  const TAB_ID = Math.random().toString(36).slice(2);
+  const LIVE_KEY = "admin-music-live";
+
+  function readLive() {
+    try {
+      return JSON.parse(localStorage.getItem(LIVE_KEY) || "null");
+    } catch (_err) {
+      return null;
+    }
+  }
+
+  function otherTabIsPlaying() {
+    const data = readLive();
+    return !!(data && data.id !== TAB_ID && Date.now() - data.t < 2500);
+  }
+
+  function claimLive() {
+    try {
+      localStorage.setItem(LIVE_KEY, JSON.stringify({
+        id: TAB_ID,
+        t: Date.now(),
+        index: music.index
+      }));
+    } catch (_err) {
+      /* ignore */
+    }
+  }
+
+  function clearLive() {
+    const data = readLive();
+    if (!data || data.id !== TAB_ID) return;
+    try {
+      localStorage.removeItem(LIVE_KEY);
+    } catch (_err) {
+      /* ignore */
+    }
+  }
 
   const PLAYLIST = [
     { title: "GD Greña - La Revancha", file: "01-la-revancha.webm" },
@@ -22,7 +59,18 @@
     { title: "Janji - Heroes Tonight", file: "07-heroes-tonight.webm" },
     { title: "Syn Cole - Feel Good", file: "08-feel-good.webm" },
     { title: "Robin Hustin x TobiMorrow - Light It Up", file: "09-light-it-up.webm" },
-    { title: "DEAF KEV - Invincible", file: "10-invincible.webm" }
+    { title: "DEAF KEV - Invincible", file: "10-invincible.webm" },
+    { title: "Cartoon, Jéja - Why We Lose (feat. Coleman Trapp)", file: "11-why-we-lose.webm" },
+    { title: "Different Heaven & EH!DE - My Heart", file: "12-my-heart.webm" },
+    { title: "Warriyo - Mortals (feat. Laura Brehm)", file: "13-mortals.webm" },
+    { title: "Disfigure - Blank", file: "14-blank.webm" },
+    { title: "Electro-Light - Symbolism", file: "15-symbolism.webm" },
+    { title: "Lost Sky - Fearless pt.II (feat. Chris Linton)", file: "16-fearless-pt2.webm" },
+    { title: "Julius Dreisig & Zeus X Crona - Invisible", file: "17-invisible.webm" },
+    { title: "Sub Urban - Cradles", file: "18-cradles.webm" },
+    { title: "Jo Cohen & Sex Whales - We Are", file: "19-we-are.webm" },
+    { title: "Lost Sky - Dreams pt. II (feat. Sara Skinner)", file: "20-dreams-pt2.webm" },
+    { title: "3rd Prototype - Dancefloor", file: "21-dancefloor.webm" }
   ].map((t) => ({ title: t.title, file: BASE + t.file }));
 
   const music = {
@@ -32,7 +80,8 @@
     unavailable: false,
     errorSkipLock: false,
     triedTracks: new Set(),
-    pausedByVisibility: false
+    pausedByVisibility: false,
+    yielded: false
   };
 
   music.audio.volume = VOLUME;
@@ -119,8 +168,10 @@
 
   function playCurrent() {
     if (music.unavailable) return;
-    if (document.hidden) return;
-    music.audio.play().catch(() => {});
+    if (otherTabIsPlaying()) return;
+    const pending = music.audio.play();
+    if (pending && pending.catch) pending.catch(() => {});
+    claimLive();
   }
 
   function playNext() {
@@ -146,7 +197,14 @@
   function startMusic(fromUser) {
     if (music.unavailable) return;
     music.pausedByVisibility = false;
-    if (fromUser) setEnabled(true);
+    if (fromUser) {
+      music.yielded = false;
+      setEnabled(true);
+      claimLive();
+    } else if (music.yielded || otherTabIsPlaying()) {
+      updateNowPlaying();
+      return;
+    }
 
     if (music.started) {
       if (music.audio.paused) playCurrent();
@@ -164,6 +222,8 @@
 
   function stopMusic(fromUser) {
     music.pausedByVisibility = false;
+    music.yielded = false;
+    clearLive();
     if (fromUser) setEnabled(false);
     music.audio.pause();
     try {
@@ -224,23 +284,6 @@
     }, 120);
   }
 
-  function pauseForBackground() {
-    if (!music.started || music.unavailable) return;
-    if (!music.audio.paused) {
-      music.pausedByVisibility = true;
-      music.audio.pause();
-      updateStopButton();
-      updateToggleButton();
-    }
-  }
-
-  function resumeFromBackground() {
-    if (!music.pausedByVisibility) return;
-    music.pausedByVisibility = false;
-    if (isEnabled() && music.started && !music.unavailable) playCurrent();
-    updateNowPlaying();
-  }
-
   function tryResumeFromFlag() {
     if (!isEnabled() || music.unavailable) {
       updateNowPlaying();
@@ -278,12 +321,29 @@
 
   bindUi();
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) pauseForBackground();
-    else resumeFromBackground();
-  });
+  window.setInterval(() => {
+    if (!isEnabled() || music.unavailable) return;
+    if (music.started && !music.audio.paused) {
+      claimLive();
+      return;
+    }
+    if (music.yielded && music.started && !otherTabIsPlaying()) {
+      music.yielded = false;
+      playCurrent();
+    }
+  }, 1000);
 
   window.addEventListener("storage", (event) => {
+    if (event.key === LIVE_KEY && otherTabIsPlaying()) {
+      const data = readLive();
+      if (data && PLAYLIST[data.index] && els().title) els().title.textContent = PLAYLIST[data.index].title;
+      if (!music.audio.paused) {
+        music.yielded = true;
+        music.audio.pause();
+        updateNowPlaying();
+      }
+      return;
+    }
     if (event.key !== STORAGE_KEY) return;
     if (isEnabled()) tryResumeFromFlag();
     else stopMusic(false);
@@ -308,6 +368,8 @@
     if (music.unavailable || !PLAYLIST[index]) return;
     setEnabled(true);
     music.pausedByVisibility = false;
+    music.yielded = false;
+    claimLive();
     music.started = true;
     music.triedTracks.clear();
     loadTrack(index);

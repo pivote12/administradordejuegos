@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Marble Escape</title>
-  <link rel="stylesheet" href="styles.css?v=marble158" />
+  <link rel="stylesheet" href="styles.css?v=marble175" />
   <link rel="stylesheet" href="../../shared-music.css?v=global2" />
 </head>
 <body>
@@ -60,6 +60,14 @@
           <div id="savePairList" class="pair-list"></div>
           <div id="savePairForm" class="pair-form"></div>
         </section>
+        <section id="saveFriendPanel" class="pair-panel" hidden>
+          <div class="section-heading">
+            <h2 data-i18n="friendTitle">👥 Grupos de amistad</h2>
+            <span data-i18n="friendHint">Opcional. Un nombre y al menos 2 pelotas. Cada pelota va en un solo grupo.</span>
+          </div>
+          <div id="saveFriendList" class="pair-list"></div>
+          <div id="saveFriendForm" class="friend-form"></div>
+        </section>
 
         <div class="menu-actions">
           <button id="playButton" class="button primary" type="button" data-i18n="playRound">Jugar ronda</button>
@@ -70,12 +78,12 @@
           <button id="createMinigameButton" class="button secondary" type="button" hidden data-i18n="createMinigame">Crear minijuego</button>
           <div id="customMiniList" class="roleplay-face-list menu-face-list" hidden></div>
           <button id="roleplayButton" class="button roleplay" type="button" data-i18n="roleplay">Roleplay</button>
-          <button id="createFaceButtonMenu" class="button secondary" type="button" data-i18n="createFace">Crear Cara</button>
-          <div id="menuFaceList" class="roleplay-face-list menu-face-list"></div>
-          <button id="createFoodButtonMenu" class="button secondary" type="button" data-i18n="createFood">Crear Comida</button>
-          <div id="menuFoodList" class="roleplay-face-list menu-face-list"></div>
-          <button id="createDrinkButtonMenu" class="button secondary" type="button" data-i18n="createDrink">Crear Bebida</button>
-          <div id="menuDrinkList" class="roleplay-face-list menu-face-list"></div>
+          <button id="createFaceButtonMenu" class="button secondary" type="button" data-i18n="createFace" hidden>Crear Cara</button>
+          <div id="menuFaceList" class="roleplay-face-list menu-face-list" hidden></div>
+          <button id="createFoodButtonMenu" class="button secondary" type="button" data-i18n="createFood" hidden>Crear Comida</button>
+          <div id="menuFoodList" class="roleplay-face-list menu-face-list" hidden></div>
+          <button id="createDrinkButtonMenu" class="button secondary" type="button" data-i18n="createDrink" hidden>Crear Bebida</button>
+          <div id="menuDrinkList" class="roleplay-face-list menu-face-list" hidden></div>
           <button id="feedAllButtonMenu" class="button compact feed-all-drop" type="button" data-feed-all="1" data-i18n="feedAllFood">Todos prueban la comida</button>
           <button id="foodLikesButton" class="button secondary" type="button" data-i18n="foodLikes">A quién le gusta</button>
           <button id="foodHatesButton" class="button secondary" type="button" data-i18n="foodHates">A quién NO le gusta</button>
@@ -130,7 +138,7 @@
         </label>
         <div class="create-gender">
           <span data-i18n="packGender">⚧ Género</span>
-          <p class="pack-gender-lead" data-i18n="packGenderTitle">Elegí el género de cada pelota. Es obligatorio para salir.</p>
+          <p class="pack-gender-lead" data-i18n="packGenderTitle">Elegí el género de cada pelota. Es obligatorio para guardar.</p>
           <p id="createGenderNeed" class="pack-gender-need" hidden></p>
           <div class="create-gender-picks">
             <button id="createGenderMale" class="pack-gender-pick" type="button">♂ Masculino</button>
@@ -175,6 +183,7 @@
           </div>
           <div class="pack-editor-actions">
             <button id="packGenderButton" class="button secondary compact" type="button" data-i18n="packGender">⚧ Género</button>
+            <button id="packIntelButton" class="button secondary compact" type="button" data-i18n="packIntel">🧠 Inteligencia</button>
             <button id="savePackButton" class="button primary compact" type="button" data-i18n="savePack">Guardar Pack</button>
           </div>
         </div>
@@ -189,14 +198,43 @@
         </form>
         <p id="packGenderNeed" class="pack-gender-need" hidden></p>
         <section id="packGenderPanel" class="pack-gender-panel" hidden>
-          <p class="pack-gender-lead" data-i18n="packGenderTitle">Elegí el género de cada pelota. Es obligatorio para salir.</p>
+          <p class="pack-gender-lead" data-i18n="packGenderTitle">Elegí el género de cada pelota. Es obligatorio para guardar.</p>
           <div id="packGenderList" class="pack-gender-list"></div>
         </section>
-        <section id="packPairPanel" class="pair-panel" hidden>
+        <section id="packIntelPanel" class="pack-gender-panel" hidden>
+          <p class="pack-gender-lead" data-i18n="packIntelTitle">🧠 Inteligencia</p>
+          <p class="pack-gender-lead" data-i18n="packIntelHint">Del 0 al 100. 0–25 tonto · 26–50 normal · 51–75 inteligente · 76–99 genio · 100 SUPER GENIO.</p>
+          <div id="packIntelList" class="pack-gender-list"></div>
+        </section>
+        <section id="packPairPanel" class="pair-panel">
           <p class="pack-gender-lead" data-i18n="pairTitle">💑 Parejas</p>
           <p class="pack-gender-lead" data-i18n="pairHint">Opcional. Un chico + una chica.</p>
           <div id="packPairList" class="pair-list"></div>
           <div id="packPairForm" class="pair-form"></div>
+        </section>
+        <section id="packFriendPanel" class="pair-panel">
+          <p class="pack-gender-lead" data-i18n="friendTitle">👥 Grupos de amistad</p>
+          <p class="pack-gender-lead" data-i18n="friendHint">Opcional. Un nombre y al menos 2 pelotas. Cada pelota va en un solo grupo.</p>
+          <div id="packFriendList" class="pair-list"></div>
+          <div id="packFriendForm" class="friend-form"></div>
+        </section>
+        <section id="packFamilyPanel" class="pair-panel">
+          <p class="pack-gender-lead" data-i18n="familyTitle">👪 Familias</p>
+          <p class="pack-gender-lead" data-i18n="familyHint">Opcional. Un nombre y al menos 2 pelotas. Cada pelota va en una sola familia.</p>
+          <div id="packFamilyList" class="pair-list"></div>
+          <div id="packFamilyForm" class="friend-form"></div>
+        </section>
+        <section id="packBuddyPanel" class="pair-panel">
+          <p class="pack-gender-lead" data-i18n="buddyTitle">🤝 Amistades</p>
+          <p class="pack-gender-lead" data-i18n="buddyHint">Opcional. Sin nombre. Mínimo 2 pelotas y sin máximo. Una pelota puede estar en varias amistades.</p>
+          <div id="packBuddyList" class="pair-list"></div>
+          <div id="packBuddyForm" class="friend-form"></div>
+        </section>
+        <section id="packEnemyPanel" class="pair-panel">
+          <p class="pack-gender-lead" data-i18n="enemyTitle">💢 Enemigos</p>
+          <p class="pack-gender-lead" data-i18n="enemyHint">Opcional. Sin nombre. Mínimo 2 pelotas y sin máximo. Son enemigos, no amigos, y se pelean muy fácil. Una pelota puede tener varios enemigos.</p>
+          <div id="packEnemyList" class="pair-list"></div>
+          <div id="packEnemyForm" class="friend-form"></div>
         </section>
         <div id="packDraftList" class="pack-draft-list"></div>
         <p id="emptyPackDraft" class="empty" data-i18n="emptyPackDraft">Agregá todas las pelotas que quieras.</p>
@@ -303,6 +341,15 @@
       <div id="splitPairNav" class="split-pair-nav" hidden>
         <button id="splitPairBack" type="button" class="button ghost compact" data-i18n="miniSplitBack">← Arena</button>
         <div id="splitPairRooms" class="split-pair-rooms"></div>
+      </div>
+      <div id="quizNav" class="split-pair-nav" hidden>
+        <button id="quizNext" type="button" class="button primary compact" data-i18n="miniQuizNext">Siguiente</button>
+      </div>
+      <div id="boatNav" class="split-pair-nav" hidden>
+        <button id="boatSail" type="button" class="button primary compact" data-i18n="miniBoatSail">Zarpar</button>
+        <button id="boatCountry" type="button" class="button ghost compact" data-i18n="miniBoatCountry" hidden>País</button>
+        <button id="boatIsland" type="button" class="button ghost compact" data-i18n="miniBoatIsland" hidden>Isla</button>
+        <button id="boatEnd" type="button" class="button primary compact" data-i18n="miniBoatEnd" hidden>Terminar</button>
       </div>
       <div id="teamSpikeNav" class="split-pair-nav" hidden>
         <button id="teamSpikePrev" type="button" class="button ghost compact" aria-label="Área anterior">←</button>
@@ -553,9 +600,9 @@
   </div>
   <div id="recToast" class="secret-toast rec-toast" hidden></div>
 
-  <script src="../../i18n.js?v=marble160"></script>
-  <script src="../../shared-packs.js?v=packs1"></script>
-  <script src="../../shared-music.js?v=global2"></script>
-  <script src="game.js?v=marble161"></script>
+  <script src="../../i18n.js?v=marble173"></script>
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=marble175"></script>
 </body>
 </html>

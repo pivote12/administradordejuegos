@@ -1,0 +1,41 @@
+.taller-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.taller-card {
+  width: 140px;
+  border: 0;
+  border-radius: 16px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.taller-card img {
+  width: 100%;
+  height: 88px;
+  object-fit: contain;
+  background: #0f172a;
+  border-radius: 10px;
+}
+
+.taller-card strong,
+.taller-card span {
+  display: block;
+}
+
+#bedCanvas {
+  display: block;
+  margin: 12px 0;
+  width: min(100%, 360px);
+  height: auto;
+  background: #fff;
+  border-radius: 12px;
+  touch-action: none;
+  cursor: crosshair;
+}

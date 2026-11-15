@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Idiomas</title>
+  <link rel="stylesheet" href="styles.css?v=id1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🗣️</p>
+      <h1>Idiomas</h1>
+      <p>Creá idiomas, publicalos y traducí entre el idioma original y el tuyo.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnPlay">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenHub" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <h2>Idiomas</h2>
+    </header>
+    <div class="hub-grid">
+      <button type="button" class="hub-card" id="btnIdiomas">
+        <span class="hub-icon">🌍</span>
+        <strong>Idiomas</strong>
+        <span>Usar o crear un idioma</span>
+      </button>
+      <button type="button" class="hub-card" id="btnPublicados">
+        <span class="hub-icon">📢</span>
+        <strong>Publicados</strong>
+        <span>Idiomas listos para traducir</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="screenIdiomasMenu" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackHubFromIdiomas">←</button>
+      <h2>Idiomas</h2>
+    </header>
+    <div class="hub-grid">
+      <button type="button" class="hub-card" id="btnUsar">
+        <span class="hub-icon">✨</span>
+        <strong>Usar</strong>
+        <span>Traducir con un idioma publicado</span>
+      </button>
+      <button type="button" class="hub-card" id="btnCrear">
+        <span class="hub-icon">🛠️</span>
+        <strong>Crear</strong>
+        <span>Armá un idioma nuevo y publicalo</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="screenCreate" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromCreate">←</button>
+      <h2>Crear idioma</h2>
+    </header>
+    <div class="panel">
+      <label class="field">
+        <span>Nombre del idioma</span>
+        <input type="text" id="langName" maxlength="48" placeholder="Ej: Pelotés" />
+      </label>
+
+      <div class="toolbar">
+        <label class="field inline">
+          <span>Idioma original</span>
+          <select id="sourceLang"></select>
+        </label>
+        <button type="button" class="btn ghost dots" id="btnHelp" title="Cómo armar el idioma" aria-label="Ayuda">⋯</button>
+      </div>
+
+      <div class="help-box" id="helpBox" hidden>
+        <h3>Cómo se arma el idioma</h3>
+        <ol>
+          <li>La palabra <strong>antes</strong> de los dos puntos <code>:</code> o del igual <code>=</code> (en el mismo renglón) es la palabra en el idioma original.</li>
+          <li>Los caracteres <strong>después</strong> de <code>:</code> o <code>=</code> son la traducción al idioma nuevo.</li>
+          <li>Todo lo que está entre barras inclinadas <code>/</code>…<code>/</code> es la pronunciación de esa palabra.</li>
+        </ol>
+        <p class="example mono">hola: sayo /sa-yo/<br />mundo = munde /mun-de/</p>
+      </div>
+
+      <label class="field">
+        <span>Texto del idioma</span>
+        <textarea id="langBody" rows="12" placeholder="palabra: traduccion /pronunciacion/"></textarea>
+      </label>
+
+      <p class="form-error" id="createError" hidden></p>
+      <button type="button" class="btn primary" id="btnPublish">Enviar y publicar</button>
+    </div>
+  </section>
+
+  <section id="screenPublicados" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromPublicados">←</button>
+      <h2>Publicados</h2>
+    </header>
+    <div class="panel">
+      <p class="hint" id="publicadosEmpty">Todavía no hay idiomas publicados. Creá uno desde Idiomas → Crear.</p>
+      <div class="list" id="publicadosList"></div>
+    </div>
+  </section>
+
+  <section id="screenTranslate" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromTranslate">←</button>
+      <div class="bar-titles">
+        <h2 id="translateTitle">Traducir</h2>
+        <p class="hint" id="translateMeta"></p>
+      </div>
+    </header>
+    <div class="panel translate-panel">
+      <label class="field">
+        <span id="labelOriginal">Idioma original</span>
+        <textarea id="textOriginal" rows="7" placeholder="Escribí acá en el idioma original…"></textarea>
+      </label>
+      <div class="swap-row">
+        <button type="button" class="btn ghost" id="btnClearTranslate">Limpiar</button>
+      </div>
+      <label class="field">
+        <span id="labelCreated">Idioma creado</span>
+        <textarea id="textCreated" rows="7" placeholder="Escribí acá en el idioma creado…"></textarea>
+      </label>
+      <p class="hint">Escribí en un espacio y se traduce al otro automáticamente.</p>
+    </div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=id2"></script>
+</body>
+</html>

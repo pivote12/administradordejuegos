@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yeller's Lucky Jackpot</title>
+  <link rel="stylesheet" href="styles.css?v=yeller1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <div id="app">
+    <section id="screenTitle" class="screen active">
+      <div class="title-card">
+        <div class="logo">🪙</div>
+        <h1>Yeller's Lucky Jackpot</h1>
+        <p class="subtitle">¡El Desafío de la Suerte Dorada!</p>
+        <p class="creator">Creador: Yeller</p>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnStart">Jugar</button>
+          <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="screenMenu" class="screen">
+      <div class="panel">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackTitle">←</button>
+          <div>
+            <h2>Mesa de juego dorada</h2>
+            <p class="hint" id="menuInfo"></p>
+          </div>
+        </header>
+        <div class="mode-list">
+          <button type="button" class="mode" id="btnSolo">
+            <strong>🍀 Modo Aventura de la Suerte</strong>
+            <span>20 tableros con trampas, multiplicadores y casillas de prueba. Llegá a la meta o hacé explotar el Jackpot.</span>
+          </button>
+          <button type="button" class="mode" id="btnRace">
+            <strong>💰 Modo Royale Jackpot</strong>
+            <span>4 pelotitas en el mismo tablero. La primera en juntar 1.000 monedas de oro, o en explotar el Jackpot, se lleva toda la riqueza.</span>
+          </button>
+          <button type="button" class="mode" id="btnShop">
+            <strong>🛒 Tienda de la Fortuna de Yeller</strong>
+            <span>Monedas personalizadas, amuletos de suerte y rastros dorados.</span>
+          </button>
+        </div>
+        <p class="hint controls-hint">En tu turno, lanzá el Dado Dorado de 12 caras. En la casilla 50/50, Yeller tira su moneda y vos elegís cara o cruz.</p>
+      </div>
+    </section>
+
+    <section id="screenPick" class="screen">
+      <div class="panel scroll">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackMenu">←</button>
+          <div>
+            <h2>Elegí tu pelotita</h2>
+            <p class="hint">Cualquiera de tus packs puede sentarse a la mesa.</p>
+          </div>
+        </header>
+        <div id="marbleList" class="marble-list"></div>
+      </div>
+    </section>
+
+    <section id="screenLevels" class="screen">
+      <div class="panel scroll">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnBackPick">←</button>
+          <div>
+            <h2 id="levelTitle">Tableros</h2>
+            <p class="hint" id="levelHint"></p>
+          </div>
+        </header>
+        <div id="levelGrid" class="level-grid"></div>
+      </div>
+    </section>
+
+    <section id="screenShop" class="screen">
+      <div class="panel scroll">
+        <header class="top">
+          <button type="button" class="btn icon" id="btnShopBack">←</button>
+          <div>
+            <h2>Tienda de la Fortuna de Yeller</h2>
+            <p class="hint" id="shopCoins"></p>
+          </div>
+        </header>
+        <div id="shopList"></div>
+      </div>
+    </section>
+
+    <section id="screenPlay" class="screen">
+      <div class="hud">
+        <div>
+          <span class="hud-label">Tablero</span>
+          <strong id="hudLevel">1</strong>
+        </div>
+        <div>
+          <span class="hud-label">Tus monedas</span>
+          <strong id="hudCoins">0</strong>
+        </div>
+        <div>
+          <span class="hud-label">Pozo</span>
+          <strong id="hudPot">0</strong>
+        </div>
+        <div>
+          <span class="hud-label">Turno</span>
+          <strong id="hudTurn">—</strong>
+        </div>
+      </div>
+      <p id="playStatus" class="status">Lanzá el dado dorado.</p>
+      <div class="table-wrap">
+        <canvas id="table" width="960" height="540"></canvas>
+      </div>
+      <div id="choiceBox" class="choice hidden">
+        <p id="choiceText">Yeller lanza su moneda. ¿Cara o cruz?</p>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnCara">CARA</button>
+          <button type="button" class="btn primary" id="btnCruz">CRUZ</button>
+        </div>
+      </div>
+      <div class="controls">
+        <button type="button" class="btn primary" id="btnRoll">Lanzar dado dorado</button>
+        <button type="button" class="btn ghost" id="btnAbort">Menú</button>
+      </div>
+    </section>
+
+    <section id="screenResult" class="screen">
+      <div class="panel result-card">
+        <h2 id="resultTitle">Mesa</h2>
+        <p class="medal" id="resultMedal"></p>
+        <ul class="stats" id="resultStats"></ul>
+        <div class="row">
+          <button type="button" class="btn primary" id="btnAgain">Otra vez</button>
+          <button type="button" class="btn secondary" id="btnNext">Siguiente tablero</button>
+          <button type="button" class="btn secondary" id="btnToShop">Tienda</button>
+          <button type="button" class="btn ghost" id="btnToMenu">Menú</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="game.js?v=yeller1"></script>
+</body>
+</html>

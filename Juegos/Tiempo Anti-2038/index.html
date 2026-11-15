@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#05080f" />
+  <title>Tiempo Anti-2038</title>
+  <link rel="stylesheet" href="styles.css?v=ta4" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">⏳</p>
+      <h1>Tiempo Anti-2038</h1>
+      <p>Contador de segundos con fecha real, número Unix y 210 luces binarias. No se rompe en 2038.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnPlay">Jugar</button>
+      <button type="button" class="btn accent" id="btnPhoneClockTitle">Usar como reloj del móvil</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenPlay" class="screen">
+    <header class="play-bar">
+      <button type="button" class="btn ghost" id="btnBack">←</button>
+      <div class="play-titles">
+        <h2>Tiempo Anti-2038</h2>
+        <p class="hint">Sincronizado con el tiempo real · estilo <a href="https://htwins.net/unix/" target="_blank" rel="noopener noreferrer">htwins.net/unix</a></p>
+      </div>
+      <div class="play-actions">
+        <button type="button" class="btn control" id="btnControlTime">ControlarTimepo</button>
+        <button type="button" class="btn accent" id="btnPhoneClock">Reloj móvil</button>
+      </div>
+    </header>
+
+    <div class="panel">
+      <div class="stat-grid">
+        <article class="stat">
+          <span class="stat-label">Fecha real</span>
+          <strong id="realDate">—</strong>
+        </article>
+        <article class="stat">
+          <span class="stat-label">Número Unix</span>
+          <strong id="unixNumber" class="mono">—</strong>
+        </article>
+        <article class="stat">
+          <span class="stat-label">Segundos desde 14/3/1210 07:30:00</span>
+          <strong id="sinceStart" class="mono">—</strong>
+        </article>
+        <article class="stat">
+          <span class="stat-label">Estado Y2038</span>
+          <strong id="y2038Status">—</strong>
+        </article>
+      </div>
+
+      <div class="milestone" id="milestone">
+        Límite clásico 32-bit: <span class="mono">19/1/2038 03:14:07 UTC</span> · Unix <span class="mono">2147483647</span>
+      </div>
+
+      <div class="lights-wrap" id="lightsWrap">
+        <div class="lights-head">
+          <h3>210 lucesitas · ON = 1 · OFF = 0</h3>
+          <p class="hint" id="lightsHint">Se resetea al llegar a <span class="mono">1,64550456×10<sup>63</sup></span> (2<sup>210</sup>) — billones de billones de veces la vida útil del universo.</p>
+          <p class="hint control-hint" id="controlHint" hidden>Modo ControlarTimepo: tocá los círculos para ON/OFF. El tiempo real sigue, pero no se ve. Al volver a TiempoReal todo vuelve a la normalidad.</p>
+        </div>
+        <div class="lights" id="lights" aria-label="Representación binaria de 210 bits"></div>
+        <p class="bits-readout mono" id="bitsReadout"></p>
+      </div>
+
+      <div class="alarm-wrap">
+        <div class="lights-head">
+          <h3>Alarma Anti-2038</h3>
+          <p class="hint">Suena un DO (~70 dB). Opcional: una oración dicha 2 veces en medio de la alarma.</p>
+        </div>
+        <div class="alarm-form">
+          <label>Fecha <input type="date" id="alarmDate" /></label>
+          <label>Hora <input type="number" id="alarmHour" min="0" max="23" value="7" /></label>
+          <label>Min <input type="number" id="alarmMinute" min="0" max="59" value="0" /></label>
+          <label>Seg <input type="number" id="alarmSecond" min="0" max="59" value="0" /></label>
+          <label class="alarm-speech">Oración (opcional)
+            <input type="text" id="alarmSpeech" maxlength="120" placeholder="Ej: Luna se va al parque" />
+          </label>
+        </div>
+        <div class="alarm-actions">
+          <button type="button" class="btn primary" id="btnSetAlarm">Activar alarma</button>
+          <button type="button" class="btn ghost" id="btnClearAlarm">Quitar</button>
+        </div>
+        <p class="hint" id="alarmStatus">Sin alarma</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="screenPhone" class="screen">
+    <div class="phone-clock">
+      <button type="button" class="btn ghost phone-exit" id="btnExitPhone">Salir del reloj</button>
+      <p class="phone-brand">Tiempo Anti-2038</p>
+      <p class="phone-time" id="phoneTime">00:00:00</p>
+      <p class="phone-date" id="phoneDate">—</p>
+      <p class="phone-unix mono" id="phoneUnix">Unix —</p>
+      <p class="phone-system" id="phoneSystem">Sistema: —</p>
+      <p class="phone-sync" id="phoneSync">Sincronizando…</p>
+      <p class="phone-note">
+        Una web no puede cambiar la hora interna del Android/iOS.
+        Este modo reemplaza la hora en pantalla: si el móvil cae a 1901 en 2038, acá seguís viendo la hora correcta.
+      </p>
+      <button type="button" class="btn primary" id="btnResync">Sincronizar otra vez</button>
+    </div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=ta4"></script>
+</body>
+</html>

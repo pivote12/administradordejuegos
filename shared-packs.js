@@ -28,6 +28,30 @@
     }, 0);
   }
 
+  function groupList(pack) {
+    return Array.isArray(pack && pack.groups) ? pack.groups : [];
+  }
+
+  function groupsStillInPack(groups, pack) {
+    var ids = {};
+    ((pack && pack.marbles) || []).forEach(function (marble) {
+      if (marble && marble.id) ids[marble.id] = true;
+    });
+    return groupList({ groups: groups }).map(function (group) {
+      var memberIds = (group.memberIds || []).filter(function (id) { return ids[id]; });
+      if (!group || !group.name || memberIds.length < 2) return null;
+      return { id: group.id, name: group.name, memberIds: memberIds };
+    }).filter(Boolean);
+  }
+
+  function withGroups(pack, groups, groupsRev) {
+    var copy = {};
+    Object.keys(pack || {}).forEach(function (key) { copy[key] = pack[key]; });
+    copy.groups = groups;
+    copy.groupsRev = groupsRev;
+    return copy;
+  }
+
   function mergePacks(a, b) {
     var byId = {};
     var order = [];
@@ -43,7 +67,21 @@
       var nextN = (pack.marbles && pack.marbles.length) || 0;
       var prevT = Number(prev.updatedAt) || 0;
       var nextT = Number(pack.updatedAt) || 0;
-      if (nextT > prevT || (nextT === prevT && nextN >= prevN)) byId[pack.id] = pack;
+      var winner = (nextT > prevT || (nextT === prevT && nextN >= prevN)) ? pack : prev;
+      var loser = winner === pack ? prev : pack;
+      var winRev = Number(winner.groupsRev) || 0;
+      var loseRev = Number(loser.groupsRev) || 0;
+      var winGroups = groupsStillInPack(groupList(winner), winner);
+      var loseGroups = groupsStillInPack(groupList(loser), winner);
+      var groups = winGroups;
+      var rev = winRev;
+      if (loseRev > winRev) {
+        groups = loseGroups;
+        rev = loseRev;
+      } else if (loseRev === winRev && !winGroups.length && loseGroups.length) {
+        groups = loseGroups;
+      }
+      byId[pack.id] = withGroups(winner, groups, rev);
     }
     (a || []).forEach(add);
     (b || []).forEach(add);
@@ -70,6 +108,22 @@
     return merged;
   }
 
+  function writeStorage(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (_err) {
+      return false;
+    }
+  }
+
+  function freeDuplicateSpace() {
+    try { localStorage.removeItem(SHARED_BAK); } catch (_err) { /* copia */ }
+    try {
+      if (localStorage.getItem(ME_KEY)) localStorage.removeItem(ME_BAK);
+    } catch (_err) { /* la partida principal sigue en su clave */ }
+  }
+
   function savePacks(incoming) {
     var current = loadPacks();
     var next = Array.isArray(incoming) ? incoming.filter(function (pack) {
@@ -77,16 +131,12 @@
     }) : [];
     if (!next.length && current.length) return current;
     var json = JSON.stringify(next);
-    try {
-      localStorage.setItem(SHARED_KEY, json);
-      localStorage.setItem(SHARED_BAK, json);
-    } catch (_err) {
-      try {
-        localStorage.setItem(SHARED_BAK, json);
-      } catch (_ignored) {
-        /* ignore quota */
-      }
+    var ok = writeStorage(SHARED_KEY, json);
+    if (!ok) {
+      freeDuplicateSpace();
+      ok = writeStorage(SHARED_KEY, json);
     }
+    if (ok) writeStorage(SHARED_BAK, json);
     return next;
   }
 

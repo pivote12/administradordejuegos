@@ -1,0 +1,193 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: #04120c;
+  color: #ecfccb;
+}
+
+.screen {
+  display: none;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 24px;
+}
+
+.screen.active {
+  display: grid;
+}
+
+#screenPlay.active {
+  display: block;
+  padding: 0;
+}
+
+.card, .panel {
+  background: rgba(6, 28, 18, 0.92);
+  border: 1px solid rgba(190, 242, 100, 0.35);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.card { width: min(520px, 100%); }
+.card.wide { width: min(760px, 100%); }
+.creator { color: #bef264; }
+.badge { font-size: 42px; margin: 0; }
+
+.btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  margin: 6px 6px 0 0;
+  background: #14532d;
+  color: #ecfccb;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn.primary { background: #65a30d; color: #052e16; font-weight: 700; }
+.btn.ghost { background: transparent; border: 1px solid rgba(190, 242, 100, 0.4); }
+
+.pack-list, .craft-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pack-btn, .slot, .inv-item {
+  border: 1px solid rgba(190, 242, 100, 0.3);
+  background: #052e16;
+  color: inherit;
+  border-radius: 14px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.pack-btn { min-width: 140px; text-align: left; }
+
+#view { position: fixed; inset: 0; }
+#view canvas { display: block; width: 100%; height: 100%; }
+
+.hud {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  max-width: min(640px, calc(100% - 24px));
+}
+
+.panel.side {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: min(240px, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+}
+
+#controlList, .craft {
+  position: fixed;
+  left: 12px;
+  bottom: 72px;
+  z-index: 3;
+  max-width: min(520px, calc(100% - 24px));
+}
+
+#controlList {
+  inset: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 40;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  margin: 0;
+  padding: 8px;
+  border-radius: 0;
+  box-sizing: border-box;
+  display: grid;
+  gap: 8px;
+  overflow: hidden;
+}
+
+#controlList[hidden] {
+  display: none !important;
+}
+
+#controlList .pack-btn,
+#roomPick .pack-btn {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(18px, 3vw, 48px);
+  font-weight: 700;
+}
+
+#roomPick {
+  position: fixed;
+  inset: 0;
+  z-index: 46;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#roomPick[hidden] {
+  display: none !important;
+}
+
+#roomPickTitle {
+  margin: 0;
+  font-size: 22px;
+}
+
+#roomPickList {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 8px;
+}
+
+#roomPick .pack-btn.on {
+  outline: 4px solid #facc15;
+  background: #365314;
+}
+
+.room-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.panel.craft { max-height: calc(100dvh - 96px); overflow: auto; }
+.craft-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.craft-list .btn { text-align: left; white-space: normal; }
+.craft-grid { display: grid; grid-template-columns: repeat(3, 72px); }
+.chest-grid { grid-template-columns: repeat(5, 72px); max-height: 240px; overflow: auto; }
+.slot { min-height: 64px; }
+.slot.on, .inv-item.on { outline: 2px solid #facc15; }
+.boot-error {
+  position: fixed;
+  inset: auto 16px 16px 16px;
+  background: #450a0a;
+  padding: 12px;
+  border-radius: 12px;
+}

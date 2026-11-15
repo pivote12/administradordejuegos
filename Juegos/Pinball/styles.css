@@ -1,0 +1,208 @@
+:root {
+  color-scheme: dark;
+  --bg: #071018;
+  --card: #10202c;
+  --ink: #eaf7ff;
+  --muted: #93a8b8;
+  --line: rgba(125, 211, 252, 0.2);
+  --accent: #38bdf8;
+  --gold: #facc15;
+  --pink: #fb7185;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.16), transparent 32%),
+    var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", sans-serif;
+}
+
+button, input { font: inherit; color: inherit; }
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+.title-card, .panel {
+  width: min(760px, calc(100% - 2rem));
+  margin: 1.5rem auto 3rem;
+  padding: 1.2rem;
+  background: rgba(16, 32, 44, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+}
+
+.logo { font-size: 3rem; }
+
+h1, h2, h3 { margin: 0.2rem 0; }
+
+.subtitle, .hint, .lead {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.creators {
+  margin: 0.8rem 0 1rem;
+  padding-left: 1.1rem;
+  color: #dbeafe;
+}
+
+.row, .top, .roster-head, .controls, .play-top {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.top { justify-content: space-between; align-items: flex-start; }
+.roster-head, .controls, .play-top { justify-content: space-between; }
+
+.btn {
+  border: 0;
+  border-radius: 0.8rem;
+  padding: 0.7rem 1rem;
+  background: #1e293b;
+  cursor: pointer;
+}
+
+.btn.primary { background: #0284c7; color: white; }
+.btn.accent { background: #a16207; color: #fff7d6; }
+.btn.secondary { background: #155e75; }
+.btn.ghost { background: transparent; border: 1px solid var(--line); text-decoration: none; }
+.btn.icon { width: 2.6rem; height: 2.6rem; padding: 0; }
+.btn.play { width: 100%; margin-top: 1rem; }
+.btn.flip { flex: 1; min-height: 3.2rem; background: #0f3d4c; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.slot-list, .pack-choices, .roster {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.slot, .pack-choice, .marble-choice {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: #0b1822;
+}
+
+.slot { justify-content: space-between; }
+.slot-actions { display: flex; gap: 0.4rem; flex: none; }
+.slot strong, .marble-choice strong, .pack-choice strong { display: block; }
+
+.dot {
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  flex: none;
+}
+
+.dots { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+
+.create-form, .stats {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.create-form input[type="text"] {
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.7rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--line);
+  background: #061019;
+}
+
+.gift-box {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+
+.gift-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.gift-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--line);
+  background: #061019;
+  color: inherit;
+}
+
+.stats {
+  grid-template-columns: 1fr 1fr;
+  margin: 0.8rem 0;
+}
+
+.stats span, .play-stats span, .play-stats strong {
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.6rem;
+  background: #07131c;
+}
+
+.error { color: #fda4af; }
+
+.table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: min(520px, calc(100% - 1rem));
+  margin: 0 auto;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  background: #04261c;
+  display: block;
+}
+
+.play-top, .status, .controls {
+  width: min(520px, calc(100% - 1rem));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.status {
+  min-height: 1.4rem;
+  color: #fde68a;
+  text-align: center;
+}
+
+#screenPlay.active {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0.35rem 0 0.5rem;
+}
+
+#screenPlay .play-top,
+#screenPlay .status,
+#screenPlay .controls {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .stats { grid-template-columns: 1fr; }
+}
+
+.controls .btn {
+  flex: 1 1 7.5rem;
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taller</title>
+  <link rel="stylesheet" href="styles.css?v=menu2" />
+  <link rel="stylesheet" href="shared-music.css?v=global1" />
+  <link rel="stylesheet" href="taller.css?v=taller1" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <main class="layout">
+    <header class="hero card">
+      <div class="hero-text">
+        <h1 id="tallerTitle">Taller</h1>
+        <p class="subtitle" id="tallerHint">Lo que ya guardaste en Marble Escape sigue acá.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="btn secondary" href="index.html">← Menú</a>
+      </div>
+    </header>
+    <section class="panel card" id="listPanel">
+      <div class="panel-top">
+        <h2 id="listTitle">Guardados</h2>
+        <button type="button" class="btn primary" id="btnCreate">Crear</button>
+      </div>
+      <p class="empty" id="emptyNote" hidden>Todavía no hay nada guardado. Crear no borra lo demás.</p>
+      <div id="itemList" class="taller-list"></div>
+    </section>
+    <section class="panel card" id="bedPanel" hidden>
+      <h2 id="bedTitle">Camas</h2>
+      <p class="subtitle" id="bedHint">Elegí un pack, después una pelotita, pintá la sábana y después la almohada.</p>
+      <div id="bedPacks" class="taller-list"></div>
+      <div id="bedMarbles" class="taller-list"></div>
+      <div id="bedPaint" hidden>
+        <p id="paintStep">Sábana</p>
+        <label>Color <input id="bedColor" type="color" value="#38bdf8" /></label>
+        <canvas id="bedCanvas" width="360" height="200"></canvas>
+        <div class="hero-actions">
+          <button type="button" class="btn secondary" id="btnBedNext">Siguiente: almohada</button>
+          <button type="button" class="btn primary" id="btnBedFinish" hidden>Terminar de pintar</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+  <script src="shared-music.js?v=global5"></script>
+  <script src="shared-packs.js?v=packs5"></script>
+  <script src="taller.js?v=taller1"></script>
+</body>
+</html>

@@ -761,6 +761,39 @@ h1 {
   background: #0c4a6e;
 }
 
+.pack-intel-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto minmax(7rem, auto);
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pack-intel-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pack-intel-input {
+  width: 4.5rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  color: var(--ink);
+  background: #061019;
+  font: inherit;
+  font-weight: 800;
+}
+
+.pack-intel-label {
+  color: #fde68a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 .pack-draft-row .mini-marble {
   width: 1.8rem;
   height: 1.8rem;
@@ -911,6 +944,63 @@ h1 {
   color: #fda4af;
   font-style: normal;
   font-weight: 800;
+}
+
+.friend-chip {
+  color: #86efac;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.friend-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+
+.friend-name {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  color: var(--ink);
+  background: #061019;
+}
+
+.friend-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.friend-pick {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #061019;
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+.friend-pick .mini-marble {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.friend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.friend-row span {
+  flex: 1;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 .create-card label {

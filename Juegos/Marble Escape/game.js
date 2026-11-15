@@ -132,6 +132,13 @@
     teamSpikePrev: document.getElementById("teamSpikePrev"),
     teamSpikeNext: document.getElementById("teamSpikeNext"),
     teamSpikeLabel: document.getElementById("teamSpikeLabel"),
+    quizNav: document.getElementById("quizNav"),
+    quizNext: document.getElementById("quizNext"),
+    boatNav: document.getElementById("boatNav"),
+    boatSail: document.getElementById("boatSail"),
+    boatCountry: document.getElementById("boatCountry"),
+    boatIsland: document.getElementById("boatIsland"),
+    boatEnd: document.getElementById("boatEnd"),
     modeBadge: document.getElementById("modeBadge"),
     createMap: document.getElementById("createMapButton"),
     createMinigame: document.getElementById("createMinigameButton"),
@@ -189,13 +196,29 @@
     packGenderNeed: document.getElementById("packGenderNeed"),
     packGenderPanel: document.getElementById("packGenderPanel"),
     packGenderList: document.getElementById("packGenderList"),
+    packIntelButton: document.getElementById("packIntelButton"),
+    packIntelPanel: document.getElementById("packIntelPanel"),
+    packIntelList: document.getElementById("packIntelList"),
     packPairPanel: document.getElementById("packPairPanel"),
     packPairList: document.getElementById("packPairList"),
     packPairForm: document.getElementById("packPairForm"),
+    packFriendPanel: document.getElementById("packFriendPanel"),
+    packFriendList: document.getElementById("packFriendList"),
+    packFriendForm: document.getElementById("packFriendForm"),
+    packFamilyPanel: document.getElementById("packFamilyPanel"),
+    packFamilyList: document.getElementById("packFamilyList"),
+    packFamilyForm: document.getElementById("packFamilyForm"),
+    packBuddyList: document.getElementById("packBuddyList"),
+    packBuddyForm: document.getElementById("packBuddyForm"),
+    packEnemyList: document.getElementById("packEnemyList"),
+    packEnemyForm: document.getElementById("packEnemyForm"),
     savePairPanel: document.getElementById("savePairPanel"),
     saveGenderList: document.getElementById("saveGenderList"),
     savePairList: document.getElementById("savePairList"),
     savePairForm: document.getElementById("savePairForm"),
+    saveFriendPanel: document.getElementById("saveFriendPanel"),
+    saveFriendList: document.getElementById("saveFriendList"),
+    saveFriendForm: document.getElementById("saveFriendForm"),
     createPairBox: document.getElementById("createPairBox"),
     createPairSelect: document.getElementById("createPairSelect"),
     form: document.getElementById("createForm"),
@@ -242,7 +265,12 @@
   let frameId = null;
   let editingPackId = null;
   let packDraft = [];
+  let packFriendGroups = [];
+  let packFamilies = [];
+  let packFriendships = [];
+  let packEnemies = [];
   let packGenderOpen = false;
+  let packIntelOpen = false;
   let createMarbleGender = "";
   let lastRoundSummary = null;
   let mapTest = false;
@@ -460,7 +488,9 @@
     { id: "splitlove", icon: "💘", kind: "splitlove", hue: 330, duration: 0, click: "dash", title: MT("Círculos de pareja", "Couple circles"), hint: MT("Chicos a la izquierda, chicas a la derecha. Mandá uno de cada lado al tubo del techo. La cámara va al círculo cerrado de esa pareja; con ← volvés y cada círculo tiene su botón. Los círculos quedan para siempre y no se pueden borrar.", "Boys on the left, girls on the right. Send one from each side into the ceiling tube. The camera pans to that couple's locked circle; ← goes back and each circle has its own button. Circles stay forever and cannot be deleted.") },
     { id: "lockpair", icon: "🔒", kind: "lockpair", hue: 318, duration: 0, click: "dash", title: MT("Sala cerrada", "Locked room"), hint: MT("Un chico al azar queda atrapado con una chica al azar. El resto no entra. Cada partida sortea de nuevo.", "A random boy is stuck with a random girl. Everyone else is out. Each play rerolls the pair.") },
     { id: "boxescape", icon: "📦", kind: "boxescape", hue: 28, duration: 0, click: "dash", title: MT("Caja atascada", "Stuck box"), hint: MT("Todas las pelotas empiezan atrapadas en una caja. Más pelotas = caja más grande. La última en salir se saltea el próximo nivel de la campaña.", "Every marble starts stuck in a box. More marbles = bigger box. The last one out automatically skips the next campaign level.") },
-    { id: "teamspike", icon: "📍", kind: "teamspike", hue: 200, duration: 0, click: "dash", title: MT("Pincho de equipos", "Team spike"), hint: MT("Cada partida elige un Lugar De Tipo al azar y usa sus equipos. Todas las pelotitas de cada equipo pasan por el tubo. Si ese lugar no está terminado, solo juegan las que ya tienen equipo. La última que queda le da a su equipo un minijuego a elección, y lo juegan solos, sin pelotitas de otros equipos.", "Each play picks a random Type Place and uses its teams. Every marble on each team goes through the tube. If that place is not finished, only marbles that already have a team play. The last marble left gives their team a minigame of their choice, and they play it alone, with no marbles from other teams.") }
+    { id: "teamspike", icon: "📍", kind: "teamspike", hue: 200, duration: 0, click: "dash", title: MT("Pincho de equipos", "Team spike"), hint: MT("Cada partida elige un Lugar De Tipo al azar y usa sus equipos. Todas las pelotitas de cada equipo pasan por el tubo. Si ese lugar no está terminado, solo juegan las que ya tienen equipo. La última que queda le da a su equipo un minijuego a elección, y lo juegan solos, sin pelotitas de otros equipos.", "Each play picks a random Type Place and uses its teams. Every marble on each team goes through the tube. If that place is not finished, only marbles that already have a team play. The last marble left gives their team a minigame of their choice, and they play it alone, with no marbles from other teams.") },
+    { id: "quiz", icon: "❓", kind: "quiz", hue: 262, duration: 0, click: "dash", title: MT("Pregunta", "Question"), hint: MT("Hay una pregunta y cuatro respuestas. Tocá una pelota y después su cuadrado. Siguiente hace desaparecer a las que están en una respuesta incorrecta. Sigue hasta que quede una.", "There is a question and four answers. Tap a marble, then its square. Next removes whoever is on a wrong answer. It continues until one marble is left.") },
+    { id: "rainboats", icon: "⛵", kind: "rainboats", hue: 205, duration: 0, click: "dash", title: MT("Barcos en la lluvia", "Boats in the rain"), hint: MT("Todas están en un barco grande, bajo la lluvia, y tienen que escapar. Dos entran en el barco más chico, ni una más ni una menos. El resto se sube a los otros dos. Una pelota en un barco chico no se puede elegir; si vuelve al grande, sí. Cuando no queda nadie en el grande, zarpan: esos dos van a un país a salvo y el más chico a una isla donde quedan atascadas.", "Everyone starts on a big boat in the rain and has to escape. Two board the smallest boat, no more and no less. The rest board the other two. A marble on a small boat can't be selected; once it returns to the big one, it can. When the big boat is empty, they sail: those two go to a safe country and the smallest goes to an island where they stay stuck.") }
   ];
 
   const COMBO_MOVES = [
@@ -1441,6 +1471,135 @@
     formEl.append(boySel, girlSel, join);
   }
 
+  function normalizeExclusiveNamed(groups, marbles, prefix) {
+    const ids = new Set((marbles || []).filter((marble) => marble && marble.id).map((marble) => marble.id));
+    const used = new Set();
+    return (Array.isArray(groups) ? groups : []).map((group) => {
+      const name = String((group && group.name) || "").trim().slice(0, 24);
+      const memberIds = [];
+      (Array.isArray(group && group.memberIds) ? group.memberIds : []).forEach((id) => {
+        if (typeof id !== "string" || !ids.has(id) || used.has(id) || memberIds.includes(id)) return;
+        used.add(id);
+        memberIds.push(id);
+      });
+      if (!name || memberIds.length < 2) return null;
+      return { id: (group && group.id) || makeId(prefix || "fg"), name, memberIds };
+    }).filter(Boolean);
+  }
+
+  function normalizeFriendGroups(groups, marbles) {
+    return normalizeExclusiveNamed(groups, marbles, "fg");
+  }
+
+  function normalizeIntelligence(value) {
+    const n = Math.round(Number(value));
+    if (!Number.isFinite(n)) return 50;
+    return Math.max(0, Math.min(100, n));
+  }
+
+  function intelligenceLabel(value) {
+    const n = normalizeIntelligence(value);
+    if (n >= 100) return t("intelSuper");
+    if (n > 75) return t("intelGenius");
+    if (n > 50) return t("intelSmart");
+    if (n > 25) return t("intelNormal");
+    return t("intelDumb");
+  }
+
+  function syncFriendIds(marbles, groups) {
+    const byMarble = {};
+    (groups || []).forEach((group) => {
+      group.memberIds.forEach((id) => { byMarble[id] = group.id; });
+    });
+    (marbles || []).forEach((marble) => {
+      marble.friendGroupId = byMarble[marble.id] || "";
+    });
+    return groups;
+  }
+
+  function friendGroupName(groups, marbleId) {
+    const group = (groups || []).find((item) => item && item.memberIds && item.memberIds.includes(marbleId));
+    return group ? group.name : "";
+  }
+
+  function renderFriendEditor(listEl, formEl, marbles, groups, onChange) {
+    if (!listEl || !formEl || !Array.isArray(groups)) return;
+    const clean = normalizeFriendGroups(groups, marbles);
+    groups.splice(0, groups.length, ...clean);
+    listEl.innerHTML = "";
+    formEl.innerHTML = "";
+    if (!clean.length) {
+      const empty = document.createElement("p");
+      empty.className = "pair-empty";
+      empty.textContent = t("friendNone");
+      listEl.appendChild(empty);
+    }
+    clean.forEach((group) => {
+      const row = document.createElement("div");
+      row.className = "friend-row";
+      const names = group.memberIds.map((id) => {
+        const marble = findMarble(marbles, id);
+        return marble ? marble.name : "";
+      }).filter(Boolean).join(", ");
+      row.innerHTML = `<strong>${escapeHtml(group.name)}</strong><span>${escapeHtml(names)}</span>`;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "button ghost compact";
+      remove.textContent = t("pairRemove");
+      remove.addEventListener("click", () => {
+        const index = groups.findIndex((item) => item.id === group.id);
+        if (index >= 0) groups.splice(index, 1);
+        onChange();
+      });
+      row.appendChild(remove);
+      listEl.appendChild(row);
+    });
+    const free = (marbles || []).filter((marble) => !clean.some((group) => group.memberIds.includes(marble.id)));
+    if (free.length < 2) {
+      const need = document.createElement("p");
+      need.className = "pair-empty";
+      need.textContent = t("friendNeed");
+      formEl.appendChild(need);
+      return;
+    }
+    const nameInput = document.createElement("input");
+    nameInput.className = "friend-name";
+    nameInput.maxLength = 24;
+    nameInput.placeholder = t("friendName");
+    const picks = document.createElement("div");
+    picks.className = "friend-picks";
+    const selected = new Set();
+    free.forEach((marble) => {
+      const label = document.createElement("label");
+      label.className = "friend-pick";
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.dataset.id = marble.id;
+      box.addEventListener("change", () => {
+        if (box.checked) selected.add(marble.id);
+        else selected.delete(marble.id);
+      });
+      const dot = document.createElement("i");
+      dot.className = "mini-marble";
+      dot.style.background = marble.color;
+      const text = document.createElement("span");
+      text.textContent = marble.name;
+      label.append(box, dot, text);
+      picks.appendChild(label);
+    });
+    const join = document.createElement("button");
+    join.type = "button";
+    join.className = "button secondary compact";
+    join.textContent = t("friendJoin");
+    join.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      if (!name || selected.size < 2) return;
+      groups.push({ id: makeId("fg"), name: name.slice(0, 24), memberIds: [...selected] });
+      onChange();
+    });
+    formEl.append(nameInput, picks, join);
+  }
+
   function normalizeMarble(item) {
     return {
       id: item.id || makeId("m"),
@@ -1453,7 +1612,9 @@
       foodLikeChance: typeof item.foodLikeChance === "number" ? item.foodLikeChance : undefined,
       foodTasteV: item.foodTasteV === 4 ? 4 : 0,
       gender: normalizeGender(item.gender),
+      intelligence: normalizeIntelligence(item.intelligence),
       partnerId: typeof item.partnerId === "string" ? item.partnerId : "",
+      friendGroupId: typeof item.friendGroupId === "string" ? item.friendGroupId : "",
       packId: typeof item.packId === "string" ? item.packId : "",
       packMarbleId: typeof item.packMarbleId === "string" ? item.packMarbleId : "",
       skipNextRound: !!item.skipNextRound
@@ -1481,6 +1642,9 @@
   }
 
   function normalizeSave(save, index) {
+    const marbles = sanitizePartners(Array.isArray(save.marbles) ? save.marbles.map(normalizeMarble) : []);
+    const friendGroups = normalizeFriendGroups(save.friendGroups, marbles);
+    syncFriendIds(marbles, friendGroups);
     return syncAliveScores({
       id: save.id || makeId("save"),
       name: String(save.name || t("defaultSaveName", { n: index + 1 })).slice(0, 24),
@@ -1505,7 +1669,8 @@
       teamSpikeAt: Math.max(0, Number(save.teamSpikeAt) || 0),
       vipTicket: normalizeVipTicket(save.vipTicket),
       vipDecisive: !!save.vipDecisive,
-      marbles: sanitizePartners(Array.isArray(save.marbles) ? save.marbles.map(normalizeMarble) : [])
+      friendGroups,
+      marbles
     });
   }
 
@@ -1601,24 +1766,103 @@
   }
 
   function normalizePack(pack, index) {
+    const marbles = sanitizePartners(
+      Array.isArray(pack.marbles)
+        ? pack.marbles
+            .filter((marble) => marble && marble.name)
+            .map((marble) => ({
+              id: marble.id || makeId("pm"),
+              name: String(marble.name).slice(0, ITEM_NAME_MAX),
+              color: marble.color || "#55d6ff",
+              gender: normalizeGender(marble.gender),
+              intelligence: normalizeIntelligence(marble.intelligence),
+              partnerId: typeof marble.partnerId === "string" ? marble.partnerId : "",
+              friendGroup: typeof marble.friendGroup === "string" ? marble.friendGroup.trim().slice(0, 24) : ""
+            }))
+        : []
+    );
+    let groups = Array.isArray(pack.groups)
+      ? normalizeFriendGroups(pack.groups, marbles)
+      : groupsFromFriendField(marbles);
+    stampFriendField(marbles, groups);
+    const friendships = normalizeBonds(pack.friendships, marbles);
+    const enemies = normalizeBonds(pack.enemies, marbles);
     return {
       id: pack.id || makeId("pack"),
       name: String(pack.name || t("defaultPackName", { n: index + 1 })).slice(0, 24),
       updatedAt: Number(pack.updatedAt) || 0,
-      marbles: sanitizePartners(
-        Array.isArray(pack.marbles)
-          ? pack.marbles
-              .filter((marble) => marble && marble.name)
-              .map((marble) => ({
-                id: marble.id || makeId("pm"),
-                name: String(marble.name).slice(0, ITEM_NAME_MAX),
-                color: marble.color || "#55d6ff",
-                gender: normalizeGender(marble.gender),
-                partnerId: typeof marble.partnerId === "string" ? marble.partnerId : ""
-              }))
-          : []
-      )
+      groupsRev: Math.max(0, Number(pack.groupsRev) || 0),
+      marbles,
+      groups,
+      families: normalizeExclusiveNamed(pack.families, marbles, "fam"),
+      friendships: dropSharedBonds(friendships, enemies),
+      enemies
     };
+  }
+
+  function bondKey(memberIds) {
+    return memberIds.slice().sort().join("|");
+  }
+
+  function normalizeBonds(list, marbles) {
+    const ids = new Set((marbles || []).filter((marble) => marble && marble.id).map((marble) => marble.id));
+    const seen = new Set();
+    return (Array.isArray(list) ? list : []).map((bond) => {
+      const memberIds = [];
+      (Array.isArray(bond && bond.memberIds) ? bond.memberIds : []).forEach((id) => {
+        if (typeof id !== "string" || !ids.has(id) || memberIds.includes(id)) return;
+        memberIds.push(id);
+      });
+      if (memberIds.length < 2) return null;
+      const key = bondKey(memberIds);
+      if (seen.has(key)) return null;
+      seen.add(key);
+      return { id: (bond && bond.id) || makeId("bond"), memberIds };
+    }).filter(Boolean);
+  }
+
+  function dropSharedBonds(keep, remove) {
+    const blocked = new Set((remove || []).map((bond) => bondKey(bond.memberIds)));
+    return (keep || []).filter((bond) => !blocked.has(bondKey(bond.memberIds)));
+  }
+
+  function groupsFromFriendField(marbles) {
+    const byName = new Map();
+    (marbles || []).forEach((marble) => {
+      const name = String(marble && marble.friendGroup || "").trim();
+      if (!name || !marble.id) return;
+      if (!byName.has(name)) byName.set(name, []);
+      byName.get(name).push(marble.id);
+    });
+    return [...byName.entries()].map(([name, memberIds]) => (
+      memberIds.length >= 2 ? { id: `fg-${name.toLowerCase().replace(/\s+/g, "-").slice(0, 18)}`, name, memberIds } : null
+    )).filter(Boolean);
+  }
+
+  function stampFriendField(marbles, groups) {
+    const byId = {};
+    (groups || []).forEach((group) => {
+      group.memberIds.forEach((id) => { byId[id] = group.name; });
+    });
+    (marbles || []).forEach((marble) => {
+      marble.friendGroup = byId[marble.id] || "";
+    });
+  }
+
+  function sameFriendGroups(a, b) {
+    const sig = (list) => (list || []).map((group) => `${group.name}:${[...group.memberIds].sort().join(",")}`).sort().join("|");
+    return sig(a) === sig(b);
+  }
+
+  function commitFriendForm(formEl, groups) {
+    if (!formEl || !Array.isArray(groups)) return;
+    const input = formEl.querySelector(".friend-name");
+    if (!input) return;
+    const name = input.value.trim().slice(0, 24);
+    const memberIds = [...formEl.querySelectorAll(".friend-pick input:checked")].map((box) => box.dataset.id).filter(Boolean);
+    if (!name || memberIds.length < 2) return;
+    groups.push({ id: makeId("fg"), name, memberIds });
+    input.value = "";
   }
 
   function normalizeRetired(entry) {
@@ -1663,7 +1907,8 @@
 
   function syncSharedPacksOut() {
     if (!window.SharedPacks || !Array.isArray(data.packs) || !data.packs.length) return;
-    SharedPacks.save(data.packs);
+    const merged = SharedPacks.merge(SharedPacks.load(), data.packs).map((pack, index) => normalizePack(pack, index));
+    SharedPacks.save(merged);
   }
 
   function storeWeight(raw) {
@@ -1753,17 +1998,19 @@
       const json = JSON.stringify(data);
       const incoming = storeWeight(data);
       const existing = Math.max(storeWeight(localStorage.getItem(STORAGE_KEY)), storeWeight(localStorage.getItem(BACKUP_KEY)));
-      if (incoming < 1 && existing > incoming) return;
-      localStorage.setItem(STORAGE_KEY, json);
-      localStorage.setItem(BACKUP_KEY, json);
-      syncSharedPacksOut();
-    } catch (_error) {
-      try {
-        localStorage.setItem(BACKUP_KEY, JSON.stringify(data));
-      } catch (_ignored) {
-        /* Ignore quota errors. */
+      if (!(incoming < 1 && existing > incoming)) {
+        try {
+          localStorage.setItem(STORAGE_KEY, json);
+        } catch (_error) {
+          try { localStorage.removeItem(BACKUP_KEY); } catch (_ignored) { /* la copia se puede soltar */ }
+          try { localStorage.setItem(STORAGE_KEY, json); } catch (_again) { /* el pack se guarda aparte */ }
+        }
+        try { localStorage.setItem(BACKUP_KEY, json); } catch (_error) { /* la copia es opcional */ }
       }
+    } catch (_error) {
+      /* el guardado del pack sigue abajo */
     }
+    try { syncSharedPacksOut(); } catch (_error) { /* no borrar la partida por un pack */ }
   }
 
   function getSave() {
@@ -1919,10 +2166,11 @@
       const chip = document.createElement("div");
       chip.className = "marble-chip";
       const mate = partnerName(save.marbles, marble);
-      chip.innerHTML = `<i class="mini-marble" style="background:${marble.color}"></i><span>${escapeHtml(marble.name)}${mate ? ` <em class="pair-chip">♥ ${escapeHtml(mate)}</em>` : ""}</span>`;
+      chip.innerHTML = `<i class="mini-marble" style="background:${marble.color}"></i><span>${escapeHtml(marble.name)}${mate ? ` <em class="pair-chip">♥ ${escapeHtml(mate)}</em>` : ""}${friendGroupName(save.friendGroups, marble.id) ? ` <em class="friend-chip">👥 ${escapeHtml(friendGroupName(save.friendGroups, marble.id))}</em>` : ""}</span>`;
       ui.list.appendChild(chip);
     });
     renderSavePairs(save);
+    renderSaveFriends(save);
 
     const canCreate = !save.started && !save.playLocked;
     const canPlay = save.started ? alive.length > 0 : alive.length >= MIN_MARBLES;
@@ -2073,6 +2321,7 @@
         name: marble.name,
         color: marble.color,
         gender: normalizeGender(marble.gender),
+        intelligence: normalizeIntelligence(marble.intelligence),
         packId: pack.id,
         packMarbleId: marble.id,
         partnerId: "",
@@ -2085,7 +2334,19 @@
       if (src && src.partnerId && idMap[src.partnerId]) copy.partnerId = idMap[src.partnerId];
     });
     sanitizePartners(copies);
+    const addedGroups = [];
+    (Array.isArray(pack.groups) ? pack.groups : []).forEach((group) => {
+      const memberIds = (group.memberIds || []).map((id) => idMap[id]).filter(Boolean);
+      if (!group.name || memberIds.length < 2) return;
+      const id = makeId("fg");
+      addedGroups.push({ id, name: String(group.name).slice(0, 24), memberIds });
+      copies.forEach((copy) => {
+        if (memberIds.includes(copy.id)) copy.friendGroupId = id;
+      });
+    });
     copies.forEach((copy) => save.marbles.push(copy));
+    save.friendGroups = normalizeFriendGroups([...(save.friendGroups || []), ...addedGroups], save.marbles);
+    syncFriendIds(save.marbles, save.friendGroups);
     persist();
     renderMenu();
   }
@@ -2131,18 +2392,29 @@
       pack ? pack.marbles.map((marble) => ({
         ...marble,
         gender: normalizeGender(marble.gender),
+        intelligence: normalizeIntelligence(marble.intelligence),
         partnerId: typeof marble.partnerId === "string" ? marble.partnerId : ""
       })) : []
     );
+    packFriendGroups = normalizeFriendGroups(pack && pack.groups, packDraft);
+    packFamilies = normalizeExclusiveNamed(pack && pack.families, packDraft, "fam");
+    packFriendships = normalizeBonds(pack && pack.friendships, packDraft);
+    packEnemies = normalizeBonds(pack && pack.enemies, packDraft);
+    packFriendships = dropSharedBonds(packFriendships, packEnemies);
     ui.packName.value = pack ? pack.name : "";
     ui.packEditorTitle.textContent = pack ? t("editPack") : t("createPack");
     ui.packMarbleForm.reset();
     ui.packMarbleColor.value = "#55d6ff";
     packGenderOpen = packDraft.some((marble) => !normalizeGender(marble.gender));
+    packIntelOpen = packDraft.length > 0;
     if (ui.packGenderNeed) ui.packGenderNeed.hidden = true;
     renderPackDraft();
     renderPackGenderPanel();
+    renderPackIntelPanel();
     renderPackPairs();
+    renderPackFriends();
+    renderPackFamilies();
+    renderPackBonds();
     showScreen("packEditor");
   }
 
@@ -2153,12 +2425,18 @@
   function setPackMarbleGender(marbleId, gender) {
     const marble = packDraft.find((item) => item.id === marbleId);
     if (!marble) return;
-    marble.gender = normalizeGender(gender);
+    const next = normalizeGender(gender);
+    if (marble.gender === next) return;
+    marble.gender = next;
     clearPartner(packDraft, marble.id);
     if (!packMissingGender().length && ui.packGenderNeed) ui.packGenderNeed.hidden = true;
     renderPackDraft();
     renderPackGenderPanel();
+    renderPackIntelPanel();
     renderPackPairs();
+    renderPackFriends();
+    renderPackFamilies();
+    renderPackBonds();
   }
 
   function openPackGenderPanel() {
@@ -2204,6 +2482,61 @@
     });
   }
 
+  function openPackIntelPanel() {
+    if (!packDraft.length) {
+      if (ui.packGenderNeed) {
+        ui.packGenderNeed.hidden = false;
+        ui.packGenderNeed.textContent = t("packGenderEmpty");
+      }
+      packIntelOpen = false;
+      renderPackIntelPanel();
+      return;
+    }
+    packIntelOpen = true;
+    if (ui.packGenderNeed) ui.packGenderNeed.hidden = true;
+    renderPackIntelPanel();
+    if (ui.packIntelPanel) ui.packIntelPanel.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  function renderPackIntelPanel() {
+    if (!ui.packIntelPanel || !ui.packIntelList) return;
+    ui.packIntelPanel.hidden = !packIntelOpen || !packDraft.length;
+    ui.packIntelList.innerHTML = "";
+    if (ui.packIntelPanel.hidden) return;
+    packDraft.forEach((marble) => {
+      const row = document.createElement("div");
+      row.className = "pack-intel-row";
+      const iq = normalizeIntelligence(marble.intelligence);
+      marble.intelligence = iq;
+      row.innerHTML = `
+        <i class="mini-marble" style="background:${marble.color}"></i>
+        <strong>${escapeHtml(marble.name)}</strong>
+      `;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.className = "pack-intel-input";
+      input.min = "0";
+      input.max = "100";
+      input.step = "1";
+      input.value = String(iq);
+      const label = document.createElement("span");
+      label.className = "pack-intel-label";
+      label.textContent = intelligenceLabel(iq);
+      const apply = () => {
+        marble.intelligence = normalizeIntelligence(input.value);
+        input.value = String(marble.intelligence);
+        label.textContent = intelligenceLabel(marble.intelligence);
+        renderPackDraft();
+      };
+      input.addEventListener("change", apply);
+      input.addEventListener("input", () => {
+        label.textContent = intelligenceLabel(normalizeIntelligence(input.value));
+      });
+      row.append(input, label);
+      ui.packIntelList.appendChild(row);
+    });
+  }
+
   function requirePackGenders() {
     const missing = packMissingGender();
     if (!missing.length) {
@@ -2223,13 +2556,245 @@
 
   function renderPackPairs() {
     if (!ui.packPairPanel) return;
-    const ready = gendersDone(packDraft);
-    ui.packPairPanel.hidden = !ready;
-    if (!ready) return;
+    ui.packPairPanel.hidden = false;
     renderPairEditor(ui.packPairList, ui.packPairForm, packDraft, () => {
       renderPackDraft();
       renderPackPairs();
     });
+  }
+
+  function renderPackFriends() {
+    if (!ui.packFriendPanel) return;
+    ui.packFriendPanel.hidden = false;
+    renderFriendEditor(ui.packFriendList, ui.packFriendForm, packDraft, packFriendGroups, () => {
+      renderPackDraft();
+      renderPackFriends();
+    });
+  }
+
+  function renderPackFamilies() {
+    if (!ui.packFamilyPanel) return;
+    ui.packFamilyPanel.hidden = false;
+    renderNamedExclusiveEditor(ui.packFamilyList, ui.packFamilyForm, packDraft, packFamilies, {
+      noneKey: "familyNone",
+      needKey: "familyNeed",
+      nameKey: "familyName",
+      joinKey: "familyJoin",
+      prefix: "fam"
+    }, () => {
+      renderPackDraft();
+      renderPackFamilies();
+    });
+  }
+
+  function renderNamedExclusiveEditor(listEl, formEl, marbles, groups, labels, onChange) {
+    if (!listEl || !formEl || !Array.isArray(groups)) return;
+    const clean = normalizeExclusiveNamed(groups, marbles, labels.prefix);
+    groups.splice(0, groups.length, ...clean);
+    listEl.innerHTML = "";
+    formEl.innerHTML = "";
+    if (!clean.length) {
+      const empty = document.createElement("p");
+      empty.className = "pair-empty";
+      empty.textContent = t(labels.noneKey);
+      listEl.appendChild(empty);
+    }
+    clean.forEach((group) => {
+      const row = document.createElement("div");
+      row.className = "friend-row";
+      const names = group.memberIds.map((id) => {
+        const marble = findMarble(marbles, id);
+        return marble ? marble.name : "";
+      }).filter(Boolean).join(", ");
+      row.innerHTML = `<strong>${escapeHtml(group.name)}</strong><span>${escapeHtml(names)}</span>`;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "button ghost compact";
+      remove.textContent = t("pairRemove");
+      remove.addEventListener("click", () => {
+        const index = groups.findIndex((item) => item.id === group.id);
+        if (index >= 0) groups.splice(index, 1);
+        onChange();
+      });
+      row.appendChild(remove);
+      listEl.appendChild(row);
+    });
+    const free = (marbles || []).filter((marble) => !clean.some((group) => group.memberIds.includes(marble.id)));
+    if (free.length < 2) {
+      const need = document.createElement("p");
+      need.className = "pair-empty";
+      need.textContent = t(labels.needKey);
+      formEl.appendChild(need);
+      return;
+    }
+    const nameInput = document.createElement("input");
+    nameInput.className = "friend-name";
+    nameInput.maxLength = 24;
+    nameInput.placeholder = t(labels.nameKey);
+    const picks = document.createElement("div");
+    picks.className = "friend-picks";
+    const selected = new Set();
+    free.forEach((marble) => {
+      const label = document.createElement("label");
+      label.className = "friend-pick";
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.dataset.id = marble.id;
+      box.addEventListener("change", () => {
+        if (box.checked) selected.add(marble.id);
+        else selected.delete(marble.id);
+      });
+      const dot = document.createElement("i");
+      dot.className = "mini-marble";
+      dot.style.background = marble.color;
+      const text = document.createElement("span");
+      text.textContent = marble.name;
+      label.append(box, dot, text);
+      picks.appendChild(label);
+    });
+    const join = document.createElement("button");
+    join.type = "button";
+    join.className = "button secondary compact";
+    join.textContent = t(labels.joinKey);
+    join.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      if (!name || selected.size < 2) return;
+      groups.push({ id: makeId(labels.prefix), name: name.slice(0, 24), memberIds: [...selected] });
+      onChange();
+    });
+    formEl.append(nameInput, picks, join);
+  }
+
+  function commitNamedExclusiveForm(formEl, groups, prefix) {
+    if (!formEl || !Array.isArray(groups)) return;
+    const input = formEl.querySelector(".friend-name");
+    if (!input) return;
+    const name = input.value.trim().slice(0, 24);
+    const memberIds = [...formEl.querySelectorAll(".friend-pick input:checked")].map((box) => box.dataset.id).filter(Boolean);
+    if (!name || memberIds.length < 2) return;
+    groups.push({ id: makeId(prefix), name, memberIds });
+    input.value = "";
+  }
+
+  function addPackBond(target, other, memberIds, prefix) {
+    const clean = [];
+    (memberIds || []).forEach((id) => {
+      if (!id || clean.includes(id) || !findMarble(packDraft, id)) return;
+      clean.push(id);
+    });
+    if (clean.length < 2) return false;
+    const key = bondKey(clean);
+    if (target.some((bond) => bondKey(bond.memberIds) === key)) return false;
+    const nextOther = other.filter((bond) => bondKey(bond.memberIds) !== key);
+    other.splice(0, other.length, ...nextOther);
+    target.push({ id: makeId(prefix), memberIds: clean });
+    return true;
+  }
+
+  function packBondNames(list, marbleId) {
+    const names = [];
+    (list || []).forEach((bond) => {
+      if (!bond.memberIds.includes(marbleId)) return;
+      bond.memberIds.forEach((id) => {
+        if (id === marbleId) return;
+        const other = findMarble(packDraft, id);
+        if (other && !names.includes(other.name)) names.push(other.name);
+      });
+    });
+    return names;
+  }
+
+  function renderPackBondList(listEl, formEl, bonds, other, options) {
+    if (!listEl || !formEl) return;
+    listEl.innerHTML = "";
+    formEl.innerHTML = "";
+    if (!bonds.length) {
+      const empty = document.createElement("p");
+      empty.className = "pair-empty";
+      empty.textContent = t(options.emptyKey);
+      listEl.appendChild(empty);
+    }
+    bonds.forEach((bond) => {
+      const people = bond.memberIds.map((id) => findMarble(packDraft, id)).filter(Boolean);
+      if (people.length < 2) return;
+      const row = document.createElement("div");
+      row.className = "friend-row";
+      row.innerHTML = `<strong>${options.mark}</strong><span>${escapeHtml(people.map((marble) => marble.name).join(", "))}</span>`;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "button ghost compact";
+      remove.textContent = t("pairRemove");
+      remove.addEventListener("click", () => {
+        const index = bonds.findIndex((item) => item.id === bond.id);
+        if (index >= 0) bonds.splice(index, 1);
+        renderPackDraft();
+        renderPackBonds();
+      });
+      row.appendChild(remove);
+      listEl.appendChild(row);
+    });
+    if (packDraft.length < 2) {
+      const need = document.createElement("p");
+      need.className = "pair-empty";
+      need.textContent = t("bondNeed");
+      formEl.appendChild(need);
+      return;
+    }
+    const picks = document.createElement("div");
+    picks.className = "friend-picks";
+    const selected = new Set();
+    packDraft.forEach((marble) => {
+      const label = document.createElement("label");
+      label.className = "friend-pick";
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.dataset.id = marble.id;
+      box.addEventListener("change", () => {
+        if (box.checked) selected.add(marble.id);
+        else selected.delete(marble.id);
+      });
+      const dot = document.createElement("i");
+      dot.className = "mini-marble";
+      dot.style.background = marble.color;
+      const text = document.createElement("span");
+      text.textContent = marble.name;
+      label.append(box, dot, text);
+      picks.appendChild(label);
+    });
+    const join = document.createElement("button");
+    join.type = "button";
+    join.className = "button secondary compact";
+    join.textContent = t(options.joinKey);
+    join.addEventListener("click", () => {
+      if (!addPackBond(bonds, other, [...selected], options.prefix)) return;
+      renderPackDraft();
+      renderPackBonds();
+    });
+    formEl.append(picks, join);
+  }
+
+  function renderPackBonds() {
+    packFriendships = normalizeBonds(packFriendships, packDraft);
+    packEnemies = normalizeBonds(packEnemies, packDraft);
+    packFriendships = dropSharedBonds(packFriendships, packEnemies);
+    renderPackBondList(ui.packBuddyList, ui.packBuddyForm, packFriendships, packEnemies, {
+      emptyKey: "buddyNone",
+      mark: "🤝",
+      joinKey: "buddyJoin",
+      prefix: "bf"
+    });
+    renderPackBondList(ui.packEnemyList, ui.packEnemyForm, packEnemies, packFriendships, {
+      emptyKey: "enemyNone",
+      mark: "💢",
+      joinKey: "enemyJoin",
+      prefix: "be"
+    });
+  }
+
+  function commitPackBond(form, target, other, prefix) {
+    if (!form) return;
+    const memberIds = [...form.querySelectorAll(".friend-pick input:checked")].map((box) => box.dataset.id).filter(Boolean);
+    addPackBond(target, other, memberIds, prefix);
   }
 
   function setSaveMarbleGender(marbleId, gender) {
@@ -2287,6 +2852,17 @@
     });
   }
 
+  function renderSaveFriends(save) {
+    if (!ui.saveFriendPanel || !save) return;
+    ui.saveFriendPanel.hidden = false;
+    if (!Array.isArray(save.friendGroups)) save.friendGroups = [];
+    renderFriendEditor(ui.saveFriendList, ui.saveFriendForm, save.marbles, save.friendGroups, () => {
+      syncFriendIds(save.marbles, save.friendGroups);
+      persist();
+      renderMenu();
+    });
+  }
+
   function leavePackEditor() {
     if (!requirePackGenders()) return;
     openPacks();
@@ -2304,7 +2880,7 @@
         <i class="mini-marble" style="background:${marble.color}"></i>
         <div class="pack-draft-meta">
           <strong>${escapeHtml(marble.name)}</strong>
-          <span class="pack-draft-gender${gender ? "" : " missing"}">${escapeHtml(genderLabel(gender))}${mate ? ` · ♥ ${escapeHtml(mate)}` : ""}</span>
+          <span class="pack-draft-gender${gender ? "" : " missing"}">${escapeHtml(genderLabel(gender))} · 🧠 ${normalizeIntelligence(marble.intelligence)} (${escapeHtml(intelligenceLabel(marble.intelligence))})${mate ? ` · ♥ ${escapeHtml(mate)}` : ""}${friendGroupName(packFriendGroups, marble.id) ? ` · 👥 ${escapeHtml(friendGroupName(packFriendGroups, marble.id))}` : ""}${friendGroupName(packFamilies, marble.id) ? ` · 👪 ${escapeHtml(friendGroupName(packFamilies, marble.id))}` : ""}${packBondNames(packFriendships, marble.id).length ? ` · 🤝 ${escapeHtml(packBondNames(packFriendships, marble.id).join(", "))}` : ""}${packBondNames(packEnemies, marble.id).length ? ` · 💢 ${escapeHtml(packBondNames(packEnemies, marble.id).join(", "))}` : ""}</span>
         </div>
       `;
       const remove = document.createElement("button");
@@ -2314,9 +2890,17 @@
       remove.addEventListener("click", () => {
         clearPartner(packDraft, marble.id);
         packDraft = packDraft.filter((item) => item.id !== marble.id);
+        packFriendGroups = normalizeFriendGroups(packFriendGroups, packDraft);
+        packFamilies = normalizeExclusiveNamed(packFamilies, packDraft, "fam");
+        packFriendships = normalizeBonds(packFriendships, packDraft);
+        packEnemies = normalizeBonds(packEnemies, packDraft);
         renderPackDraft();
         renderPackGenderPanel();
+        renderPackIntelPanel();
         renderPackPairs();
+        renderPackFriends();
+        renderPackFamilies();
+        renderPackBonds();
       });
       row.appendChild(remove);
       ui.packDraftList.appendChild(row);
@@ -2332,12 +2916,18 @@
       name: name.slice(0, ITEM_NAME_MAX),
       color: ui.packMarbleColor.value,
       gender: "",
+      intelligence: 50,
       partnerId: ""
     });
     ui.packMarbleName.value = "";
+    packIntelOpen = true;
     renderPackDraft();
     renderPackGenderPanel();
+    renderPackIntelPanel();
     renderPackPairs();
+    renderPackFriends();
+    renderPackFamilies();
+    renderPackBonds();
     ui.packMarbleName.focus();
   }
 
@@ -2348,6 +2938,20 @@
       return;
     }
     if (!requirePackGenders()) return;
+    commitFriendForm(ui.packFriendForm, packFriendGroups);
+    commitNamedExclusiveForm(ui.packFamilyForm, packFamilies, "fam");
+    commitPackBond(ui.packBuddyForm, packFriendships, packEnemies, "bf");
+    commitPackBond(ui.packEnemyForm, packEnemies, packFriendships, "be");
+    if (ui.packIntelList) {
+      [...ui.packIntelList.querySelectorAll(".pack-intel-row")].forEach((row, index) => {
+        if (!packDraft[index]) return;
+        const input = row.querySelector(".pack-intel-input");
+        if (input) packDraft[index].intelligence = normalizeIntelligence(input.value);
+      });
+    }
+    packDraft.forEach((marble) => {
+      marble.intelligence = normalizeIntelligence(marble.intelligence);
+    });
     const existing = data.packs.find((pack) => pack.id === editingPackId);
     if (existing) {
       existing.name = name.slice(0, 24);
@@ -2357,15 +2961,31 @@
         name: marble.name,
         color: marble.color,
         gender: normalizeGender(marble.gender),
-        partnerId: marble.partnerId || ""
+        intelligence: normalizeIntelligence(marble.intelligence),
+        partnerId: marble.partnerId || "",
+        friendGroup: ""
       })));
+      const nextGroups = normalizeFriendGroups(packFriendGroups, existing.marbles);
+      const prevRev = Number(existing.groupsRev) || 0;
+      existing.groupsRev = sameFriendGroups(existing.groups, nextGroups) ? prevRev : prevRev + 1;
+      existing.groups = nextGroups;
+      stampFriendField(existing.marbles, existing.groups);
+      existing.families = normalizeExclusiveNamed(packFamilies, existing.marbles, "fam");
+      existing.friendships = dropSharedBonds(normalizeBonds(packFriendships, existing.marbles), normalizeBonds(packEnemies, existing.marbles));
+      existing.enemies = normalizeBonds(packEnemies, existing.marbles);
     } else {
+      const nextGroups = normalizeFriendGroups(packFriendGroups, packDraft);
       data.packs.push(
         normalizePack({
           id: makeId("pack"),
           name,
           updatedAt: Date.now(),
-          marbles: packDraft
+          groupsRev: nextGroups.length ? 1 : 0,
+          marbles: packDraft,
+          groups: nextGroups,
+          families: packFamilies,
+          friendships: packFriendships,
+          enemies: packEnemies
         }, data.packs.length)
       );
     }
@@ -5075,6 +5695,9 @@
     if (ui.minigameLegend) ui.minigameLegend.hidden = !isMini;
     if (ui.splitPairNav) ui.splitPairNav.hidden = !(isMini && minigame && minigame.kind === "splitlove" && (minigame.extras.rooms || []).length);
     if (ui.teamSpikeNav) ui.teamSpikeNav.hidden = !(isMini && minigame && minigame.kind === "teamspike");
+    if (ui.quizNav) ui.quizNav.hidden = !(isMini && minigame && minigame.kind === "quiz");
+    if (ui.boatNav) ui.boatNav.hidden = !(isMini && minigame && minigame.kind === "rainboats");
+    if (isMini && minigame && minigame.kind === "rainboats") syncBoatNav();
     if (ui.roleplayLegend) ui.roleplayLegend.hidden = !isRole || marbleChatOpen;
     if (ui.roleplayFaces) ui.roleplayFaces.hidden = !isRole || marbleChatOpen;
     if (ui.houseNav) ui.houseNav.hidden = !(isRole && roleplay && roleplay.inside) || marbleChatOpen;
@@ -6887,6 +7510,11 @@
   }
 
   function closeFaceEditor() {
+    const taller = new URLSearchParams(location.search).get("taller");
+    if (taller) {
+      location.href = "../../taller.html?tipo=" + encodeURIComponent(taller);
+      return;
+    }
     const returnTo = faceEditor && faceEditor.returnTo;
     const backToRoleplay = !!(faceEditor && (faceEditor.fromRoleplay || returnTo === "game") && roleplay);
     if (ui.faceCanvas) ui.faceCanvas.classList.remove("drop-canvas");
@@ -7491,6 +8119,718 @@
     };
   }
 
+  const QUIZ_QUESTIONS = [
+    { text: "¿De qué color es el cielo despejado?", options: ["Azul", "Verde", "Rojo", "Negro"], correct: 0 },
+    { text: "¿Cuántas patas tiene un perro?", options: ["4", "2", "6", "8"], correct: 0 },
+    { text: "¿Qué fruta es amarilla y curva?", options: ["Banana", "Manzana", "Uva", "Sandía"], correct: 0 },
+    { text: "¿Cuánto es 2 + 2?", options: ["4", "3", "5", "22"], correct: 0 },
+    { text: "¿Qué animal dice miau?", options: ["Gato", "Perro", "Vaca", "Pato"], correct: 0 },
+    { text: "¿El hielo es agua...?", options: ["Sólida", "Gaseosa", "Caliente", "Roja"], correct: 0 },
+    { text: "¿Cuántos días tiene una semana?", options: ["7", "5", "10", "12"], correct: 0 },
+    { text: "¿Qué se usa para escribir?", options: ["Lápiz", "Zapato", "Plato", "Almohada"], correct: 0 },
+    { text: "¿El sol sale por...?", options: ["El este", "El piso", "La luna", "El sur"], correct: 0 },
+    { text: "¿En qué planeta vivimos?", options: ["Tierra", "Marte", "Júpiter", "Venus"], correct: 0 },
+    { text: "¿Cuánto es 5 − 1?", options: ["4", "6", "3", "1"], correct: 0 },
+    { text: "¿Cuántos ojos tiene una persona?", options: ["2", "1", "4", "8"], correct: 0 },
+    { text: "¿En qué estación nieva más?", options: ["Invierno", "Verano", "Primavera", "Otoño"], correct: 0 },
+    { text: "¿El fuego...?", options: ["Quema", "Enfría", "Llueve", "Flota"], correct: 0 },
+    { text: "¿Qué forma tiene una pelota?", options: ["Redonda", "Cuadrada", "Triángulo", "Plana"], correct: 0 },
+    { text: "¿Cuánto es 10 + 0?", options: ["10", "0", "11", "100"], correct: 0 },
+    { text: "¿Qué hay en el mar?", options: ["Agua", "Arena seca", "Papel", "Fuego"], correct: 0 },
+    { text: "¿Un pájaro tiene...?", options: ["Alas", "Ruedas", "Botas", "Astas"], correct: 0 },
+    { text: "¿Qué número viene después del 8?", options: ["9", "7", "80", "1"], correct: 0 },
+    { text: "¿Qué animal vive en el agua y tiene aletas?", options: ["Pez", "Gato", "Caballo", "Gallina"], correct: 0 },
+    { text: "¿Cuánto es 3 + 3?", options: ["6", "5", "9", "33"], correct: 0 },
+    { text: "¿Cuánto es 7 − 2?", options: ["5", "9", "4", "72"], correct: 0 },
+    { text: "¿Cuánto es 4 + 1?", options: ["5", "3", "6", "41"], correct: 0 },
+    { text: "¿Cuánto es 8 − 3?", options: ["5", "11", "6", "4"], correct: 0 },
+    { text: "¿Cuánto es 9 + 1?", options: ["10", "8", "11", "91"], correct: 0 },
+    { text: "¿Cuánto es 6 + 2?", options: ["8", "4", "7", "62"], correct: 0 },
+    { text: "¿Cuánto es 10 − 4?", options: ["6", "14", "5", "40"], correct: 0 },
+    { text: "¿Cuánto es 1 + 1?", options: ["2", "11", "3", "0"], correct: 0 },
+    { text: "¿Qué número viene antes del 5?", options: ["4", "6", "3", "10"], correct: 0 },
+    { text: "¿Qué número viene después del 3?", options: ["4", "2", "5", "30"], correct: 0 },
+    { text: "¿Cuántos dedos tiene una mano?", options: ["5", "4", "10", "2"], correct: 0 },
+    { text: "¿Cuántas ruedas tiene una bicicleta?", options: ["2", "1", "4", "3"], correct: 0 },
+    { text: "¿Cuántas ruedas tiene un auto?", options: ["4", "2", "6", "8"], correct: 0 },
+    { text: "¿Cuántos meses tiene un año?", options: ["12", "10", "7", "24"], correct: 0 },
+    { text: "¿Cuántas horas tiene un día?", options: ["24", "12", "60", "7"], correct: 0 },
+    { text: "¿Cuántos minutos tiene una hora?", options: ["60", "24", "100", "30"], correct: 0 },
+    { text: "¿De qué color es el pasto?", options: ["Verde", "Azul", "Rojo", "Negro"], correct: 0 },
+    { text: "¿De qué color es la nieve?", options: ["Blanca", "Negra", "Verde", "Azul"], correct: 0 },
+    { text: "¿De qué color es una banana madura?", options: ["Amarilla", "Azul", "Negra", "Violeta"], correct: 0 },
+    { text: "¿De qué color es el tomate?", options: ["Rojo", "Azul", "Negro", "Verde oscuro"], correct: 0 },
+    { text: "¿Qué animal hace mu?", options: ["Vaca", "Gato", "Pez", "Rana"], correct: 0 },
+    { text: "¿Qué animal hace guau?", options: ["Perro", "Pato", "Abeja", "Ratón"], correct: 0 },
+    { text: "¿Qué animal hace cuac?", options: ["Pato", "León", "Gato", "Caballo"], correct: 0 },
+    { text: "¿El rey de la selva es el...?", options: ["León", "Ratón", "Pez", "Conejo"], correct: 0 },
+    { text: "¿Qué animal tiene trompa?", options: ["Elefante", "Gato", "Pájaro", "Rana"], correct: 0 },
+    { text: "¿Qué animal tiene cuello muy largo?", options: ["Jirafa", "Perro", "Pato", "Ratón"], correct: 0 },
+    { text: "¿Qué animal salta y tiene bolsa?", options: ["Canguro", "Tortuga", "Pez", "Serpiente"], correct: 0 },
+    { text: "¿Qué animal vive en un panal?", options: ["Abeja", "Gato", "Perro", "Caballo"], correct: 0 },
+    { text: "¿Qué animal pone huevos y tiene plumas?", options: ["Gallina", "Vaca", "Perro", "Ballena"], correct: 0 },
+    { text: "¿Qué come una vaca en el campo?", options: ["Pasto", "Piedras", "Tornillos", "Nubes"], correct: 0 },
+    { text: "¿La leche sale de la...?", options: ["Vaca", "Piedra", "Nube", "Silla"], correct: 0 },
+    { text: "¿Con qué se hace el queso?", options: ["Leche", "Arena", "Papel", "Vidrio"], correct: 0 },
+    { text: "¿Qué fruta es roja y redonda?", options: ["Manzana", "Banana", "Limón", "Kiwi"], correct: 0 },
+    { text: "¿Qué fruta es verde por fuera y roja por dentro?", options: ["Sandía", "Banana", "Uva", "Limón"], correct: 0 },
+    { text: "¿Qué bebida es blanca y sale de la vaca?", options: ["Leche", "Jugo", "Agua", "Té"], correct: 0 },
+    { text: "¿Qué usás para cortar el pan?", options: ["Cuchillo", "Almohada", "Pelota", "Zapato"], correct: 0 },
+    { text: "¿Qué usás para comer sopa?", options: ["Cuchara", "Martillo", "Peine", "Regla"], correct: 0 },
+    { text: "¿Dónde se cocina la comida?", options: ["Cocina", "Techo", "Nube", "Zapato"], correct: 0 },
+    { text: "¿Dónde se duerme?", options: ["Cama", "Heladera", "Auto", "Pizarra"], correct: 0 },
+    { text: "¿Qué hay en el cielo de noche?", options: ["Luna", "Pasto", "Mar", "Silla"], correct: 0 },
+    { text: "¿Qué cae del cielo cuando llueve?", options: ["Agua", "Arena", "Fuego", "Papel"], correct: 0 },
+    { text: "¿El invierno es...?", options: ["Frío", "Caliente", "Un color", "Una fruta"], correct: 0 },
+    { text: "¿El verano es...?", options: ["Caluroso", "Helado", "Un número", "Un pez"], correct: 0 },
+    { text: "¿Qué planta da sombra y tiene tronco?", options: ["Árbol", "Piedra", "Nube", "Auto"], correct: 0 },
+    { text: "¿Las flores crecen en...?", options: ["La tierra", "El techo", "El fuego", "El hielo"], correct: 0 },
+    { text: "¿Qué animal nada y es enorme?", options: ["Ballena", "Gallina", "Gato", "Hormiga"], correct: 0 },
+    { text: "¿Qué insecto tiene alas de colores?", options: ["Mariposa", "Lombriz", "Caracol", "Tiburón"], correct: 0 },
+    { text: "¿Un caracol camina...?", options: ["Despacio", "En el aire", "Sin cuerpo", "De noche solo"], correct: 0 },
+    { text: "¿Qué tiene púas y se enrolla?", options: ["Erizo", "Pez", "Paloma", "Caballo"], correct: 0 },
+    { text: "¿Los peces respiran con...?", options: ["Branquias", "Ruedas", "Zapatos", "Alas de tela"], correct: 0 },
+    { text: "¿Las personas respiran con...?", options: ["Pulmones", "Ruedas", "Orejas", "Pelo"], correct: 0 },
+    { text: "¿Con qué parte oís?", options: ["Orejas", "Codos", "Rodillas", "Pelo"], correct: 0 },
+    { text: "¿Con qué parte ves?", options: ["Ojos", "Pies", "Codos", "Espalda"], correct: 0 },
+    { text: "¿Con qué parte olés?", options: ["Nariz", "Codo", "Rodilla", "Talón"], correct: 0 },
+    { text: "¿Cuántas narices tiene una persona?", options: ["1", "2", "4", "0"], correct: 0 },
+    { text: "¿Qué usás en los pies para caminar afuera?", options: ["Zapatos", "Guantes", "Gorro", "Bufanda"], correct: 0 },
+    { text: "¿Qué te ponés en la cabeza cuando hace frío?", options: ["Gorro", "Zapato", "Plato", "Libro"], correct: 0 },
+    { text: "¿Qué abre una puerta con llave?", options: ["Llave", "Cuchara", "Pelota", "Hoja"], correct: 0 },
+    { text: "¿Qué marca la hora?", options: ["Reloj", "Zapato", "Almohada", "Pelota"], correct: 0 },
+    { text: "¿En la escuela se lee un...?", options: ["Libro", "Zapato", "Plato", "Auto"], correct: 0 },
+    { text: "¿Con qué se pinta un dibujo?", options: ["Pincel", "Tenedor", "Martillo", "Cuchara"], correct: 0 },
+    { text: "¿El círculo es...?", options: ["Redondo", "Cuadrado", "Un animal", "Un mes"], correct: 0 },
+    { text: "¿Un cuadrado tiene...?", options: ["4 lados", "3 lados", "1 lado", "8 lados"], correct: 0 },
+    { text: "¿Un triángulo tiene...?", options: ["3 lados", "4 lados", "6 lados", "1 lado"], correct: 0 },
+    { text: "¿Qué es más grande?", options: ["Elefante", "Hormiga", "Mosca", "Pulga"], correct: 0 },
+    { text: "¿Qué es más chico?", options: ["Hormiga", "Elefante", "Casa", "Camión"], correct: 0 },
+    { text: "¿El opuesto de día es...?", options: ["Noche", "Sol", "Mañana", "Luz"], correct: 0 },
+    { text: "¿El opuesto de frío es...?", options: ["Calor", "Hielo", "Nieve", "Agua"], correct: 0 },
+    { text: "¿El opuesto de arriba es...?", options: ["Abajo", "Cielo", "Techo", "Alto"], correct: 0 },
+    { text: "¿El opuesto de grande es...?", options: ["Chico", "Alto", "Ancho", "Largo"], correct: 0 },
+    { text: "¿Qué vehículo vuela?", options: ["Avión", "Bicicleta", "Barco", "Tren"], correct: 0 },
+    { text: "¿Qué vehículo va por el agua?", options: ["Barco", "Avión", "Bicicleta", "Camión"], correct: 0 },
+    { text: "¿Qué vehículo va por rieles?", options: ["Tren", "Barco", "Avión", "Bicicleta"], correct: 0 },
+    { text: "¿Las abejas hacen...?", options: ["Miel", "Leche", "Queso", "Pan"], correct: 0 },
+    { text: "¿El pan se hornea en el...?", options: ["Horno", "Mar", "Techo", "Árbol"], correct: 0 },
+    { text: "¿Para lavarte las manos usás...?", options: ["Agua", "Arena", "Papel solo", "Fuego"], correct: 0 },
+    { text: "¿El hielo se derrite y queda...?", options: ["Agua", "Fuego", "Arena", "Piedra"], correct: 0 },
+    { text: "¿Qué hay dentro de un globo inflado?", options: ["Aire", "Arena", "Piedra", "Fuego"], correct: 0 },
+    { text: "¿Qué estrella vemos de día?", options: ["El sol", "La luna llena", "Un farol", "Una nube"], correct: 0 },
+    { text: "¿Las nubes están en...?", options: ["El cielo", "El piso", "El mar profundo", "La heladera"], correct: 0 },
+    { text: "¿Un arcoíris aparece con...?", options: ["Sol y lluvia", "Solo noche", "Solo nieve negra", "Fuego"], correct: 0 },
+    { text: "¿Qué animal tiene rayas negras y blancas?", options: ["Cebra", "Elefante", "Pez dorado", "Oveja"], correct: 0 },
+    { text: "¿La oveja tiene...?", options: ["Lana", "Plumas", "Escamas", "Caparazón"], correct: 0 },
+    { text: "¿La tortuga tiene...?", options: ["Caparazón", "Alas", "Trompa", "Melena"], correct: 0 },
+    { text: "¿El pingüino vive bien en...?", options: ["El frío", "El desierto", "Un volcán", "El horno"], correct: 0 },
+    { text: "¿Los cactus viven en...?", options: ["El desierto", "El hielo", "El mar", "La nieve"], correct: 0 },
+    { text: "¿Qué fruta es ácida y amarilla?", options: ["Limón", "Sandía", "Uva", "Banana"], correct: 0 },
+    { text: "¿Las uvas crecen en...?", options: ["Una vid", "Un pez", "Una nube", "Una piedra"], correct: 0 },
+    { text: "¿Cuántas patas tiene una araña?", options: ["8", "4", "2", "6"], correct: 0 },
+    { text: "¿Cuántas patas tiene un insecto?", options: ["6", "8", "2", "4"], correct: 0 },
+    { text: "¿Un bebé de perro se llama...?", options: ["Cachorro", "Pollito", "Ternero", "Potro"], correct: 0 },
+    { text: "¿Un bebé de gato se llama...?", options: ["Gatito", "Pollito", "Patito", "Potro"], correct: 0 },
+    { text: "¿La capital de Francia es...?", options: ["París", "Roma", "Lima", "Oslo"], correct: 0 },
+    { text: "¿La capital de Italia es...?", options: ["Roma", "París", "Madrid", "Berlín"], correct: 0 },
+    { text: "¿La capital de España es...?", options: ["Madrid", "Lisboa", "Roma", "París"], correct: 0 },
+    { text: "¿En qué continente está Brasil?", options: ["América del Sur", "Europa", "Asia", "Oceanía"], correct: 0 },
+    { text: "¿El Nilo es un...?", options: ["Río", "Monte", "País", "Mar"], correct: 0 },
+    { text: "¿El Everest es una...?", options: ["Montaña", "Isla", "Ciudad", "Playa"], correct: 0 },
+    { text: "¿Qué océano está entre América y Europa?", options: ["Atlántico", "Índico", "Ártico", "Un lago"], correct: 0 },
+    { text: "¿Cuántos continentes se suelen contar?", options: ["7", "3", "12", "2"], correct: 0 },
+    { text: "¿Qué gas respiramos del aire?", options: ["Oxígeno", "Humo", "Arena", "Vapor de piedra"], correct: 0 },
+    { text: "¿El corazón bombea...?", options: ["Sangre", "Aire de globo", "Arena", "Leche"], correct: 0 },
+    { text: "¿Los dientes sirven para...?", options: ["Masticar", "Ver", "Oír", "Volar"], correct: 0 },
+    { text: "¿El sábado y el domingo son el...?", options: ["Fin de semana", "Lunes", "Mediodía", "Año"], correct: 0 }
+  ];
+
+  function quizBoxes() {
+    return [
+      { x: 28, y: 108, w: 460, h: 220 },
+      { x: 512, y: 108, w: 460, h: 220 },
+      { x: 28, y: 348, w: 460, h: 220 },
+      { x: 512, y: 348, w: 460, h: 220 }
+    ];
+  }
+
+  function shuffledQuiz(question) {
+    const order = [0, 1, 2, 3];
+    for (let index = order.length - 1; index > 0; index -= 1) {
+      const swap = Math.floor(Math.random() * (index + 1));
+      const held = order[index];
+      order[index] = order[swap];
+      order[swap] = held;
+    }
+    return {
+      text: question.text,
+      options: order.map((index) => question.options[index]),
+      correct: order.indexOf(question.correct)
+    };
+  }
+
+  function assignQuizQuestion() {
+    const extras = minigame.extras;
+    const unused = QUIZ_QUESTIONS.map((_, index) => index).filter((index) => !extras.used.includes(index));
+    const pool = unused.length ? unused : QUIZ_QUESTIONS.map((_, index) => index);
+    if (!unused.length) extras.used = [];
+    const index = pool[Math.floor(Math.random() * pool.length)];
+    extras.used.push(index);
+    extras.question = shuffledQuiz(QUIZ_QUESTIONS[index]);
+    extras.phase = "play";
+  }
+
+  function quizSpot(box, index, total) {
+    const cols = Math.max(1, Math.ceil(Math.sqrt(total)));
+    const rows = Math.ceil(total / cols);
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    return {
+      x: box.x + 24 + ((col + 0.5) / cols) * (box.w - 48),
+      y: box.y + 78 + ((row + 0.5) / rows) * (box.h - 100)
+    };
+  }
+
+  function layoutQuizMarbles() {
+    const boxes = quizBoxes();
+    for (let answer = 0; answer < 4; answer += 1) {
+      const group = marbles.filter((ball) => ball.state === "active" && ball.answer === answer);
+      const cols = Math.max(1, Math.ceil(Math.sqrt(group.length || 1)));
+      const rows = Math.ceil((group.length || 1) / cols);
+      const cell = Math.min((boxes[answer].w - 24) / cols, (boxes[answer].h - 96) / rows);
+      const radius = Math.max(5, Math.min(RADIUS, cell * 0.38));
+      group.forEach((ball, index) => {
+        const spot = quizSpot(boxes[answer], index, group.length);
+        ball.tx = spot.x;
+        ball.ty = spot.y;
+        ball.radius = radius;
+        ball.vx = 0;
+        ball.vy = 0;
+      });
+    }
+  }
+
+  function setupQuiz(alive) {
+    marbles = layoutMinigameMarbles(alive, () => ({ x: 500, y: 300 }));
+    minigame.extras = { used: [], phase: "play", selectedId: "", round: 1, question: null, revealUntil: 0, winnerId: "" };
+    assignQuizQuestion();
+    marbles.forEach((ball) => { ball.answer = Math.floor(Math.random() * 4); });
+    layoutQuizMarbles();
+  }
+
+  function quizAdvance() {
+    if (!minigame || minigame.kind !== "quiz" || !minigame.playing) return;
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "play" || !extras.question) return;
+    const correct = extras.question.correct;
+    marbles.forEach((ball) => {
+      if (ball.state !== "active") return;
+      if (ball.answer !== correct) {
+        ball.state = "lost";
+        addParticles(ball.x, ball.y, ball.color, 8);
+      } else {
+        ball.score = (ball.score || 0) + 1;
+      }
+    });
+    extras.phase = "reveal";
+    extras.revealUntil = minigame.elapsed + 0.95;
+    extras.selectedId = "";
+    updateMinigameStatus();
+  }
+
+  function updateQuiz() {
+    const extras = minigame.extras;
+    if (!extras) return;
+    marbles.forEach((ball) => {
+      if (ball.state !== "active") return;
+      ball.x += ((ball.tx || ball.x) - ball.x) * 0.22;
+      ball.y += ((ball.ty || ball.y) - ball.y) * 0.22;
+      ball.vx = 0;
+      ball.vy = 0;
+    });
+    if (extras.phase !== "reveal" || minigame.elapsed < extras.revealUntil) return;
+    const left = marbles.filter((ball) => ball.state === "active");
+    if (left.length <= 1) {
+      extras.winnerId = left[0] ? left[0].recordId : "";
+      finishMinigame();
+      return;
+    }
+    extras.round += 1;
+    extras.selectedId = "";
+    assignQuizQuestion();
+    layoutQuizMarbles();
+    updateMinigameStatus();
+  }
+
+  function handleQuizClick(point) {
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "play") return;
+    const marble = nearestActiveMarble(point, 36);
+    if (marble) {
+      extras.selectedId = extras.selectedId === marble.recordId ? "" : marble.recordId;
+      return;
+    }
+    if (!extras.selectedId) return;
+    const boxIndex = quizBoxes().findIndex((box) => point.x >= box.x && point.x <= box.x + box.w && point.y >= box.y && point.y <= box.y + box.h);
+    if (boxIndex < 0) return;
+    const ball = marbles.find((item) => item.recordId === extras.selectedId && item.state === "active");
+    if (!ball) return;
+    ball.answer = boxIndex;
+    layoutQuizMarbles();
+  }
+
+  function drawWrappedText(text, x, y, maxWidth, lineHeight, maxLines) {
+    const words = String(text || "").split(" ");
+    let line = "";
+    let row = 0;
+    words.forEach((word) => {
+      const test = line ? `${line} ${word}` : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        if (row < maxLines) ctx.fillText(line, x, y + row * lineHeight);
+        row += 1;
+        line = word;
+      } else line = test;
+    });
+    if (line && row < maxLines) ctx.fillText(line, x, y + row * lineHeight);
+  }
+
+  function drawQuizWorld() {
+    const extras = minigame.extras || {};
+    const question = extras.question;
+    const boxes = quizBoxes();
+    ctx.fillStyle = "rgba(4,10,16,0.62)";
+    ctx.fillRect(28, 14, 944, 82);
+    ctx.fillStyle = "#eaf7ff";
+    ctx.font = "700 22px Segoe UI";
+    ctx.textAlign = "center";
+    drawWrappedText(question ? question.text : "", 500, 46, 900, 26, 2);
+    boxes.forEach((box, index) => {
+      const correct = extras.phase === "reveal" && question && index === question.correct;
+      const wrong = extras.phase === "reveal" && question && index !== question.correct;
+      ctx.fillStyle = correct ? "rgba(34,197,94,0.28)" : wrong ? "rgba(244,63,94,0.16)" : "rgba(8,18,32,0.55)";
+      ctx.fillRect(box.x, box.y, box.w, box.h);
+      ctx.strokeStyle = correct ? "#4ade80" : wrong ? "#fb7185" : "#93c5fd";
+      ctx.lineWidth = correct ? 6 : 3;
+      ctx.strokeRect(box.x, box.y, box.w, box.h);
+      ctx.fillStyle = "#eaf7ff";
+      ctx.font = "700 22px Segoe UI";
+      ctx.textAlign = "center";
+      drawWrappedText(question ? question.options[index] : "", box.x + box.w / 2, box.y + 36, box.w - 36, 24, 2);
+    });
+    ctx.textAlign = "left";
+  }
+
+  function drawQuizSelection() {
+    const extras = minigame.extras;
+    if (!extras || !extras.selectedId) return;
+    const ball = marbles.find((item) => item.recordId === extras.selectedId && item.state === "active");
+    if (!ball) return;
+    ctx.strokeStyle = "#fef08a";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius + 6, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function boatZones() {
+    return {
+      big: { x: 230, y: 318, w: 540, h: 175 },
+      left: { x: 28, y: 250, w: 188, h: 128 },
+      right: { x: 784, y: 250, w: 188, h: 128 },
+      tiny: { x: 390, y: 108, w: 220, h: 86 }
+    };
+  }
+
+  function boatSpot(zone, index, total) {
+    const cols = Math.max(1, Math.ceil(Math.sqrt(total)));
+    const rows = Math.ceil(total / cols);
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    return {
+      x: zone.x + 16 + ((col + 0.5) / cols) * (zone.w - 32),
+      y: zone.y + 22 + ((row + 0.5) / rows) * (zone.h - 36)
+    };
+  }
+
+  function layoutBoatMarbles() {
+    const zones = boatZones();
+    ["big", "left", "right", "tiny"].forEach((id) => {
+      const group = marbles.filter((ball) => ball.state === "active" && ball.boat === id);
+      group.forEach((ball, index) => {
+        const spot = boatSpot(zones[id], index, group.length);
+        ball.tx = spot.x;
+        ball.ty = spot.y;
+        ball.radius = id === "tiny" ? 11 : RADIUS;
+      });
+    });
+  }
+
+  function makeBoatCrowd(count, area) {
+    const colors = ["#38bdf8", "#f472b6", "#facc15", "#a3e635", "#fb7185", "#c084fc", "#fdba74", "#67e8f9", "#86efac", "#f9a8d4"];
+    return Array.from({ length: count }, (_, index) => {
+      const spot = {
+        x: area.x + 20 + Math.random() * (area.w - 40),
+        y: area.y + 20 + Math.random() * (area.h - 40)
+      };
+      return { color: colors[index % colors.length], x: spot.x, y: spot.y, tx: spot.x, ty: spot.y, area };
+    });
+  }
+
+  function setupRainBoats(alive) {
+    marbles = layoutMinigameMarbles(alive, () => ({ x: 500, y: 420 }));
+    marbles.forEach((ball) => { ball.boat = "big"; });
+    minigame.extras = {
+      phase: "board",
+      view: "country",
+      selectedId: "",
+      warn: "",
+      sailUntil: 0,
+      rain: Array.from({ length: 70 }, () => ({ x: Math.random() * WIDTH, y: Math.random() * HEIGHT, len: 10 + Math.random() * 16 })),
+      crowdCountry: [],
+      crowdIsland: []
+    };
+    layoutBoatMarbles();
+    syncBoatNav();
+  }
+
+  function boatReady() {
+    const active = marbles.filter((ball) => ball.state === "active");
+    const tiny = active.filter((ball) => ball.boat === "tiny").length;
+    const aboard = active.every((ball) => ball.boat === "left" || ball.boat === "right" || ball.boat === "tiny");
+    return aboard && tiny === 2;
+  }
+
+  function boatSail() {
+    if (!minigame || minigame.kind !== "rainboats" || !minigame.playing) return;
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "board") return;
+    if (!boatReady()) {
+      extras.warn = "need";
+      updateMinigameStatus();
+      return;
+    }
+    extras.warn = "";
+    extras.phase = "sail";
+    extras.sailUntil = minigame.elapsed + 1.35;
+    marbles.forEach((ball) => {
+      if (ball.boat === "left" || ball.boat === "right") ball.score = 1;
+    });
+    syncBoatNav();
+    updateMinigameStatus();
+  }
+
+  function beginBoatLand() {
+    const extras = minigame.extras;
+    extras.phase = "land";
+    extras.view = "country";
+    extras.crowdCountry = makeBoatCrowd(18, { x: 90, y: 230, w: 820, h: 300 });
+    extras.crowdIsland = makeBoatCrowd(14, { x: 300, y: 250, w: 400, h: 220 });
+    placeBoatLanding();
+    syncBoatNav();
+    updateMinigameStatus();
+  }
+
+  function placeBoatLanding() {
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "land") return;
+    if (extras.view === "island") {
+      const stuck = marbles.filter((ball) => ball.boat === "tiny");
+      const seats = [{ x: 460, y: 390 }, { x: 540, y: 390 }];
+      stuck.forEach((ball, index) => {
+        const seat = seats[index] || seats[0];
+        ball.x = seat.x;
+        ball.y = seat.y;
+        ball.tx = seat.x;
+        ball.ty = seat.y;
+      });
+      return;
+    }
+    const safe = marbles.filter((ball) => ball.boat === "left" || ball.boat === "right");
+    const area = { x: 120, y: 250, w: 760, h: 260 };
+    safe.forEach((ball, index) => {
+      const spot = boatSpot(area, index, safe.length || 1);
+      ball.tx = spot.x;
+      ball.ty = spot.y;
+    });
+  }
+
+  function lookBoatLand(view) {
+    if (!minigame || minigame.kind !== "rainboats") return;
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "land") return;
+    extras.view = view === "island" ? "island" : "country";
+    placeBoatLanding();
+    updateMinigameStatus();
+  }
+
+  function syncBoatNav() {
+    const on = !!(minigame && minigame.kind === "rainboats");
+    if (ui.boatNav) ui.boatNav.hidden = !on;
+    if (!on) return;
+    const land = minigame.extras && minigame.extras.phase === "land";
+    if (ui.boatSail) ui.boatSail.hidden = land;
+    if (ui.boatCountry) ui.boatCountry.hidden = !land;
+    if (ui.boatIsland) ui.boatIsland.hidden = !land;
+    if (ui.boatEnd) ui.boatEnd.hidden = !land;
+  }
+
+  function updateRainBoats() {
+    const extras = minigame.extras;
+    if (!extras) return;
+    extras.rain.forEach((drop) => {
+      drop.y += 11;
+      drop.x -= 2.2;
+      if (drop.y > HEIGHT) {
+        drop.y = -20;
+        drop.x = Math.random() * (WIDTH + 80);
+      }
+    });
+    if (extras.phase === "sail") {
+      marbles.forEach((ball) => {
+        if (ball.state !== "active") return;
+        ball.y -= 7;
+      });
+      if (minigame.elapsed >= extras.sailUntil) beginBoatLand();
+      return;
+    }
+    if (!(extras.phase === "land" && extras.view === "island")) {
+      marbles.forEach((ball) => {
+        if (ball.state !== "active") return;
+        if (extras.phase === "land" && ball.boat === "tiny") return;
+        ball.x += ((ball.tx || ball.x) - ball.x) * 0.2;
+        ball.y += ((ball.ty || ball.y) - ball.y) * 0.2;
+      });
+    }
+    const crowd = extras.phase === "land"
+      ? (extras.view === "island" ? extras.crowdIsland : extras.crowdCountry)
+      : [];
+    crowd.forEach((ball) => {
+      if (Math.hypot(ball.x - ball.tx, ball.y - ball.ty) < 6) {
+        ball.tx = ball.area.x + 16 + Math.random() * (ball.area.w - 32);
+        ball.ty = ball.area.y + 16 + Math.random() * (ball.area.h - 32);
+      }
+      ball.x += (ball.tx - ball.x) * 0.02;
+      ball.y += (ball.ty - ball.y) * 0.02;
+    });
+  }
+
+  function handleBoatClick(point) {
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "board") return;
+    if (extras.selectedId) {
+      const chosen = marbles.find((item) => item.recordId === extras.selectedId);
+      if (chosen && chosen.boat !== "big") extras.selectedId = "";
+    }
+    const marble = nearestActiveMarble(point, 36);
+    const onSmall = !!(marble && marble.boat !== "big");
+    if (marble && !onSmall) {
+      extras.selectedId = extras.selectedId === marble.recordId ? "" : marble.recordId;
+      return;
+    }
+    if (onSmall && !extras.selectedId) {
+      marble.boat = "big";
+      extras.warn = "";
+      layoutBoatMarbles();
+      updateMinigameStatus();
+      return;
+    }
+    if (!extras.selectedId) return;
+    const zones = boatZones();
+    const zoneId = Object.keys(zones).find((id) => {
+      const zone = zones[id];
+      return point.x >= zone.x && point.x <= zone.x + zone.w && point.y >= zone.y && point.y <= zone.y + zone.h;
+    });
+    if (!zoneId) return;
+    const ball = marbles.find((item) => item.recordId === extras.selectedId && item.state === "active");
+    if (!ball) return;
+    if (zoneId === "tiny") {
+      const taken = marbles.filter((item) => item.state === "active" && item.boat === "tiny" && item !== ball).length;
+      if (taken >= 2) {
+        extras.warn = "full";
+        updateMinigameStatus();
+        return;
+      }
+    }
+    extras.warn = "";
+    ball.boat = zoneId;
+    if (zoneId !== "big") extras.selectedId = "";
+    layoutBoatMarbles();
+    updateMinigameStatus();
+  }
+
+  function boatShowsMarble(ball) {
+    const extras = minigame.extras || {};
+    if (extras.phase !== "land") return true;
+    if (extras.view === "island") return ball.boat === "tiny";
+    return ball.boat === "left" || ball.boat === "right";
+  }
+
+  function drawBoatHull(x, y, w, h, fill, edge) {
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y);
+    ctx.quadraticCurveTo(x + w - 8, y + h, x + w * 0.72, y + h);
+    ctx.lineTo(x + w * 0.28, y + h);
+    ctx.quadraticCurveTo(x + 8, y + h, x, y);
+    ctx.fill();
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = edge;
+    ctx.fillRect(x + 10, y - 8, w - 20, 10);
+  }
+
+  function drawRainBoats() {
+    const extras = minigame.extras || {};
+    const zones = boatZones();
+    if (extras.phase === "land") {
+      drawBoatLand(extras);
+      return;
+    }
+    const sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+    sky.addColorStop(0, "#0b1d33");
+    sky.addColorStop(1, "#12324f");
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.strokeStyle = "rgba(226,232,240,0.45)";
+    ctx.lineWidth = 2;
+    (extras.rain || []).forEach((drop) => {
+      ctx.beginPath();
+      ctx.moveTo(drop.x, drop.y);
+      ctx.lineTo(drop.x - 4, drop.y + drop.len);
+      ctx.stroke();
+    });
+    ctx.fillStyle = "#0e4c6e";
+    ctx.fillRect(0, 430, WIDTH, 170);
+    ctx.fillStyle = "rgba(125,211,252,0.25)";
+    ctx.fillRect(0, 430, WIDTH, 8);
+    drawBoatHull(188, 300, 624, 150, "#b45309", "#7c2d12");
+    ctx.fillStyle = "#92400e";
+    ctx.fillRect(470, 248, 70, 52);
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(486, 262, 16, 16);
+    ctx.strokeStyle = "#e2e8f0";
+    ctx.beginPath();
+    ctx.moveTo(505, 150);
+    ctx.lineTo(505, 248);
+    ctx.stroke();
+    drawBoatHull(zones.left.x, zones.left.y + 18, zones.left.w, 78, "#0369a1", "#082f49");
+    drawBoatHull(zones.right.x, zones.right.y + 18, zones.right.w, 78, "#0369a1", "#082f49");
+    drawBoatHull(zones.tiny.x, zones.tiny.y + 8, zones.tiny.w, 52, "#155e75", "#083344");
+    ctx.fillStyle = "#e0f2fe";
+    ctx.font = "700 16px Segoe UI";
+    ctx.textAlign = "center";
+    const tinyCount = marbles.filter((ball) => ball.state === "active" && ball.boat === "tiny").length;
+    ctx.fillText("2 exactas", zones.tiny.x + zones.tiny.w / 2, zones.tiny.y + 6);
+    ctx.fillText(`${tinyCount}/2`, zones.tiny.x + zones.tiny.w / 2, zones.tiny.y + 48);
+    ctx.fillText("Barco", zones.left.x + zones.left.w / 2, zones.left.y + 12);
+    ctx.fillText("Barco", zones.right.x + zones.right.w / 2, zones.right.y + 12);
+    ctx.textAlign = "left";
+  }
+
+  function drawBoatLand(extras) {
+    const island = extras.view === "island";
+    const sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+    if (island) {
+      sky.addColorStop(0, "#082f49");
+      sky.addColorStop(1, "#155e75");
+    } else {
+      sky.addColorStop(0, "#7dd3fc");
+      sky.addColorStop(1, "#bae6fd");
+    }
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    if (island) {
+      ctx.fillStyle = "#0c4a6e";
+      ctx.fillRect(0, 470, WIDTH, 130);
+      ctx.fillStyle = "#ca8a04";
+      ctx.beginPath();
+      ctx.ellipse(500, 400, 250, 130, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#65a30d";
+      ctx.beginPath();
+      ctx.ellipse(500, 372, 180, 70, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#166534";
+      ctx.beginPath();
+      ctx.moveTo(500, 210);
+      ctx.lineTo(560, 300);
+      ctx.lineTo(440, 300);
+      ctx.fill();
+      ctx.fillStyle = "#14532d";
+      ctx.fillRect(494, 300, 12, 70);
+      ctx.fillStyle = "rgba(15,23,42,0.45)";
+      ctx.beginPath();
+      ctx.ellipse(500, 400, 70, 28, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#e0f2fe";
+      ctx.font = "700 22px Segoe UI";
+      ctx.textAlign = "center";
+      ctx.fillText("Isla donde nadie sabe", 500, 78);
+    } else {
+      ctx.fillStyle = "#15803d";
+      ctx.fillRect(0, 250, WIDTH, 350);
+      ctx.fillStyle = "#4ade80";
+      ctx.fillRect(0, 250, WIDTH, 18);
+      ctx.fillStyle = "#166534";
+      [[160, 300], [300, 340], [700, 310], [820, 360]].forEach(([x, y]) => {
+        ctx.fillRect(x, y, 54, 40);
+        ctx.beginPath();
+        ctx.moveTo(x - 8, y);
+        ctx.lineTo(x + 27, y - 28);
+        ctx.lineTo(x + 62, y);
+        ctx.fill();
+      });
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "700 28px Segoe UI";
+      ctx.textAlign = "center";
+      ctx.fillText("País a salvo", 500, 90);
+      ctx.font = "600 16px Segoe UI";
+      ctx.fillText("Hay muchas pelotas más", 500, 118);
+    }
+    ctx.textAlign = "left";
+    const crowd = island ? extras.crowdIsland : extras.crowdCountry;
+    (crowd || []).forEach((ball) => {
+      ctx.fillStyle = ball.color;
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, 8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function drawBoatSelection() {
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "board" || !extras.selectedId) return;
+    const ball = marbles.find((item) => item.recordId === extras.selectedId && item.state === "active");
+    if (!ball || ball.boat !== "big") return;
+    ctx.strokeStyle = "#fef08a";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius + 6, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function drawBoatStuck() {
+    const extras = minigame.extras;
+    if (!extras || extras.phase !== "land" || extras.view !== "island") return;
+    marbles.forEach((ball) => {
+      if (ball.boat !== "tiny" || ball.state !== "active") return;
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius + 10, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ball.x - 16, ball.y);
+      ctx.lineTo(ball.x + 16, ball.y);
+      ctx.moveTo(ball.x, ball.y - 16);
+      ctx.lineTo(ball.x, ball.y + 16);
+      ctx.stroke();
+    });
+  }
+
   function setupMinigameWorld(def, alive) {
     const kind = def.kind;
     if (kind === "custom") {
@@ -7600,6 +8940,10 @@
       setupBoxEscape(alive);
     } else if (kind === "teamspike") {
       setupTeamSpike(alive);
+    } else if (kind === "quiz") {
+      setupQuiz(alive);
+    } else if (kind === "rainboats") {
+      setupRainBoats(alive);
     } else {
       marbles = layoutMinigameMarbles(alive, (index, total) => spreadGrid(index, total));
     }
@@ -7692,6 +9036,36 @@
       updateTeamSpikeStatus();
       return;
     }
+    if (minigame.kind === "quiz") {
+      const extras = minigame.extras || {};
+      const question = extras.question;
+      if (extras.phase === "reveal" && question) {
+        ui.status.textContent = t("miniQuizReveal", {
+          answer: question.options[question.correct] || "",
+          n: marbles.filter((ball) => ball.state === "active").length
+        });
+        return;
+      }
+      ui.status.textContent = t("miniQuizStatus", { n: extras.round || 1 });
+      return;
+    }
+    if (minigame.kind === "rainboats") {
+      const extras = minigame.extras || {};
+      if (extras.phase === "sail") {
+        ui.status.textContent = t("miniBoatSailStatus");
+        return;
+      }
+      if (extras.phase === "land") {
+        ui.status.textContent = extras.view === "island" ? t("miniBoatIslandStatus") : t("miniBoatCountryStatus");
+        return;
+      }
+      ui.status.textContent = extras.warn === "need"
+        ? t("miniBoatNeed")
+        : extras.warn === "full"
+          ? t("miniBoatTinyFull")
+          : t("miniBoatStatus");
+      return;
+    }
     ui.status.textContent = t("miniStatus");
   }
 
@@ -7725,6 +9099,17 @@
         : ranked.slice(0, 1);
       return { ranked, winners, topScore: winners[0] ? winners[0].exitOrder || 0 : 0 };
     }
+    if (minigame && minigame.kind === "quiz") {
+      const winnerId = minigame.extras && minigame.extras.winnerId;
+      const ranked = marbles.slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+      const winners = winnerId ? ranked.filter((ball) => ball.recordId === winnerId) : [];
+      return { ranked, winners, topScore: winners[0] ? winners[0].score || 0 : 0 };
+    }
+    if (minigame && minigame.kind === "rainboats") {
+      const ranked = marbles.slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+      const winners = ranked.filter((ball) => ball.boat === "left" || ball.boat === "right");
+      return { ranked, winners, topScore: winners.length };
+    }
     const ranked = marbles.slice().sort((a, b) => (b.score || 0) - (a.score || 0));
     const topScore = ranked[0] ? ranked[0].score || 0 : 0;
     const winners = ranked.filter((ball) => (ball.score || 0) === topScore && topScore > 0);
@@ -7734,7 +9119,11 @@
   function showMinigameModal() {
     const { ranked, winners } = rankMinigame();
     const names = (winners.length ? winners : ranked.slice(0, 1)).map((ball) => ball.name).join(", ");
-    const title = winners.length > 1 ? t("miniTie", { names }) : t("miniWinner", { name: names });
+    const stuckNames = marbles.filter((ball) => ball.boat === "tiny").map((ball) => ball.name).join(", ");
+    const safeNames = winners.map((ball) => ball.name).join(", ");
+    const title = minigame.kind === "rainboats" && !winners.length
+      ? t("miniBoatStuckTitle", { names: stuckNames || t("miniBoatNobody") })
+      : winners.length > 1 ? t("miniTie", { names }) : t("miniWinner", { name: names });
     const lines = ranked
       .slice(0, 6)
       .map((ball, index) => `${index + 1}. ${ball.name} · ${Math.round(ball.score || 0)}`)
@@ -7751,7 +9140,10 @@
         ? t("miniTeamVipWin", { name: teamExtras.winnerName, team: teamExtras.teamName })
         : t("miniTeamVipHeld", { name: teamExtras.winnerName, holder: teamExtras.heldName || teamExtras.teamName })}`
       : "";
-    ui.modalText.textContent = `${lines}. ${t("miniNoPenalty")}${granted ? ` ${t("miniSpeedBoost")}` : ""}${boxNote}${teamNote}`;
+    const boatNote = minigame.kind === "rainboats"
+      ? ` ${t("miniBoatResult", { safe: safeNames || t("miniBoatNobody"), stuck: stuckNames || t("miniBoatNobody") })}`
+      : "";
+    ui.modalText.textContent = `${lines}. ${t("miniNoPenalty")}${granted ? ` ${t("miniSpeedBoost")}` : ""}${boxNote}${teamNote}${boatNote}`;
     ui.nextRound.hidden = true;
     if (ui.modalRejoin) ui.modalRejoin.hidden = true;
     ui.modal.hidden = false;
@@ -7888,6 +9280,8 @@
     else if (kind === "lockpair") updateLockPair(step);
     else if (kind === "boxescape") updateBoxEscape(step);
     else if (kind === "teamspike") updateTeamSpike(step);
+    else if (kind === "quiz") updateQuiz(step);
+    else if (kind === "rainboats") updateRainBoats(step);
     else if (kind === "custom") updateCustomMinigame(step);
   }
 
@@ -10962,6 +12356,14 @@
       }
       return;
     }
+    if (minigame.kind === "quiz") {
+      handleQuizClick(point);
+      return;
+    }
+    if (minigame.kind === "rainboats") {
+      handleBoatClick(point);
+      return;
+    }
     const click = minigame.def.click || minigame.def.clickMode || "";
     const tight = click === "potato" || click === "pass" || minigame.kind === "potato" || minigame.kind === "flash" || minigame.def.goal === "flash";
     const target = nearestActiveMarble(point, tight ? 80 : 120);
@@ -11093,6 +12495,8 @@
     }
     if (kind === "lockpair") drawLockPairWorld();
     if (kind === "boxescape") drawBoxEscapeWorld();
+    if (kind === "quiz") drawQuizWorld();
+    if (kind === "rainboats") drawRainBoats();
     if (kind === "custom") {
       ((minigame.extras && minigame.extras.parts) || []).forEach((part) => {
         if (part.invisible || isScriptType(part.type)) return;
@@ -11231,7 +12635,15 @@
         ctx.stroke();
       }
     }
-    marbles.forEach(drawMarble);
+    marbles.forEach((ball) => {
+      if (kind === "rainboats" && !boatShowsMarble(ball)) return;
+      drawMarble(ball);
+    });
+    if (kind === "quiz") drawQuizSelection();
+    if (kind === "rainboats") {
+      drawBoatSelection();
+      drawBoatStuck();
+    }
     if (kind === "teamspike") {
       marbles.forEach((ball) => {
         if (!ball.picked || ball.phase !== "area") return;
@@ -11244,6 +12656,7 @@
     }
     drawParticles();
     if (kind === "splitlove" || kind === "teamspike") ctx.restore();
+    if (kind === "quiz" || kind === "rainboats") return;
     const board = marbles.slice().sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 4);
     ctx.textAlign = "left";
     ctx.font = "700 12px Segoe UI";
@@ -11297,7 +12710,11 @@
       ui.packEditorTitle.textContent = editingPackId ? t("editPack") : t("createPack");
       renderPackDraft();
       renderPackGenderPanel();
+      renderPackIntelPanel();
       renderPackPairs();
+      renderPackFriends();
+      renderPackFamilies();
+      renderPackBonds();
     }
     if (screens.create && screens.create.classList.contains("active")) {
       renderCreateGender();
@@ -13930,6 +15347,7 @@
   document.getElementById("newPackButton").addEventListener("click", () => openPackEditor(null));
   document.getElementById("cancelPackEditor").addEventListener("click", leavePackEditor);
   document.getElementById("packGenderButton").addEventListener("click", openPackGenderPanel);
+  if (ui.packIntelButton) ui.packIntelButton.addEventListener("click", openPackIntelPanel);
   document.getElementById("savePackButton").addEventListener("click", savePack);
   document.getElementById("createButton").addEventListener("click", openCreate);
   if (ui.createMap) ui.createMap.addEventListener("click", () => openLevelEditor("map"));
@@ -14085,6 +15503,15 @@
   if (ui.teamSpikeNext) ui.teamSpikeNext.addEventListener("click", () => {
     if (minigame && minigame.kind === "teamspike") lookTeamSpike(minigame.extras.view + 1);
   });
+  if (ui.quizNext) ui.quizNext.addEventListener("click", () => {
+    if (minigame && minigame.kind === "quiz") quizAdvance();
+  });
+  if (ui.boatSail) ui.boatSail.addEventListener("click", () => boatSail());
+  if (ui.boatCountry) ui.boatCountry.addEventListener("click", () => lookBoatLand("country"));
+  if (ui.boatIsland) ui.boatIsland.addEventListener("click", () => lookBoatLand("island"));
+  if (ui.boatEnd) ui.boatEnd.addEventListener("click", () => {
+    if (minigame && minigame.kind === "rainboats" && minigame.extras && minigame.extras.phase === "land") finishMinigame();
+  });
   if (ui.splitPairRooms) {
     ui.splitPairRooms.addEventListener("click", (event) => {
       const button = event.target.closest("[data-split-room]");
@@ -14169,6 +15596,11 @@
       persist();
     }
   });
+
+  const taller = new URLSearchParams(location.search).get("taller");
+  if (taller === "cara") openFaceEditor("face");
+  else if (taller === "comida") openFoodEditor();
+  else if (taller === "bebida") openFaceEditor("drink");
 
   renderSlots();
   renderSongList();

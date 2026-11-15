@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colegio Creado</title>
+  <link rel="stylesheet" href="styles.css?v=colegio1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🏫</p>
+      <h1>Colegio Creado</h1>
+      <p>Armá tu colegio con packs o pelotitas, mandalas a aulas y dá clase corrigiendo trabajos.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnOpenSaves">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenSaves" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <div class="topline">
+        <div>
+          <h2>Partidas</h2>
+          <p class="hint">Podés guardar partidas ilimitadas.</p>
+        </div>
+        <button type="button" class="btn primary" id="btnNewSave">+ Nueva partida</button>
+      </div>
+      <div id="saveList" class="save-list"></div>
+      <p id="emptySaves" class="empty">Todavía no hay partidas.</p>
+    </div>
+  </section>
+
+  <section id="screenCreate" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackSaves">←</button>
+      <h2>Nueva partida</h2>
+      <label class="field">
+        <span>Nombre de la partida</span>
+        <input id="saveName" maxlength="40" placeholder="Ej.: Colegio Arcoíris" />
+      </label>
+      <h3>Packs</h3>
+      <p class="hint">Elegí uno, varios, todos, o ninguno si preferís crear pelotitas a mano.</p>
+      <div id="packPickList" class="pack-pick-list"></div>
+      <div class="pack-pick-actions">
+        <button type="button" class="btn secondary" id="btnPickAllPacks">Elegir todos</button>
+        <button type="button" class="btn ghost" id="btnPickNoPacks">Ninguno</button>
+      </div>
+      <h3>Crear pelotitas</h3>
+      <form id="marbleForm" class="marble-form">
+        <input id="marbleName" maxlength="100" placeholder="Nombre" />
+        <input id="marbleColor" type="color" value="#55d6ff" title="Color" />
+        <button class="btn secondary" type="submit">+ Agregar</button>
+      </form>
+      <div id="createMarbleList" class="chip-list"></div>
+      <p id="createStatus" class="status"></p>
+      <button type="button" class="btn primary" id="btnStartSave">Empezar partida</button>
+    </div>
+  </section>
+
+  <section id="screenHub" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnHubBack">← Partidas</button>
+      <h2 id="hubTitle">Colegio</h2>
+      <p id="hubHint" class="hint"></p>
+      <div class="hub-grid">
+        <button type="button" class="hub-btn" id="btnPelotitas">
+          <strong>Pelotitas</strong>
+          <span>Tocá una pelotita para que aparezca en un salón aleatorio.</span>
+        </button>
+        <button type="button" class="hub-btn" id="btnColegio">
+          <strong>Colegio</strong>
+          <span>Entrá a un aula, dá clase y corregí trabajos con A o F.</span>
+        </button>
+      </div>
+      <p id="hubStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="screenMarbles" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackHubFromMarbles">←</button>
+      <h2>Pelotitas</h2>
+      <p class="hint">Clic en una pelotita para mandarla a un salón aleatorio del colegio.</p>
+      <div id="marbleList" class="marble-grid"></div>
+      <p id="marbleStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="screenSchool" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackHubFromSchool">←</button>
+      <h2>Colegio</h2>
+      <p class="hint">Elegí el aula de la materia a la que querés entrar.</p>
+      <div id="roomList" class="room-list"></div>
+    </div>
+  </section>
+
+  <section id="screenRoom" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackSchool">← Aulas</button>
+      <h2 id="roomTitle">Aula</h2>
+      <p id="roomTeacher" class="teacher-line"></p>
+      <div id="roomStudents" class="chip-list"></div>
+      <div id="roomActions" class="actions"></div>
+      <div id="workList" class="work-list"></div>
+      <p id="roomStatus" class="status"></p>
+    </div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=colegio1"></script>
+</body>
+</html>

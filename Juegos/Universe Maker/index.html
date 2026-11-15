@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universe Maker</title>
+  <link rel="stylesheet" href="styles.css?v=um1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🌌</p>
+      <h1>Universe Maker</h1>
+      <p>Creá universos con un pack, mirá pasar los eones y formá planetas con vida.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo</p>
+      <button type="button" class="btn primary" id="btnOpenSaves">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenSaves" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <div class="topline">
+        <div>
+          <h2>Universos</h2>
+          <p class="hint">Partidas infinitas, ordenadas alfabéticamente.</p>
+        </div>
+        <button type="button" class="btn primary" id="btnNewUniverse">+ Nuevo universo</button>
+      </div>
+      <div id="saveList" class="save-list"></div>
+      <p id="emptySaves" class="empty">Todavía no hay universos.</p>
+    </div>
+  </section>
+
+  <section id="screenCreate" class="screen">
+    <div class="card wide">
+      <button type="button" class="btn ghost" id="btnBackSaves">←</button>
+      <h2>Nuevo universo</h2>
+      <label class="field">
+        <span>Nombre del universo</span>
+        <input id="universeName" maxlength="40" placeholder="Ej.: Vía Michi" />
+      </label>
+      <h3>Pack (solo uno)</h3>
+      <div id="packPickList" class="pack-list"></div>
+      <p id="createStatus" class="status"></p>
+      <button type="button" class="btn primary" id="btnStartUniverse">Crear universo</button>
+    </div>
+  </section>
+
+  <section id="screenPlay" class="screen">
+    <div class="play-shell">
+      <header class="play-bar">
+        <button type="button" class="btn ghost" id="btnPlayBack">←</button>
+        <div>
+          <h2 id="playTitle">Universo</h2>
+          <p id="playAge" class="hint">Año 0</p>
+        </div>
+        <div class="play-actions">
+          <button type="button" class="btn secondary" id="btnConfig">Configuración</button>
+          <button type="button" class="btn secondary" id="btnLife">Vida</button>
+          <button type="button" class="btn secondary" id="btnPause">Pausar</button>
+        </div>
+      </header>
+      <p id="playStatus" class="status play-status"></p>
+      <div class="canvas-wrap">
+        <canvas id="cosmos" width="900" height="640" aria-label="Universo"></canvas>
+      </div>
+      <div class="tool-row" id="marbleTools">
+        <button type="button" class="btn care" id="btnFace" disabled>Cambiar cara</button>
+        <button type="button" class="btn care" id="btnTalk" disabled>Hablar</button>
+        <span class="hint">Arrastrá el fondo para mirar. Si te alejás mucho, te teletransportás a la pelotita más cercana.</span>
+      </div>
+    </div>
+  </section>
+
+  <div id="modalConfig" class="modal" hidden>
+    <div class="modal-card">
+      <h3>Configuración</h3>
+      <p class="hint">¿Cuánto tiempo real equivale a 1 año del universo?</p>
+      <label class="field">
+        <span>Escala de tiempo</span>
+        <select id="yearScale">
+          <option value="ns">1 nanosegundo</option>
+          <option value="ms">1 milisegundo</option>
+          <option value="s" selected>1 segundo</option>
+          <option value="min">1 minuto</option>
+          <option value="hour">1 hora</option>
+          <option value="day">1 día</option>
+          <option value="month">1 mes</option>
+          <option value="year">1 año</option>
+          <option value="decade">1 década</option>
+        </select>
+      </label>
+      <button type="button" class="btn primary" id="btnSaveConfig">Guardar</button>
+      <button type="button" class="btn ghost" id="btnCloseConfig">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="modalLife" class="modal" hidden>
+    <div class="modal-card">
+      <h3>Vida</h3>
+      <p class="hint">Creá una pelotita nueva (puede ser hija de otras).</p>
+      <label class="field"><span>Nombre</span><input id="lifeName" maxlength="40" /></label>
+      <label class="field"><span>Color</span><input id="lifeColor" type="color" value="#55d6ff" /></label>
+      <label class="field"><span>Familia</span><input id="lifeFamily" maxlength="40" placeholder="Ej.: Familia Sol" /></label>
+      <label class="field"><span>Padre / Madre 1</span><select id="lifeParent1"><option value="">Ninguno</option></select></label>
+      <label class="field"><span>Padre / Madre 2</span><select id="lifeParent2"><option value="">Ninguno</option></select></label>
+      <p id="lifeStatus" class="status"></p>
+      <button type="button" class="btn primary" id="btnCreateLife">Crear pelotita</button>
+      <button type="button" class="btn ghost" id="btnCloseLife">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="modalFace" class="modal" hidden>
+    <div class="modal-card">
+      <h3>Cambiar cara</h3>
+      <div id="faceList" class="face-list"></div>
+      <p id="faceEmpty" class="hint" hidden>No hay caras creadas. Creálas en Caras del administrador.</p>
+      <button type="button" class="btn ghost" id="btnCloseFace">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="modalPlanet" class="modal" hidden>
+    <div class="modal-card">
+      <h3 id="planetModalTitle">Crear planeta</h3>
+      <label class="field"><span>Nombre</span><input id="planetName" maxlength="40" /></label>
+      <label class="field"><span>Tamaño (1–100)</span><input id="planetSize" type="number" min="1" max="100" value="40" /></label>
+      <label class="field"><span>Porcentaje de agua</span><input id="planetWater" type="number" min="0" max="100" value="70" /></label>
+      <label class="field">
+        <span>¿Tiene vida?</span>
+        <select id="planetLife">
+          <option value="yes">Sí</option>
+          <option value="no">No</option>
+        </select>
+      </label>
+      <label class="field" id="planetOrbitField" hidden>
+        <span>Ubicación (sin vida)</span>
+        <select id="planetOrbit">
+          <option value="hot">MUY cerca del sol</option>
+          <option value="cold">MUY lejos del sol</option>
+        </select>
+      </label>
+      <p id="planetStatus" class="status"></p>
+      <button type="button" class="btn primary" id="btnSavePlanet">Crear planeta</button>
+      <button type="button" class="btn ghost" id="btnClosePlanet">Después</button>
+    </div>
+  </div>
+
+  <div id="modalTalk" class="modal" hidden>
+    <div class="modal-card">
+      <h3>Hablar</h3>
+      <label class="field"><span>Mensaje</span><input id="talkText" maxlength="80" placeholder="¡Hola universo!" /></label>
+      <button type="button" class="btn primary" id="btnSendTalk">Decir</button>
+      <button type="button" class="btn ghost" id="btnCloseTalk">Cerrar</button>
+    </div>
+  </div>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-packs.js?v=packs5"></script>
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=um3"></script>
+</body>
+</html>
