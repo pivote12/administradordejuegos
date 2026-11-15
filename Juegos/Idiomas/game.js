@@ -2,6 +2,12 @@
   "use strict";
 
   const STORAGE_KEY = "idiomas-publicados-v1";
+  const SHARED_READ_URLS = [
+    "/api/idiomas",
+    "../../data/idiomas-publicados.json",
+    "/data/idiomas-publicados.json",
+    "https://raw.githubusercontent.com/pivote12/administradordejuegos/main/data/idiomas-publicados.json"
+  ];
 
   const SOURCE_LANGS = [
     { id: "es", name: "Español" },
@@ -26,11 +32,12 @@
     { id: "hi", name: "हिन्दी" }
   ];
 
-  let published = loadPublished();
+  let published = loadLocalPublished();
   /** @type {object | null} */
   let activeLang = null;
   let translateLock = false;
   let backFromTranslate = "screenPublicados";
+  let syncing = false;
 
   const sourceLangSelect = document.getElementById("sourceLang");
   const helpBox = document.getElementById("helpBox");
@@ -59,7 +66,7 @@
     return found ? found.name : id;
   }
 
-  function loadPublished() {
+  function loadLocalPublished() {
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
       return Array.isArray(parsed) ? parsed : [];
@@ -68,12 +75,128 @@
     }
   }
 
-  function savePublished() {
+  function saveLocalPublished() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(published));
     } catch (_err) {
       /* ignore */
     }
+  }
+
+  function mergePublishedLists() {
+    const map = new Map();
+    Array.from(arguments).forEach((list) => {
+      if (!Array.isArray(list)) return;
+      list.forEach((item) => {
+        if (!item || !item.id) return;
+        const prev = map.get(item.id);
+        if (!prev || Number(item.createdAt || 0) >= Number(prev.createdAt || 0)) {
+          map.set(item.id, item);
+        }
+      });
+    });
+    return Array.from(map.values()).sort(
+      (a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0)
+    );
+  }
+
+  async function fetchPublishedList(url) {
+    const sep = url.indexOf("?") >= 0 ? "&" : "?";
+    const res = await fetch(url + sep + "t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.items)) return data.items;
+    return [];
+  }
+
+  async function refreshPublishedFromCloud() {
+    if (syncing) return published;
+    syncing = true;
+    const lists = [published.slice()];
+    for (let i = 0; i < SHARED_READ_URLS.length; i += 1) {
+      try {
+        const list = await fetchPublishedList(SHARED_READ_URLS[i]);
+        lists.push(list);
+      } catch (_err) {
+        /* probar siguiente fuente */
+      }
+    }
+    published = mergePublishedLists.apply(null, lists);
+    saveLocalPublished();
+    syncing = false;
+    return published;
+  }
+
+  async function publishToCloud(lang) {
+    const endpoints = ["/api/idiomas"];
+    try {
+      endpoints.unshift(new URL("/api/idiomas", window.location.origin).href);
+    } catch (_err) {
+      /* ignore */
+    }
+    let lastError = null;
+    for (let i = 0; i < endpoints.length; i += 1) {
+      try {
+        const res = await fetch(endpoints[i], {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang: lang }),
+          cache: "no-store"
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 409) {
+          throw new Error(data.error || "Ya existe un idioma con ese nombre");
+        }
+        if (!res.ok) throw new Error(data.error || ("HTTP " + res.status));
+        if (Array.isArray(data.items)) {
+          published = mergePublishedLists(data.items, [lang]);
+        } else {
+          published = mergePublishedLists(published, [lang]);
+        }
+        saveLocalPublished();
+        return { ok: true, shared: true };
+      } catch (err) {
+        lastError = err;
+      }
+    }
+    published = mergePublishedLists(published, [lang]);
+    saveLocalPublished();
+    return {
+      ok: true,
+      shared: false,
+      error: lastError ? lastError.message : "Sin servidor compartido"
+    };
+  }
+
+  async function deleteFromCloud(langId) {
+    try {
+      const res = await fetch("/api/idiomas", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: langId }),
+        cache: "no-store"
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && Array.isArray(data.items)) {
+        published = data.items;
+        saveLocalPublished();
+        return true;
+      }
+    } catch (_err) {
+      /* fallback local */
+    }
+    published = published.filter((item) => item.id !== langId);
+    saveLocalPublished();
+    return false;
+  }
+
+  async function openPublicados() {
+    publicadosEmpty.hidden = true;
+    publicadosEmpty.textContent = "Cargando idiomas publicados…";
+    show("screenPublicados");
+    await refreshPublishedFromCloud();
+    renderPublicados();
   }
 
   function parseLanguageText(raw) {
@@ -175,6 +298,7 @@
   function renderPublicados() {
     publicadosList.innerHTML = "";
     publicadosEmpty.hidden = published.length > 0;
+    publicadosEmpty.textContent = "Todavía no hay idiomas publicados. Creá uno desde Idiomas → Crear.";
 
     published
       .slice()
@@ -187,7 +311,7 @@
         info.className = "lang-item-info";
         info.innerHTML =
           "<strong>" + lang.name + "</strong>" +
-          "<span>Original: " + sourceName(lang.sourceLang) + " · " + lang.entries.length + " palabras · Publicado</span>";
+          "<span>Original: " + sourceName(lang.sourceLang) + " · " + lang.entries.length + " palabras · Publicado para todos</span>";
 
         const actions = document.createElement("div");
         actions.style.display = "flex";
@@ -204,11 +328,10 @@
         delBtn.type = "button";
         delBtn.className = "btn danger";
         delBtn.textContent = "Borrar";
-        delBtn.addEventListener("click", () => {
+        delBtn.addEventListener("click", async () => {
           const ok = window.confirm('¿Borrar el idioma publicado "' + lang.name + '"?');
           if (!ok) return;
-          published = published.filter((item) => item.id !== lang.id);
-          savePublished();
+          await deleteFromCloud(lang.id);
           renderPublicados();
         });
 
@@ -220,14 +343,13 @@
       });
   }
 
-  function openUsarPicker() {
+  async function openUsarPicker() {
+    await refreshPublishedFromCloud();
     if (!published.length) {
       window.alert("Todavía no hay idiomas publicados. Creá uno primero.");
       show("screenIdiomasMenu");
       return;
     }
-
-    // Reutiliza la lista de publicados como selector de uso.
     renderPublicados();
     show("screenPublicados");
   }
@@ -244,11 +366,12 @@
   document.getElementById("btnBackTitle").addEventListener("click", () => show("screenTitle"));
   document.getElementById("btnIdiomas").addEventListener("click", () => show("screenIdiomasMenu"));
   document.getElementById("btnPublicados").addEventListener("click", () => {
-    renderPublicados();
-    show("screenPublicados");
+    openPublicados();
   });
   document.getElementById("btnBackHubFromIdiomas").addEventListener("click", () => show("screenHub"));
-  document.getElementById("btnUsar").addEventListener("click", openUsarPicker);
+  document.getElementById("btnUsar").addEventListener("click", () => {
+    openUsarPicker();
+  });
   document.getElementById("btnCrear").addEventListener("click", () => {
     resetCreateForm();
     show("screenCreate");
@@ -258,8 +381,7 @@
   document.getElementById("btnBackFromTranslate").addEventListener("click", () => {
     activeLang = null;
     if (backFromTranslate === "screenPublicados") {
-      renderPublicados();
-      show("screenPublicados");
+      openPublicados();
     } else {
       show(backFromTranslate);
     }
@@ -269,7 +391,7 @@
     helpBox.hidden = !helpBox.hidden;
   });
 
-  document.getElementById("btnPublish").addEventListener("click", () => {
+  document.getElementById("btnPublish").addEventListener("click", async () => {
     createError.hidden = true;
     const name = document.getElementById("langName").value.trim();
     const body = document.getElementById("langBody").value;
@@ -281,6 +403,7 @@
       return;
     }
 
+    await refreshPublishedFromCloud();
     if (published.some((item) => item.name.toLowerCase() === name.toLowerCase())) {
       createError.hidden = false;
       createError.textContent = "Ya hay un idioma publicado con ese nombre.";
@@ -306,12 +429,41 @@
       published: true
     };
 
-    published.unshift(lang);
-    savePublished();
+    const btn = document.getElementById("btnPublish");
+    btn.disabled = true;
+    btn.textContent = "Publicando…";
+    let result;
+    try {
+      result = await publishToCloud(lang);
+    } catch (err) {
+      createError.hidden = false;
+      createError.textContent = err.message || "No se pudo publicar.";
+      btn.disabled = false;
+      btn.textContent = "Enviar y publicar";
+      return;
+    }
+    btn.disabled = false;
+    btn.textContent = "Enviar y publicar";
+
+    await refreshPublishedFromCloud();
     renderPublicados();
     show("screenPublicados");
-    window.alert('"' + name + '" quedó publicado. Cualquiera puede traducir desde ' + sourceName(sourceLang) + ".");
+    if (result.shared) {
+      window.alert(
+        '"' + name + '" quedó publicado para todos (celulares, laptops y consolas). ' +
+        "Cualquiera puede traducir desde " + sourceName(sourceLang) + "."
+      );
+    } else {
+      window.alert(
+        '"' + name + '" se guardó acá, pero no hubo servidor compartido. ' +
+        "Abrí el juego con JUGAR.bat (http://...:8090) para publicarlo a todos, " +
+        "y después subí data/idiomas-publicados.json a git."
+      );
+    }
   });
+
+  // Precarga la lista compartida al abrir el juego.
+  refreshPublishedFromCloud();
 
   textOriginal.addEventListener("input", () => {
     if (!activeLang || translateLock) return;
