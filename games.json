@@ -271,6 +271,15 @@
       "icon": "⬡",
       "tags": ["batalla", "formas", "obstáculos"],
       "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "math-ball",
+      "name": "Math Ball",
+      "description": "Creá pelotitas con números únicos y corré la Conjetura de Collatz.",
+      "folder": "Math Ball",
+      "icon": "🔵",
+      "tags": ["matemática", "collatz", "números"],
+      "creator": "José Rafael Rodriguez Morillo"
     }
   ]
 }

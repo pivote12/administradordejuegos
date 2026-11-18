@@ -643,6 +643,20 @@ const GAME_I18N = {
     ja: { name: "Shape Battle", description: "数学サークルのバトルか、RGB正方形の障害物コース。" },
     ko: { name: "Shape Battle", description: "수학 원 배틀 또는 RGB 사각형 장애물 코스." },
   },
+  "math-ball": {
+    es: { name: "Math Ball", description: "Creá pelotitas con números únicos y corré la Conjetura de Collatz." },
+    en: { name: "Math Ball", description: "Create balls with unique numbers and run the Collatz Conjecture." },
+    fr: { name: "Math Ball", description: "Crée des balles avec des nombres uniques et lance la conjecture de Collatz." },
+    de: { name: "Math Ball", description: "Erstelle Bälle mit einzigartigen Zahlen und starte die Collatz-Vermutung." },
+    pt: { name: "Math Ball", description: "Crie bolinhas com números únicos e rode a Conjectura de Collatz." },
+    it: { name: "Math Ball", description: "Crea palline con numeri unici e lancia la congettura di Collatz." },
+    ru: { name: "Math Ball", description: "Создавай шарики с уникальными числами и запускай гипотезу Коллатца." },
+    pl: { name: "Math Ball", description: "Twórz piłki z unikalnymi liczbami i uruchom hipotezę Collatza." },
+    nl: { name: "Math Ball", description: "Maak balletjes met unieke getallen en speel het Collatz-vermoeden." },
+    zh: { name: "Math Ball", description: "用唯一数字创建小球，并运行考拉兹猜想。" },
+    ja: { name: "Math Ball", description: "一意の数字のボールを作り、コラッツ予想で遊ぶ。" },
+    ko: { name: "Math Ball", description: "고유 숫자 공을 만들고 콜라츠 추측 레이스를 하세요." },
+  },
 };
 
 const FALLBACK_GAMES = [
@@ -916,6 +930,15 @@ const FALLBACK_GAMES = [
     folder: "Shape Battle",
     icon: "⬡",
     tags: ["batalla", "formas", "obstáculos"],
+    creator: "José Rafael Rodriguez Morillo",
+  },
+  {
+    id: "math-ball",
+    name: "Math Ball",
+    description: "Creá pelotitas con números únicos y corré la Conjetura de Collatz.",
+    folder: "Math Ball",
+    icon: "🔵",
+    tags: ["matemática", "collatz", "números"],
     creator: "José Rafael Rodriguez Morillo",
   },
 ];

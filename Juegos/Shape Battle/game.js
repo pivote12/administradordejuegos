@@ -19,6 +19,8 @@
 
   /** @type {Array<{id:string,name:string,color:string,text:string,attack:string,lastN:number|null}>} */
   let circles = [];
+  const SQUARES_KEY = "shape-battle-squares-v1";
+
   /** @type {Array<{id:string,r:number,g:number,b:number,color:string}>} */
   let squares = [];
   /** @type {Array<{id:string,name:string,color:string,text:string,attack:string,lastN:number|null}>} */
@@ -323,6 +325,35 @@
     return Math.max(0, Math.min(255, Number(n) || 0));
   }
 
+  function loadSquares() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(SQUARES_KEY) || "[]");
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((item, index) => {
+        const r = clampByte(item && item.r);
+        const g = clampByte(item && item.g);
+        const b = clampByte(item && item.b);
+        return {
+          id: String((item && item.id) || ("s-load-" + index)),
+          r: r,
+          g: g,
+          b: b,
+          color: "rgb(" + r + ", " + g + ", " + b + ")"
+        };
+      });
+    } catch (_err) {
+      return [];
+    }
+  }
+
+  function saveSquares() {
+    try {
+      localStorage.setItem(SQUARES_KEY, JSON.stringify(squares));
+    } catch (_err) {
+      /* ignore */
+    }
+  }
+
   function updateRgbPreview() {
     const r = clampByte(document.getElementById("sR").value);
     const g = clampByte(document.getElementById("sG").value);
@@ -347,6 +378,7 @@
       del.textContent = "X";
       del.addEventListener("click", () => {
         squares.splice(index, 1);
+        saveSquares();
         renderSquares();
       });
       row.appendChild(del);
@@ -585,6 +617,7 @@
       b: b,
       color: "rgb(" + r + ", " + g + ", " + b + ")"
     });
+    saveSquares();
     renderSquares();
   });
 
@@ -592,5 +625,6 @@
     document.getElementById(id).addEventListener("input", updateRgbPreview);
   });
 
+  squares = loadSquares();
   btnStartSquareRace.addEventListener("click", startSquareRace);
 })();

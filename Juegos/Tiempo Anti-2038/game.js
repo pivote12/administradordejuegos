@@ -123,17 +123,44 @@
   }
 
   async function fetchJsonUnixMs(url) {
+    const t0 = performance.now();
     const res = await fetch(url, { cache: "no-store" });
+    const t1 = performance.now();
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
-    if (typeof data.unixMs === "number") return { unixMs: data.unixMs, source: data.source || url };
-    if (typeof data.unixtime === "number") return { unixMs: data.unixtime * 1000, source: "worldtimeapi" };
-    if (typeof data.datetime === "string") return { unixMs: Date.parse(data.datetime), source: "worldtimeapi" };
-    if (typeof data.dateTime === "string") return { unixMs: Date.parse(data.dateTime), source: "timeapi.io" };
-    throw new Error("Sin marca de tiempo");
+    const rtt = Math.max(0, t1 - t0);
+    let unixMs = null;
+    let source = url;
+    if (typeof data.unixMs === "number") {
+      unixMs = data.unixMs;
+      source = data.source || url;
+    } else if (typeof data.unixtime === "number") {
+      unixMs = data.unixtime * 1000;
+      source = "worldtimeapi";
+    } else if (typeof data.datetime === "string") {
+      unixMs = Date.parse(data.datetime);
+      source = "worldtimeapi";
+    } else if (typeof data.dateTime === "string") {
+      unixMs = Date.parse(data.dateTime);
+      source = "timeapi.io";
+    }
+    if (!Number.isFinite(unixMs)) throw new Error("Sin marca de tiempo");
+    // Compensa la mitad del viaje de red para no atrasar los segundos.
+    return { unixMs: unixMs + rtt / 2, source: source, rtt: rtt };
   }
 
   async function syncTrustedTime() {
+    // Si el reloj del sistema está bien, usarlo: evita desfases de red.
+    if (!systemLooksBroken(new Date())) {
+      syncAnchor = {
+        unixMs: Date.now(),
+        perf: performance.now(),
+        source: "reloj del sistema"
+      };
+      saveSync(syncAnchor.unixMs, syncAnchor.source);
+      return syncAnchor;
+    }
+
     const candidates = [
       { type: "json", url: "/time" },
       { type: "json", url: "https://worldtimeapi.org/api/timezone/Etc/UTC" },
@@ -151,7 +178,6 @@
     for (let i = 0; i < candidates.length; i += 1) {
       try {
         const got = await fetchJsonUnixMs(candidates[i].url);
-        if (!Number.isFinite(got.unixMs)) throw new Error("unixMs inválido");
         syncAnchor = {
           unixMs: got.unixMs,
           perf: performance.now(),
@@ -170,19 +196,17 @@
       return syncAnchor;
     }
 
-    // Último recurso: reloj del sistema (falla si el móvil ya cayó a 1901)
     syncAnchor = {
       unixMs: Date.now(),
       perf: performance.now(),
-      source: "reloj del sistema"
+      source: "reloj del sistema" + (lastError ? " (sin red)" : "")
     };
-    if (lastError) {
-      syncAnchor.source += " (sin red)";
-    }
     return syncAnchor;
   }
 
   function trustedNowMs() {
+    // Con reloj sano, Date.now() es la fuente más fiel segundo a segundo.
+    if (!systemLooksBroken(new Date())) return Date.now();
     if (!syncAnchor) return Date.now();
     return syncAnchor.unixMs + (performance.now() - syncAnchor.perf);
   }
@@ -443,12 +467,17 @@
   function startClock() {
     stopClock();
     render();
-    timerId = window.setInterval(render, 200);
+    // Alinea el tick al inicio de cada segundo real para no “saltarse” segundos.
+    const delay = 1000 - (trustedNowMs() % 1000);
+    timerId = window.setTimeout(function tick() {
+      render();
+      timerId = window.setTimeout(tick, 1000 - (trustedNowMs() % 1000));
+    }, delay);
   }
 
   function stopClock() {
     if (timerId) {
-      window.clearInterval(timerId);
+      window.clearTimeout(timerId);
       timerId = 0;
     }
   }
