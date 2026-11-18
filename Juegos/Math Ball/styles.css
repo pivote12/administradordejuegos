@@ -185,7 +185,14 @@ h1, h2, h3 { margin: 0 0 10px; }
 }
 
 .racer.done {
+  outline: 3px solid var(--danger);
+  opacity: 0.45;
+  transform: scale(0.92);
+}
+
+.racer.winner {
   outline: 3px solid var(--ok);
+  opacity: 1;
   transform: scale(1.08);
 }
 

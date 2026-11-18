@@ -148,7 +148,8 @@
       racer.el.style.left = racer.x + "px";
       racer.el.style.bottom = valueToBottom(racer.current, maxValue) + "px";
       racer.el.textContent = String(racer.current);
-      racer.el.classList.toggle("done", racer.current === 1);
+      racer.el.classList.toggle("done", !!racer.eliminated);
+      racer.el.classList.toggle("winner", !!racer.isWinner);
     });
   }
 
@@ -156,10 +157,15 @@
     stopRace();
     raceDone = true;
     lastWinner = winner;
-    raceHint.textContent = "¡Collatz terminado!";
+    racers.forEach((racer) => {
+      racer.isWinner = racer.id === winner.id;
+      if (racer.isWinner) racer.eliminated = false;
+    });
+    paintRacers(Math.max.apply(null, racers.map((r) => Math.max(r.start, r.current, 2))));
+    raceHint.textContent = "¡Collatz terminado! El último en llegar a 1 gana.";
     raceResult.hidden = false;
     raceResult.textContent =
-      "Ganador: " + winner.label + " (empezó en " + winner.start + ")";
+      "Ganador: " + winner.label + " (empezó en " + winner.start + ") · fue el último en llegar a 1";
     maxCreatedEl.textContent = String(maxCreated());
     challengeValue.min = String(maxCreated() + 1);
     challengeValue.value = String(maxCreated() + 1);
@@ -175,6 +181,7 @@
     const width = board.clientWidth || 900;
     const gap = width / (list.length + 1);
     const maxStart = Math.max.apply(null, list.map((item) => item.value));
+    let finishOrder = 0;
 
     racers = list.map((ball, index) => {
       const el = document.createElement("div");
@@ -188,39 +195,48 @@
         color: ball.color,
         start: ball.value,
         current: ball.value,
+        eliminated: false,
+        isWinner: false,
+        finishIndex: 0,
         x: gap * (index + 1) - 28,
         el: el
       };
     });
 
     paintRacers(maxStart);
-    raceHint.textContent = "Corriendo Collatz… más arriba = mayor valor actual";
+    raceHint.textContent = "Corriendo Collatz… llegar a 1 = descalificado · gana el último";
 
     raceTimer = window.setInterval(() => {
       let maxNow = 1;
-      let allOne = true;
       racers.forEach((racer) => {
-        if (racer.current !== 1) {
-          allOne = false;
-          racer.current = collatzNext(racer.current);
-        }
+        if (racer.eliminated) return;
+        racer.current = collatzNext(racer.current);
         if (racer.current > maxNow) maxNow = racer.current;
+        if (racer.current === 1) {
+          racer.eliminated = true;
+          finishOrder += 1;
+          racer.finishIndex = finishOrder;
+          racer.el.title = "Descalificado · llegó a 1 (#" + finishOrder + ")";
+        }
       });
-      const scaleMax = Math.max(maxStart, maxNow);
+
+      const alive = racers.filter((racer) => !racer.eliminated);
+      const scaleMax = Math.max(maxStart, maxNow, 2);
       paintRacers(scaleMax);
 
-      const winners = racers.filter((racer) => racer.current === 1);
-      if (winners.length && !allOne) {
-        // Primer@ en llegar a 1 en este tick.
-        const first = winners[0];
-        // Si varios llegan juntos, gana el de menor start original.
-        winners.sort((a, b) => a.start - b.start);
-        finishRace(winners[0] || first);
+      // Si varios llegan a 1 en el mismo tick y no queda nadie, gana el de mayor start
+      // (último “efectivo”); si queda uno vivo, sigue hasta que también llegue a 1.
+      if (alive.length === 0) {
+        const lastWave = racers
+          .filter((racer) => racer.finishIndex === finishOrder)
+          .sort((a, b) => b.start - a.start);
+        finishRace(lastWave[0] || racers[racers.length - 1]);
         return;
       }
-      if (allOne) {
-        racers.sort((a, b) => a.start - b.start);
-        finishRace(racers[0]);
+
+      if (alive.length === 1 && finishOrder >= racers.length - 1) {
+        // El último superviviente: cuando llegue a 1 será el ganador.
+        raceHint.textContent = "Queda 1 · si llega a 1 gana por ser el último";
       }
     }, 450);
   }
