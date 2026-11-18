@@ -18,6 +18,7 @@
   const ballError = document.getElementById("ballError");
   const btnGoSelect = document.getElementById("btnGoSelect");
   const selectGrid = document.getElementById("selectGrid");
+  const btnSelectAll = document.getElementById("btnSelectAll");
   const btnStartRace = document.getElementById("btnStartRace");
   const board = document.getElementById("board");
   const raceHint = document.getElementById("raceHint");
@@ -121,6 +122,11 @@
       selectGrid.appendChild(btn);
     });
     btnStartRace.disabled = selected.size < 3;
+    if (btnSelectAll) {
+      const allSelected = balls.length > 0 && selected.size === balls.length;
+      btnSelectAll.textContent = allSelected ? "Deseleccionar todas" : "Seleccionar todas";
+      btnSelectAll.disabled = balls.length === 3;
+    }
   }
 
   function collatzNext(n) {
@@ -262,6 +268,12 @@
     openSelect();
   });
   btnGoSelect.addEventListener("click", openSelect);
+  btnSelectAll.addEventListener("click", () => {
+    if (balls.length === 3) return;
+    if (selected.size === balls.length) selected = new Set();
+    else selected = new Set(balls.map((ball) => ball.id));
+    renderSelect();
+  });
 
   document.getElementById("ballForm").addEventListener("submit", (event) => {
     event.preventDefault();
