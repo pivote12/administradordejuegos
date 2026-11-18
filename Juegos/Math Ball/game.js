@@ -25,7 +25,7 @@
   const raceResult = document.getElementById("raceResult");
   const challengeBox = document.getElementById("challengeBox");
   const maxCreatedEl = document.getElementById("maxCreated");
-  const challengeValue = document.getElementById("challengeValue");
+  const RIVAL_COLORS = ["#f472b6", "#fb923c", "#a78bfa"];
 
   function show(id) {
     document.querySelectorAll(".screen").forEach((screen) => {
@@ -172,65 +172,42 @@
     raceResult.hidden = false;
     raceResult.textContent =
       "Ganador: " + winner.label + " (empezó en " + winner.start + ") · fue el último en llegar a 1";
-    prepareChallengeInput();
+    maxCreatedEl.textContent = String(maxCreated());
     challengeBox.hidden = false;
   }
 
-  function prepareChallengeInput() {
+  function biggestCreatedBall() {
+    if (!balls.length) return null;
+    return balls.reduce((best, ball) => (ball.value > best.value ? ball : best), balls[0]);
+  }
+
+  function createdValues() {
+    return new Set(balls.map((ball) => ball.value));
+  }
+
+  function randomUncreatedNumbers(count, alsoAvoid) {
+    const used = createdValues();
+    (alsoAvoid || []).forEach((value) => used.add(value));
     const max = maxCreated();
-    const next = max + 1;
-    maxCreatedEl.textContent = String(max);
-    challengeValue.removeAttribute("max");
-    challengeValue.min = String(next);
-    challengeValue.step = "1";
-    challengeValue.value = String(next);
-    challengeValue.setAttribute("value", String(next));
-  }
-
-  function ensureBallForValue(value, color) {
-    const existing = balls.find((ball) => ball.value === value);
-    if (existing) return existing;
-    const ball = {
-      id: uid(),
-      value: value,
-      color: color || "#f472b6",
-      label: String(value)
-    };
-    balls.push(ball);
-    sortBalls();
-    saveBalls();
-    return ball;
-  }
-
-  function pickFiller(champValue, rivalValue) {
-    const candidates = balls
-      .filter((ball) => ball.value !== champValue && ball.value !== rivalValue)
-      .sort((a, b) => a.value - b.value);
-    if (candidates.length) {
-      return {
-        id: candidates[Math.floor(candidates.length / 2)].id,
-        value: candidates[Math.floor(candidates.length / 2)].value,
-        color: candidates[Math.floor(candidates.length / 2)].color,
-        label: candidates[Math.floor(candidates.length / 2)].label
-      };
+    const results = [];
+    const span = Math.max(30, max * 3);
+    let guard = 0;
+    while (results.length < count && guard < 400) {
+      guard += 1;
+      const value = max + 1 + Math.floor(Math.random() * span);
+      if (used.has(value)) continue;
+      used.add(value);
+      results.push(value);
     }
-    let fillerValue = Math.max(1, Math.floor((champValue + rivalValue) / 2));
-    if (fillerValue === champValue || fillerValue === rivalValue) {
-      fillerValue = Math.max(1, rivalValue - 1);
+    let next = max + 1;
+    while (results.length < count) {
+      if (!used.has(next)) {
+        used.add(next);
+        results.push(next);
+      }
+      next += 1;
     }
-    if (fillerValue === champValue || fillerValue === rivalValue) {
-      fillerValue = Math.max(1, rivalValue - 2);
-    }
-    if (fillerValue === champValue || fillerValue === rivalValue) {
-      fillerValue = rivalValue + 1;
-    }
-    const ball = ensureBallForValue(fillerValue, "#94a3b8");
-    return {
-      id: ball.id,
-      value: ball.value,
-      color: ball.color,
-      label: ball.label
-    };
+    return results;
   }
 
   function startRace(list) {
@@ -364,33 +341,45 @@
 
   document.getElementById("btnChallenge").addEventListener("click", () => {
     if (!lastWinner) return;
-    const max = maxCreated();
-    let challenge = Math.floor(Number(challengeValue.value));
-    if (!Number.isFinite(challenge) || challenge <= max) {
-      challenge = max + 1;
-      prepareChallengeInput();
+    const highest = biggestCreatedBall();
+    if (!highest) return;
+
+    const lineup = [];
+    const seenValues = new Set();
+
+    const winnerEntry = {
+      id: lastWinner.id,
+      value: lastWinner.start,
+      color: lastWinner.color,
+      label: lastWinner.label
+    };
+    lineup.push(winnerEntry);
+    seenValues.add(winnerEntry.value);
+
+    if (!seenValues.has(highest.value)) {
+      lineup.push({
+        id: highest.id,
+        value: highest.value,
+        color: highest.color,
+        label: highest.label
+      });
+      seenValues.add(highest.value);
     }
-    // El número más grande que tu máximo se crea y queda elegible para próximas partidas.
-    const rivalBall = ensureBallForValue(challenge, "#f472b6");
-    selected.add(rivalBall.id);
-    const champBall =
-      balls.find((ball) => ball.id === lastWinner.id) ||
-      ensureBallForValue(lastWinner.start, lastWinner.color);
-    const champ = {
-      id: champBall.id,
-      value: champBall.value,
-      color: champBall.color,
-      label: champBall.label
-    };
-    const rival = {
-      id: rivalBall.id,
-      value: rivalBall.value,
-      color: rivalBall.color,
-      label: rivalBall.label
-    };
-    const filler = pickFiller(champ.value, rival.value);
-    renderBalls();
-    startRace([champ, filler, rival]);
+
+    const rivals = randomUncreatedNumbers(3, Array.from(seenValues)).map((value, index) => ({
+      id: "rival-" + value + "-" + index,
+      value: value,
+      color: RIVAL_COLORS[index % RIVAL_COLORS.length],
+      label: String(value)
+    }));
+
+    raceHint.textContent =
+      "Desafío: ganador " +
+      winnerEntry.value +
+      (winnerEntry.value === highest.value ? "" : " + más alto " + highest.value) +
+      " vs " +
+      rivals.map((r) => r.value).join(", ");
+    startRace(lineup.concat(rivals));
   });
 
   renderBalls();
