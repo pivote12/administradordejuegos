@@ -172,10 +172,65 @@
     raceResult.hidden = false;
     raceResult.textContent =
       "Ganador: " + winner.label + " (empezó en " + winner.start + ") · fue el último en llegar a 1";
-    maxCreatedEl.textContent = String(maxCreated());
-    challengeValue.min = String(maxCreated() + 1);
-    challengeValue.value = String(maxCreated() + 1);
+    prepareChallengeInput();
     challengeBox.hidden = false;
+  }
+
+  function prepareChallengeInput() {
+    const max = maxCreated();
+    const next = max + 1;
+    maxCreatedEl.textContent = String(max);
+    challengeValue.removeAttribute("max");
+    challengeValue.min = String(next);
+    challengeValue.step = "1";
+    challengeValue.value = String(next);
+    challengeValue.setAttribute("value", String(next));
+  }
+
+  function ensureBallForValue(value, color) {
+    const existing = balls.find((ball) => ball.value === value);
+    if (existing) return existing;
+    const ball = {
+      id: uid(),
+      value: value,
+      color: color || "#f472b6",
+      label: String(value)
+    };
+    balls.push(ball);
+    sortBalls();
+    saveBalls();
+    return ball;
+  }
+
+  function pickFiller(champValue, rivalValue) {
+    const candidates = balls
+      .filter((ball) => ball.value !== champValue && ball.value !== rivalValue)
+      .sort((a, b) => a.value - b.value);
+    if (candidates.length) {
+      return {
+        id: candidates[Math.floor(candidates.length / 2)].id,
+        value: candidates[Math.floor(candidates.length / 2)].value,
+        color: candidates[Math.floor(candidates.length / 2)].color,
+        label: candidates[Math.floor(candidates.length / 2)].label
+      };
+    }
+    let fillerValue = Math.max(1, Math.floor((champValue + rivalValue) / 2));
+    if (fillerValue === champValue || fillerValue === rivalValue) {
+      fillerValue = Math.max(1, rivalValue - 1);
+    }
+    if (fillerValue === champValue || fillerValue === rivalValue) {
+      fillerValue = Math.max(1, rivalValue - 2);
+    }
+    if (fillerValue === champValue || fillerValue === rivalValue) {
+      fillerValue = rivalValue + 1;
+    }
+    const ball = ensureBallForValue(fillerValue, "#94a3b8");
+    return {
+      id: ball.id,
+      value: ball.value,
+      color: ball.color,
+      label: ball.label
+    };
   }
 
   function startRace(list) {
@@ -309,37 +364,32 @@
 
   document.getElementById("btnChallenge").addEventListener("click", () => {
     if (!lastWinner) return;
-    const challenge = Math.floor(Number(challengeValue.value));
     const max = maxCreated();
+    let challenge = Math.floor(Number(challengeValue.value));
     if (!Number.isFinite(challenge) || challenge <= max) {
-      window.alert("El desafío tiene que ser mayor que " + max + ".");
-      return;
+      challenge = max + 1;
+      prepareChallengeInput();
     }
-    const rival = {
-      id: "challenge-" + challenge,
-      value: challenge,
-      color: "#f472b6",
-      label: String(challenge)
-    };
+    // El número más grande que tu máximo se crea y queda elegible para próximas partidas.
+    const rivalBall = ensureBallForValue(challenge, "#f472b6");
+    selected.add(rivalBall.id);
+    const champBall =
+      balls.find((ball) => ball.id === lastWinner.id) ||
+      ensureBallForValue(lastWinner.start, lastWinner.color);
     const champ = {
-      id: lastWinner.id,
-      value: lastWinner.start,
-      color: lastWinner.color,
-      label: lastWinner.label
+      id: champBall.id,
+      value: champBall.value,
+      color: champBall.color,
+      label: champBall.label
     };
-    // Also allow adding a mid filler if only 2 - Collatz needs 3? User said select at least 3.
-    // For challenge: winner + bigger rival + optional ghost of max created
-    const fillerValue = Math.max(1, Math.floor((champ.value + rival.value) / 2));
-    const filler = {
-      id: "filler-" + fillerValue,
-      value: fillerValue === champ.value || fillerValue === rival.value ? rival.value - 1 : fillerValue,
-      color: "#94a3b8",
-      label: String(fillerValue === champ.value || fillerValue === rival.value ? rival.value - 1 : fillerValue)
+    const rival = {
+      id: rivalBall.id,
+      value: rivalBall.value,
+      color: rivalBall.color,
+      label: rivalBall.label
     };
-    if (filler.value < 1 || filler.value === champ.value || filler.value === rival.value) {
-      filler.value = Math.max(1, rival.value - 2);
-      filler.label = String(filler.value);
-    }
+    const filler = pickFiller(champ.value, rival.value);
+    renderBalls();
     startRace([champ, filler, rival]);
   });
 

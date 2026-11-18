@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Ball</title>
-  <link rel="stylesheet" href="styles.css?v=mb3" />
+  <link rel="stylesheet" href="styles.css?v=mb4" />
   <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
@@ -71,10 +71,10 @@
     <div id="raceResult" class="winner-box" hidden></div>
     <div class="challenge panel" id="challengeBox" hidden>
       <h3>Desafío extra</h3>
-      <p class="hint">El ganador puede competir contra un número más grande que tu máximo (<span id="maxCreated">0</span>).</p>
+      <p class="hint">Competí contra un número más grande que tu máximo (<span id="maxCreated">0</span>). Ese número se crea solo y después lo podés seleccionar.</p>
       <div class="challenge-row">
-        <input type="number" id="challengeValue" min="2" step="1" />
-        <button type="button" class="btn primary" id="btnChallenge">Competir</button>
+        <input type="number" id="challengeValue" min="2" step="1" inputmode="numeric" />
+        <button type="button" class="btn primary" id="btnChallenge">Elegir y competir</button>
       </div>
     </div>
   </section>
@@ -92,6 +92,6 @@
   </div>
 
   <script src="../../shared-music.js?v=global5"></script>
-  <script src="game.js?v=mb3"></script>
+  <script src="game.js?v=mb4"></script>
 </body>
 </html>
