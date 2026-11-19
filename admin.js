@@ -1131,7 +1131,7 @@ async function loadGames() {
     if (location.protocol === "file:") {
       throw new Error("file-protocol");
     }
-    const response = await fetch("games.json?v=menu22", { cache: "no-store" });
+    const response = await fetch("games.json?v=menu36", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudo leer games.json");
     const data = await response.json();
     allGames = (data.games || [])
