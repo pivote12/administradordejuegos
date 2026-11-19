@@ -187,7 +187,7 @@ h1, h2, h3 { margin: 0 0 10px; }
   font-size: 0.85rem;
   color: #0f172a;
   border: 2px solid rgb(255 255 255 / 0.45);
-  transition: bottom 0.35s ease, transform 0.2s ease;
+  transition: bottom var(--race-transition, 0.35s) ease, transform 0.2s ease;
   box-shadow: 0 8px 18px rgb(0 0 0 / 0.35);
 }
 
@@ -212,6 +212,24 @@ h1, h2, h3 { margin: 0 0 10px; }
   border: 1px solid rgb(74 222 128 / 0.4);
   color: #bbf7d0;
   font-weight: 700;
+}
+
+.speed-controls {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.speed-btn {
+  min-width: 44px;
+  padding: 0.45rem 0.7rem;
+  font-weight: 800;
+}
+
+.speed-btn.active {
+  border-color: var(--accent);
+  color: #0f172a;
+  background: var(--accent);
 }
 
 .challenge { margin-top: 12px; }

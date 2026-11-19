@@ -12,6 +12,10 @@
   let racers = [];
   let raceDone = false;
   let lastWinner = null;
+  let raceSpeed = 1;
+  const BASE_TICK_MS = 450;
+  /** @type {null | (() => void)} */
+  let raceTick = null;
 
   const ballCount = document.getElementById("ballCount");
   const ballList = document.getElementById("ballList");
@@ -147,6 +151,29 @@
       window.clearInterval(raceTimer);
       raceTimer = 0;
     }
+    raceTick = null;
+  }
+
+  function tickMs() {
+    return Math.max(40, Math.round(BASE_TICK_MS / raceSpeed));
+  }
+
+  function syncSpeedButtons() {
+    document.querySelectorAll(".speed-btn").forEach((btn) => {
+      const speed = Number(btn.getAttribute("data-speed"));
+      btn.classList.toggle("active", speed === raceSpeed);
+    });
+  }
+
+  function applyRaceSpeed(speed) {
+    const next = speed === 2 || speed === 4 ? speed : 1;
+    raceSpeed = next;
+    syncSpeedButtons();
+    board.style.setProperty("--race-transition", Math.max(0.08, 0.35 / raceSpeed) + "s");
+    if (!raceDone && raceTick) {
+      if (raceTimer) window.clearInterval(raceTimer);
+      raceTimer = window.setInterval(raceTick, tickMs());
+    }
   }
 
   function paintRacers(maxValue) {
@@ -243,8 +270,9 @@
 
     paintRacers(maxStart);
     raceHint.textContent = "Corriendo Collatz… llegar a 1 = descalificado · gana el último";
+    syncSpeedButtons();
 
-    raceTimer = window.setInterval(() => {
+    raceTick = () => {
       let maxNow = 1;
       racers.forEach((racer) => {
         if (racer.eliminated) return;
@@ -262,8 +290,6 @@
       const scaleMax = Math.max(maxStart, maxNow, 2);
       paintRacers(scaleMax);
 
-      // Si varios llegan a 1 en el mismo tick y no queda nadie, gana el de mayor start
-      // (último “efectivo”); si queda uno vivo, sigue hasta que también llegue a 1.
       if (alive.length === 0) {
         const lastWave = racers
           .filter((racer) => racer.finishIndex === finishOrder)
@@ -273,10 +299,10 @@
       }
 
       if (alive.length === 1 && finishOrder >= racers.length - 1) {
-        // El último superviviente: cuando llegue a 1 será el ganador.
         raceHint.textContent = "Queda 1 · si llega a 1 gana por ser el último";
       }
-    }, 450);
+    };
+    raceTimer = window.setInterval(raceTick, tickMs());
   }
 
   function openSelect() {
@@ -285,6 +311,13 @@
     renderSelect();
     show("screenSelect");
   }
+
+  document.querySelectorAll(".speed-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      applyRaceSpeed(Number(btn.getAttribute("data-speed")));
+    });
+  });
+  syncSpeedButtons();
 
   document.getElementById("btnPlay").addEventListener("click", () => {
     renderBalls();
