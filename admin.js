@@ -937,6 +937,7 @@ const FALLBACK_GAMES = [
     name: "Math Ball",
     description: "Creá pelotitas con números únicos y corré la Conjetura de Collatz.",
     folder: "Math Ball",
+    playUrl: "https://servidordejose.com/Juegos/Math%20Ball/index.html?v=mb9",
     icon: "🔵",
     tags: ["matemática", "collatz", "números"],
     creator: "José Rafael Rodriguez Morillo",
@@ -973,6 +974,11 @@ function gamePath(folder) {
   return `Juegos/${encoded}/index.html`;
 }
 
+function playHref(game) {
+  if (game.playUrl) return game.playUrl;
+  return gamePath(game.folder);
+}
+
 function getGameText(game, field) {
   const pack = GAME_I18N[game.id];
   if (game.id === "bruchimichis" && field === "name") return "bruchimichis";
@@ -990,6 +996,7 @@ function normalizeGame(game) {
     name: game.name,
     description: game.description || "",
     folder: game.folder,
+    playUrl: typeof game.playUrl === "string" && game.playUrl.trim() ? game.playUrl.trim() : "",
     icon: game.icon || "🎮",
     tags: Array.isArray(game.tags) ? game.tags : [],
     creator: Array.isArray(game.creator)
@@ -1043,7 +1050,7 @@ function renderGames(games) {
 
     const playButton = game.comingSoon
       ? `<button type="button" class="btn primary" disabled>${strings.comingSoon}</button>`
-      : `<a class="btn primary" href="${gamePath(game.folder)}">${strings.play}</a>`;
+      : `<a class="btn primary" href="${playHref(game)}">${strings.play}</a>`;
 
     item.innerHTML = `
       <div class="game-card-head">

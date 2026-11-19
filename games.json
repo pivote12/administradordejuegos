@@ -277,6 +277,7 @@
       "name": "Math Ball",
       "description": "Creá pelotitas con números únicos y corré la Conjetura de Collatz.",
       "folder": "Math Ball",
+      "playUrl": "https://servidordejose.com/Juegos/Math%20Ball/index.html?v=mb9",
       "icon": "🔵",
       "tags": ["matemática", "collatz", "números"],
       "creator": "José Rafael Rodriguez Morillo"
