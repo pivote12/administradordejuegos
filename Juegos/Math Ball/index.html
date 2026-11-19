@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
   <title>Math Ball</title>
-  <link rel="stylesheet" href="styles.css?v=mb8" />
+  <link rel="stylesheet" href="styles.css?v=mb9" />
   <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
@@ -65,15 +67,13 @@
         <p class="hint" id="raceHint">Más arriba = mayor valor · impar: 3n+1 · par: n/2 · quien llega a 1 queda descalificado · gana el último en llegar a 1</p>
       </div>
     </header>
-    <div class="race-toolbar panel">
-      <span class="hint">Velocidad de la partida</span>
-      <div class="speed-controls" id="speedControls" aria-label="Velocidad">
+    <div class="board-wrap">
+      <div class="race-toolbar" id="speedControls">
+        <span class="speed-label">Velocidad</span>
         <button type="button" class="btn ghost speed-btn" data-speed="1" id="btnSpeed1">x1</button>
         <button type="button" class="btn ghost speed-btn" data-speed="2" id="btnSpeed2">x2</button>
         <button type="button" class="btn ghost speed-btn" data-speed="4" id="btnSpeed4">x4</button>
       </div>
-    </div>
-    <div class="board-wrap">
       <div class="board" id="board"></div>
     </div>
     <div id="raceResult" class="winner-box" hidden></div>
@@ -99,6 +99,6 @@
   </div>
 
   <script src="../../shared-music.js?v=global5"></script>
-  <script src="game.js?v=mb8"></script>
+  <script src="game.js?v=mb9"></script>
 </body>
 </html>

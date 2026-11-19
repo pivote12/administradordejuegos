@@ -153,6 +153,7 @@ h1, h2, h3 { margin: 0 0 10px; }
 }
 
 .board-wrap {
+  position: relative;
   max-width: 980px;
   margin: 0 auto 14px;
   border-radius: 18px;
@@ -215,23 +216,31 @@ h1, h2, h3 { margin: 0 0 10px; }
 }
 
 .race-toolbar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
-  padding: 10px 14px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgb(15 23 42 / 0.92);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.35);
 }
 
-.speed-controls {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
+.speed-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-right: 2px;
 }
 
 .speed-btn {
   min-width: 52px;
+  margin: 0;
   padding: 0.55rem 0.85rem;
   font-weight: 800;
   border: 1px solid var(--line);

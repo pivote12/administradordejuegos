@@ -254,6 +254,7 @@
     challengeBox.hidden = true;
     board.innerHTML = "";
     const width = board.clientWidth || 900;
+    const ballSize = list.length > 12 ? 40 : list.length > 8 ? 48 : 56;
     const gap = width / (list.length + 1);
     const maxStart = Math.max.apply(null, list.map((item) => item.value));
 
@@ -261,6 +262,9 @@
       const el = document.createElement("div");
       el.className = "racer";
       el.style.background = ball.color;
+      el.style.width = ballSize + "px";
+      el.style.height = ballSize + "px";
+      el.style.fontSize = ballSize > 48 ? "0.85rem" : "0.72rem";
       el.title = "Original: " + ball.label;
       board.appendChild(el);
       return {
@@ -272,7 +276,7 @@
         eliminated: false,
         isWinner: false,
         finishIndex: 0,
-        x: gap * (index + 1) - 28,
+        x: Math.max(4, gap * (index + 1) - ballSize / 2),
         el: el
       };
     });
