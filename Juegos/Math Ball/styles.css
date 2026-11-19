@@ -214,16 +214,27 @@ h1, h2, h3 { margin: 0 0 10px; }
   font-weight: 700;
 }
 
+.race-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+}
+
 .speed-controls {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .speed-btn {
-  min-width: 44px;
-  padding: 0.45rem 0.7rem;
+  min-width: 52px;
+  padding: 0.55rem 0.85rem;
   font-weight: 800;
+  border: 1px solid var(--line);
 }
 
 .speed-btn.active {

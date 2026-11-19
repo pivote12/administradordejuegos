@@ -151,11 +151,10 @@
       window.clearInterval(raceTimer);
       raceTimer = 0;
     }
-    raceTick = null;
   }
 
   function tickMs() {
-    return Math.max(40, Math.round(BASE_TICK_MS / raceSpeed));
+    return Math.max(50, Math.round(BASE_TICK_MS / Math.min(2, raceSpeed)));
   }
 
   function syncSpeedButtons() {
@@ -169,10 +168,21 @@
     const next = speed === 2 || speed === 4 ? speed : 1;
     raceSpeed = next;
     syncSpeedButtons();
-    board.style.setProperty("--race-transition", Math.max(0.08, 0.35 / raceSpeed) + "s");
+    board.style.setProperty("--race-transition", Math.max(0.06, 0.35 / raceSpeed) + "s");
     if (!raceDone && raceTick) {
       if (raceTimer) window.clearInterval(raceTimer);
       raceTimer = window.setInterval(raceTick, tickMs());
+    }
+  }
+
+  function advanceRacer(racer, finishState) {
+    if (racer.eliminated) return;
+    racer.current = collatzNext(racer.current);
+    if (racer.current === 1) {
+      racer.eliminated = true;
+      finishState.order += 1;
+      racer.finishIndex = finishState.order;
+      racer.el.title = "Descalificado · llegó a 1 (#" + finishState.order + ")";
     }
   }
 
@@ -246,7 +256,6 @@
     const width = board.clientWidth || 900;
     const gap = width / (list.length + 1);
     const maxStart = Math.max.apply(null, list.map((item) => item.value));
-    let finishOrder = 0;
 
     racers = list.map((ball, index) => {
       const el = document.createElement("div");
@@ -272,18 +281,19 @@
     raceHint.textContent = "Corriendo Collatz… llegar a 1 = descalificado · gana el último";
     syncSpeedButtons();
 
+    const finishState = { order: 0 };
     raceTick = () => {
+      if (raceDone) return;
+      const steps = raceSpeed === 4 ? 4 : raceSpeed === 2 ? 2 : 1;
+      for (let step = 0; step < steps; step += 1) {
+        racers.forEach((racer) => advanceRacer(racer, finishState));
+        const aliveMid = racers.filter((racer) => !racer.eliminated);
+        if (aliveMid.length === 0) break;
+      }
+
       let maxNow = 1;
       racers.forEach((racer) => {
-        if (racer.eliminated) return;
-        racer.current = collatzNext(racer.current);
         if (racer.current > maxNow) maxNow = racer.current;
-        if (racer.current === 1) {
-          racer.eliminated = true;
-          finishOrder += 1;
-          racer.finishIndex = finishOrder;
-          racer.el.title = "Descalificado · llegó a 1 (#" + finishOrder + ")";
-        }
       });
 
       const alive = racers.filter((racer) => !racer.eliminated);
@@ -292,13 +302,13 @@
 
       if (alive.length === 0) {
         const lastWave = racers
-          .filter((racer) => racer.finishIndex === finishOrder)
+          .filter((racer) => racer.finishIndex === finishState.order)
           .sort((a, b) => b.start - a.start);
         finishRace(lastWave[0] || racers[racers.length - 1]);
         return;
       }
 
-      if (alive.length === 1 && finishOrder >= racers.length - 1) {
+      if (alive.length === 1 && finishState.order >= racers.length - 1) {
         raceHint.textContent = "Queda 1 · si llega a 1 gana por ser el último";
       }
     };
