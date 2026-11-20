@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Practica De Fracciones</title>
+  <link rel="stylesheet" href="styles.css?v=pf1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">½</p>
+      <h1>Practica De Fracciones</h1>
+      <p>Nombres por renglón · sumas y restas · el último en pie gana el trofeo.</p>
+      <p class="creator">Creadores: José Rafael Rodriguez Morillo y Rocío Biondi</p>
+      <button type="button" class="btn primary" id="btnPlay">Jugar</button>
+      <button type="button" class="btn ghost" id="btnOpenBoard">Tabla de calificación</button>
+      <button type="button" class="btn ghost" id="btnVsAi" hidden>Jugar vs IA</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenNames" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <div class="bar-titles">
+        <h2>Nombres</h2>
+        <p class="hint">Un nombre por renglón · pegá desde el Bloc de notas o escribilos · mínimo 2</p>
+      </div>
+      <button type="button" class="btn primary" id="btnStartMatch" disabled>Empezar</button>
+    </header>
+    <div class="panel">
+      <label class="field" for="namesInput">Lista de nombres</label>
+      <textarea id="namesInput" rows="12" placeholder="Ana&#10;Bruno&#10;Carla"></textarea>
+      <p class="form-error" id="namesError" hidden></p>
+      <p class="hint" id="namesCount">0 nombres válidos</p>
+    </div>
+  </section>
+
+  <section id="screenMatch" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackNames">←</button>
+      <div class="bar-titles">
+        <h2>Partida</h2>
+        <p class="hint" id="matchHint">Quedan en juego…</p>
+      </div>
+    </header>
+    <div class="match-layout">
+      <div class="panel alive-panel">
+        <h3>En juego</h3>
+        <ul class="name-list" id="aliveList"></ul>
+        <h3 class="out-title">Eliminados</h3>
+        <ul class="name-list out" id="outList"></ul>
+      </div>
+      <div class="panel turn-panel">
+        <p class="turn-label" id="turnLabel">Turno</p>
+        <p class="problem" id="problemText">—</p>
+        <form id="answerForm" class="answer-form">
+          <label class="field">Respuesta (ej: 3/4 o 1 1/2)
+            <input type="text" id="answerInput" autocomplete="off" inputmode="text" required />
+          </label>
+          <p class="form-error" id="answerError" hidden></p>
+          <button type="submit" class="btn primary" id="btnAnswer">Responder</button>
+        </form>
+        <p class="ai-note" id="aiNote" hidden>La IA está pensando…</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="screenWinner" class="screen">
+    <div class="card">
+      <p class="badge trophy">🏆</p>
+      <h1>¡Ganador!</h1>
+      <p class="winner-name" id="winnerName">—</p>
+      <p class="hint">Trofeo anotado en la tabla de calificación.</p>
+      <button type="button" class="btn primary" id="btnWinnerBoard">Ver tabla</button>
+      <button type="button" class="btn ghost" id="btnWinnerAgain">Otra partida</button>
+      <button type="button" class="btn ghost" id="btnWinnerHome">Inicio</button>
+    </div>
+  </section>
+
+  <section id="screenBoard" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackBoard">←</button>
+      <div class="bar-titles">
+        <h2>Tabla de calificación</h2>
+        <p class="hint">Trofeos ganados · el 1.º puede desafiar a la IA</p>
+      </div>
+    </header>
+    <div class="panel">
+      <ol class="board-list" id="boardList"></ol>
+      <p class="hint" id="boardEmpty" hidden>Todavía no hay trofeos. Jugá una partida.</p>
+      <button type="button" class="btn primary" id="btnBoardVsAi" hidden>1.º vs IA</button>
+    </div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=pf1"></script>
+</body>
+</html>

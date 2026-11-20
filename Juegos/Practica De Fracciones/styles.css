@@ -1,0 +1,196 @@
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+:root {
+  --ink: #f8fafc;
+  --muted: #94a3b8;
+  --card: rgb(15 23 42 / 0.92);
+  --line: rgb(45 212 191 / 0.32);
+  --accent: #2dd4bf;
+  --ok: #4ade80;
+  --danger: #fb7185;
+  --warn: #fbbf24;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 14% 10%, rgb(45 212 191 / 0.18), transparent 28%),
+    radial-gradient(circle at 90% 6%, rgb(251 191 36 / 0.12), transparent 24%),
+    linear-gradient(165deg, #0f172a, #020617);
+}
+
+.screen { display: none; min-height: 100vh; padding: 18px 14px 120px; }
+.screen.active { display: block; }
+#screenTitle.active,
+#screenWinner.active {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.card {
+  width: min(520px, 100%);
+  margin-top: 8vh;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  text-align: center;
+  display: grid;
+  gap: 10px;
+}
+
+.badge {
+  font-size: 2.4rem;
+  margin: 0 0 4px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.badge.trophy { font-size: 3rem; }
+h1, h2, h3 { margin: 0 0 8px; }
+.creator, .hint { color: var(--muted); font-size: 0.92rem; margin: 0; }
+.winner-name {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--warn);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 14px;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink);
+  text-decoration: none;
+}
+.btn.primary { background: var(--accent); color: #042f2e; }
+.btn.primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.ghost { background: rgb(2 6 23 / 0.45); }
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 980px;
+  margin: 0 auto 14px;
+}
+.bar .btn.ghost { margin: 0; }
+.bar-titles { flex: 1; min-width: 0; }
+.bar-titles h2 { margin: 0 0 2px; font-size: 1.2rem; }
+.bar-titles .hint { margin: 0; }
+
+.panel {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+textarea,
+input[type="text"] {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  font: inherit;
+  color: var(--ink);
+  background: rgb(2 6 23 / 0.55);
+  resize: vertical;
+}
+
+.form-error { margin: 0 0 8px; color: var(--danger); font-weight: 700; }
+
+.match-layout {
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) 1fr;
+  gap: 14px;
+}
+
+.name-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.name-list li {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(2 6 23 / 0.45);
+  font-weight: 700;
+}
+.name-list.out li {
+  opacity: 0.55;
+  text-decoration: line-through;
+  border-color: rgb(251 113 133 / 0.35);
+}
+.out-title { margin-top: 8px; color: var(--danger); font-size: 1rem; }
+
+.turn-label {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+.problem {
+  margin: 0 0 16px;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.answer-form { display: grid; gap: 8px; }
+.ai-note {
+  margin: 12px 0 0;
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.board-list {
+  margin: 0 0 14px;
+  padding-left: 1.4rem;
+  display: grid;
+  gap: 8px;
+}
+.board-list li {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(2 6 23 / 0.45);
+}
+.board-list li:first-child {
+  border-color: var(--warn);
+  box-shadow: 0 0 0 1px rgb(251 191 36 / 0.25);
+}
+.board-rank {
+  font-weight: 800;
+  color: var(--warn);
+  margin-right: 8px;
+}
+
+@media (max-width: 720px) {
+  .match-layout { grid-template-columns: 1fr; }
+}

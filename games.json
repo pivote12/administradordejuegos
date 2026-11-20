@@ -281,6 +281,15 @@
       "icon": "🔵",
       "tags": ["matemática", "collatz", "números"],
       "creator": "José Rafael Rodriguez Morillo"
+    },
+    {
+      "id": "practica-de-fracciones",
+      "name": "Practica De Fracciones",
+      "description": "Nombres por renglón, sumas y restas con fracciones: fallás y quedás eliminado. El último gana trofeo; el 1.º de la tabla juega vs IA.",
+      "folder": "Practica De Fracciones",
+      "icon": "½",
+      "tags": ["fracciones", "matemática", "eliminación", "tabla"],
+      "creator": ["José Rafael Rodriguez Morillo", "Rocío Biondi"]
     }
   ]
 }

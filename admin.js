@@ -657,6 +657,20 @@ const GAME_I18N = {
     ja: { name: "Math Ball", description: "一意の数字のボールを作り、コラッツ予想で遊ぶ。" },
     ko: { name: "Math Ball", description: "고유 숫자 공을 만들고 콜라츠 추측 레이스를 하세요." },
   },
+  "practica-de-fracciones": {
+    es: { name: "Practica De Fracciones", description: "Nombres por renglón, sumas y restas con fracciones: fallás y quedás eliminado. El último gana trofeo; el 1.º de la tabla juega vs IA." },
+    en: { name: "Fraction Practice", description: "Enter names, solve fraction add/subtract rounds, get eliminated on a miss, earn trophies, and let 1st place face the AI." },
+    fr: { name: "Pratique des fractions", description: "Entrez des noms, résolvez des additions/soustractions de fractions, élimination en cas d'erreur, trophées et défi IA pour le 1er." },
+    de: { name: "Brüche üben", description: "Namen eingeben, Brüche addieren/subtrahieren, bei Fehler raus, Trophäen und KI-Duell für Platz 1." },
+    pt: { name: "Prática de Frações", description: "Coloque nomes, some/subtraia frações, errou saiu, ganhe troféus e o 1.º enfrenta a IA." },
+    it: { name: "Pratica di frazioni", description: "Inserisci nomi, somma/sottrai frazioni, errore = eliminazione, trofei e sfida IA per il 1°." },
+    ru: { name: "Практика дробей", description: "Введи имена, складывай/вычитай дроби, ошибка = вылет, трофеи и бой с ИИ для 1-го места." },
+    pl: { name: "Ćwiczenie ułamków", description: "Wpisz imiona, dodawaj/odejmuj ułamki, błąd = odpadnięcie, trofea i pojedynek z AI dla 1. miejsca." },
+    nl: { name: "Breuken oefenen", description: "Voer namen in, tel/trek breuken af, fout = eruit, trofeeën en AI-duel voor nummer 1." },
+    zh: { name: "分数练习", description: "输入名字，做分数加减，答错淘汰，奖杯榜首可挑战 AI。" },
+    ja: { name: "分数の練習", description: "名前を入れ、分数の加減を解き、間違えたら脱落。トロフィーと1位のAI対戦。" },
+    ko: { name: "분수 연습", description: "이름을 넣고 분수 덧셈/뺄셈을 풀며, 틀리면 탈락. 트로피와 1위의 AI 대결." },
+  },
 };
 
 const FALLBACK_GAMES = [
@@ -942,6 +956,15 @@ const FALLBACK_GAMES = [
     tags: ["matemática", "collatz", "números"],
     creator: "José Rafael Rodriguez Morillo",
   },
+  {
+    id: "practica-de-fracciones",
+    name: "Practica De Fracciones",
+    description: "Nombres por renglón, sumas y restas con fracciones: fallás y quedás eliminado. El último gana trofeo; el 1.º de la tabla juega vs IA.",
+    folder: "Practica De Fracciones",
+    icon: "½",
+    tags: ["fracciones", "matemática", "eliminación", "tabla"],
+    creator: ["José Rafael Rodriguez Morillo", "Rocío Biondi"],
+  },
 ];
 
 const gameGrid = document.getElementById("gameGrid");
@@ -1131,7 +1154,7 @@ async function loadGames() {
     if (location.protocol === "file:") {
       throw new Error("file-protocol");
     }
-    const response = await fetch("games.json?v=menu36", { cache: "no-store" });
+    const response = await fetch("games.json?v=menu37", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudo leer games.json");
     const data = await response.json();
     allGames = (data.games || [])
