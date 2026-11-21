@@ -933,6 +933,7 @@ const FALLBACK_GAMES = [
     name: "Idiomas",
     description: "Creá idiomas, guardalos y traducí entre el idioma original y el tuyo.",
     folder: "Idiomas",
+    playUrl: "https://servidordejose.com/Juegos/Idiomas/index.html?v=mb9",
     icon: "🗣️",
     tags: ["idiomas", "traducir", "crear", "guardados"],
     creator: "José Rafael Rodriguez Morillo",
@@ -1154,7 +1155,7 @@ async function loadGames() {
     if (location.protocol === "file:") {
       throw new Error("file-protocol");
     }
-    const response = await fetch("games.json?v=menu37", { cache: "no-store" });
+    const response = await fetch("games.json?v=menu38", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudo leer games.json");
     const data = await response.json();
     allGames = (data.games || [])

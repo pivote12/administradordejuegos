@@ -259,6 +259,7 @@
       "name": "Idiomas",
       "description": "Creá idiomas, guardalos y traducí entre el original y el tuyo.",
       "folder": "Idiomas",
+      "playUrl": "https://servidordejose.com/Juegos/Idiomas/index.html?v=mb9",
       "icon": "🗣️",
       "tags": ["idiomas", "traducir", "crear", "guardados"],
       "creator": "José Rafael Rodriguez Morillo"
