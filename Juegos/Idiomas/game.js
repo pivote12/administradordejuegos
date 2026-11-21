@@ -207,6 +207,7 @@
       const trimmed = line.trim();
       if (!trimmed) return;
 
+      // Formato: Palabra: traduccion /pronunciacion/ (pronunciacion traducido al idioma principal)
       const sepMatch = trimmed.match(/^(.+?)\s*([:=])\s*(.+)$/);
       if (!sepMatch) {
         throw new Error("Renglón " + (index + 1) + ": falta : o =");
@@ -217,22 +218,36 @@
       if (!original) throw new Error("Renglón " + (index + 1) + ": falta la palabra original");
       if (!rest) throw new Error("Renglón " + (index + 1) + ": falta la traducción");
 
-      const pronunciations = [];
+      let pronunciationMain = "";
+      const mainPronMatch = rest.match(/\(([^)]*)\)\s*$/);
+      if (mainPronMatch) {
+        pronunciationMain = String(mainPronMatch[1] || "").trim();
+        rest = rest.slice(0, mainPronMatch.index).replace(/\s+/g, " ").trim();
+      }
+
+      let pronunciation = "";
+      const slashMatches = [];
       rest = rest.replace(/\/([^/]*)\//g, (_all, pron) => {
         const clean = String(pron || "").trim();
-        if (clean) pronunciations.push(clean);
+        if (clean) slashMatches.push(clean);
         return " ";
       });
+      pronunciation = slashMatches.join(" · ");
 
       const translation = rest.replace(/\s+/g, " ").trim();
       if (!translation) {
-        throw new Error("Renglón " + (index + 1) + ": la traducción quedó vacía");
+        throw new Error(
+          "Renglón " +
+            (index + 1) +
+            ": la traducción quedó vacía. Usá: Palabra: traduccion /pronunciacion/ (pronunciacion en el idioma principal)"
+        );
       }
 
       entries.push({
         original,
         translation,
-        pronunciation: pronunciations.join(" · ")
+        pronunciation,
+        pronunciationMain
       });
     });
 
@@ -269,17 +284,38 @@
     const keys = Array.from(map.keys()).sort((a, b) => b.length - a.length);
     if (!keys.length) return text;
 
-    // Solo palabras/frases enteras entre espacios (o al borde del texto).
-    const pattern = new RegExp(
-      "(^|\\s)(" + keys.map((key) => escapeRegExp(key)).join("|") + ")(?=\\s|$)",
-      "gi"
-    );
+    const hasSkipPunct = /[¡!¿?]/;
+    const keysWithPunct = keys.filter((key) => hasSkipPunct.test(key));
+    const keysPlain = keys.filter((key) => !hasSkipPunct.test(key));
+    let result = text;
 
-    return text.replace(pattern, (full, space, match) => {
-      const mapped = map.get(match.toLowerCase());
-      if (mapped == null) return full;
-      return space + applyCase(match, mapped);
-    });
+    // Palabras del usuario que ya traen ¡!¿?: match exacto, no se saltan.
+    if (keysWithPunct.length) {
+      const pattern = new RegExp(
+        "(^|\\s)(" + keysWithPunct.map((key) => escapeRegExp(key)).join("|") + ")(?=\\s|$)",
+        "gi"
+      );
+      result = result.replace(pattern, (full, space, match) => {
+        const mapped = map.get(match.toLowerCase());
+        if (mapped == null) return full;
+        return space + applyCase(match, mapped);
+      });
+    }
+
+    // Resto: ¡!¿? se saltan (quedan pegados) y no bloquean la traducción.
+    if (keysPlain.length) {
+      const pattern = new RegExp(
+        "(^|\\s)([¡¿]*)(" + keysPlain.map((key) => escapeRegExp(key)).join("|") + ")([!?]*)(?=\\s|$)",
+        "gi"
+      );
+      result = result.replace(pattern, (full, space, openMarks, match, closeMarks) => {
+        const mapped = map.get(match.toLowerCase());
+        if (mapped == null) return full;
+        return space + openMarks + applyCase(match, mapped) + closeMarks;
+      });
+    }
+
+    return result;
   }
 
   function openTranslate(lang, backScreen) {
@@ -463,17 +499,27 @@
   textOriginal.addEventListener("input", () => {
     if (!activeLang || translateLock) return;
     translateLock = true;
-    const maps = buildMaps(activeLang.entries);
-    textCreated.value = translateText(textOriginal.value, maps.toCreated);
-    translateLock = false;
+    try {
+      const maps = buildMaps(activeLang.entries);
+      textCreated.value = translateText(textOriginal.value, maps.toCreated);
+    } catch (_err) {
+      /* ignore */
+    } finally {
+      translateLock = false;
+    }
   });
 
   textCreated.addEventListener("input", () => {
     if (!activeLang || translateLock) return;
     translateLock = true;
-    const maps = buildMaps(activeLang.entries);
-    textOriginal.value = translateText(textCreated.value, maps.toOriginal);
-    translateLock = false;
+    try {
+      const maps = buildMaps(activeLang.entries);
+      textOriginal.value = translateText(textCreated.value, maps.toOriginal);
+    } catch (_err) {
+      /* ignore */
+    } finally {
+      translateLock = false;
+    }
   });
 
   document.getElementById("btnClearTranslate").addEventListener("click", () => {

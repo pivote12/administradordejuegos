@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Idiomas</title>
-  <link rel="stylesheet" href="styles.css?v=id4" />
+  <link rel="stylesheet" href="styles.css?v=id7" />
   <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
@@ -79,16 +79,17 @@
       <div class="help-box" id="helpBox" hidden>
         <h3>Cómo se arma el idioma</h3>
         <ol>
-          <li>La palabra <strong>antes</strong> de los dos puntos <code>:</code> o del igual <code>=</code> (en el mismo renglón) es la palabra en el idioma original.</li>
-          <li>Los caracteres <strong>después</strong> de <code>:</code> o <code>=</code> son la traducción al idioma nuevo.</li>
-          <li>Todo lo que está entre barras inclinadas <code>/</code>…<code>/</code> es la pronunciación de esa palabra.</li>
+          <li><strong>Palabra</strong> (antes de <code>:</code> o <code>=</code>): en el idioma principal.</li>
+          <li><strong>traduccion</strong>: cómo se dice en tu idioma creado.</li>
+          <li><code>/pronunciacion/</code>: cómo suena esa traducción.</li>
+          <li><code>(pronunciacion en el idioma principal)</code>: esa misma pronunciación explicada en el idioma original (ej. español).</li>
         </ol>
-        <p class="example mono">hola: sayo /sa-yo/<br />mundo = munde /mun-de/</p>
+        <p class="example mono">Palabra: traduccion /pronunciacion/ (pronunciacion traducido al idioma principal)<br />hola: sayo /sa-yo/ (sa yo)<br />mundo = munde /mun-de/ (mun de)</p>
       </div>
 
       <label class="field">
         <span>Texto del idioma</span>
-        <textarea id="langBody" rows="12" placeholder="palabra: traduccion /pronunciacion/"></textarea>
+        <textarea id="langBody" rows="12" placeholder="Palabra: traduccion /pronunciacion/ (pronunciacion traducido al idioma principal)"></textarea>
       </label>
 
       <p class="form-error" id="createError" hidden></p>
@@ -144,6 +145,6 @@
   </div>
 
   <script src="../../shared-music.js?v=global5"></script>
-  <script src="game.js?v=id4"></script>
+  <script src="game.js?v=id7"></script>
 </body>
 </html>
