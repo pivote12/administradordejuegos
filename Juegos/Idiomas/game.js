@@ -284,12 +284,13 @@
     const keys = Array.from(map.keys()).sort((a, b) => b.length - a.length);
     if (!keys.length) return text;
 
-    const hasSkipPunct = /[¡!¿?]/;
+    // Se saltan salvo que formen parte de una palabra definida por el usuario.
+    const hasSkipPunct = /[¡!¿?.,:;]/;
     const keysWithPunct = keys.filter((key) => hasSkipPunct.test(key));
     const keysPlain = keys.filter((key) => !hasSkipPunct.test(key));
     let result = text;
 
-    // Palabras del usuario que ya traen ¡!¿?: match exacto, no se saltan.
+    // Palabras del usuario que ya traen esos signos: match exacto, no se saltan.
     if (keysWithPunct.length) {
       const pattern = new RegExp(
         "(^|\\s)(" + keysWithPunct.map((key) => escapeRegExp(key)).join("|") + ")(?=\\s|$)",
@@ -302,10 +303,12 @@
       });
     }
 
-    // Resto: ¡!¿? se saltan (quedan pegados) y no bloquean la traducción.
+    // Resto: ¡!¿?.,:; se saltan (quedan pegados) y no bloquean la traducción.
     if (keysPlain.length) {
       const pattern = new RegExp(
-        "(^|\\s)([¡¿]*)(" + keysPlain.map((key) => escapeRegExp(key)).join("|") + ")([!?]*)(?=\\s|$)",
+        "(^|\\s)([¡¿]*)(" +
+          keysPlain.map((key) => escapeRegExp(key)).join("|") +
+          ")([!?.,:;]*)(?=\\s|$)",
         "gi"
       );
       result = result.replace(pattern, (full, space, openMarks, match, closeMarks) => {
