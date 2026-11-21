@@ -284,8 +284,10 @@
     const keys = Array.from(map.keys()).sort((a, b) => b.length - a.length);
     if (!keys.length) return text;
 
-    // Se saltan salvo que formen parte de una palabra definida por el usuario.
-    const hasSkipPunct = /[¡!¿?.,:;]/;
+    // ¡!¿?.,:; se saltan (valen como borde) salvo que estén en una palabra del usuario.
+    // El punto va escapado: en una clase [.-:] se interpretaría como rango.
+    const SKIP_CLASS = "[\\s¡¿!?\\.,:;]";
+    const hasSkipPunct = /[¡¿!?\.,:;]/;
     const keysWithPunct = keys.filter((key) => hasSkipPunct.test(key));
     const keysPlain = keys.filter((key) => !hasSkipPunct.test(key));
     let result = text;
@@ -293,28 +295,30 @@
     // Palabras del usuario que ya traen esos signos: match exacto, no se saltan.
     if (keysWithPunct.length) {
       const pattern = new RegExp(
-        "(^|\\s)(" + keysWithPunct.map((key) => escapeRegExp(key)).join("|") + ")(?=\\s|$)",
+        "(^|" + SKIP_CLASS + ")(" +
+          keysWithPunct.map((key) => escapeRegExp(key)).join("|") +
+          ")(?=" + SKIP_CLASS + "|$)",
         "gi"
       );
-      result = result.replace(pattern, (full, space, match) => {
+      result = result.replace(pattern, (full, sep, match) => {
         const mapped = map.get(match.toLowerCase());
         if (mapped == null) return full;
-        return space + applyCase(match, mapped);
+        return sep + applyCase(match, mapped);
       });
     }
 
-    // Resto: ¡!¿?.,:; se saltan (quedan pegados) y no bloquean la traducción.
+    // Resto: los signos quedan y no bloquean el match (también sin espacio: hola,mundo).
     if (keysPlain.length) {
       const pattern = new RegExp(
-        "(^|\\s)([¡¿]*)(" +
+        "(^|" + SKIP_CLASS + ")(" +
           keysPlain.map((key) => escapeRegExp(key)).join("|") +
-          ")([!?.,:;]*)(?=\\s|$)",
+          ")(?=" + SKIP_CLASS + "|$)",
         "gi"
       );
-      result = result.replace(pattern, (full, space, openMarks, match, closeMarks) => {
+      result = result.replace(pattern, (full, sep, match) => {
         const mapped = map.get(match.toLowerCase());
         if (mapped == null) return full;
-        return space + openMarks + applyCase(match, mapped) + closeMarks;
+        return sep + applyCase(match, mapped);
       });
     }
 
