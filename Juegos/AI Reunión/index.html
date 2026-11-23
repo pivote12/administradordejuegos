@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>AI Reunión</title>
+  <link rel="stylesheet" href="styles.css?v=ar1" />
+  <link rel="stylesheet" href="../../shared-music.css?v=global1" />
+</head>
+<body>
+  <section id="screenTitle" class="screen active">
+    <div class="card">
+      <p class="badge">🤖</p>
+      <h1>AI Reunión</h1>
+      <p>Elegí IAs, escribí un mensaje y escuchá sus respuestas en orden aleatorio.</p>
+      <p class="creator">Creador: José Rafael Rodriguez Morillo · 2026</p>
+      <button type="button" class="btn primary" id="btnPlay">Jugar</button>
+      <a class="btn ghost" href="../../index.html">Volver al administrador</a>
+    </div>
+  </section>
+
+  <section id="screenSelect" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackTitle">←</button>
+      <div class="bar-titles">
+        <h2>Elegí IAs</h2>
+        <p class="hint">La memoria del chat se borra al cerrar la pestaña · mínimo 1 IA</p>
+      </div>
+      <button type="button" class="btn primary" id="btnStartChat" disabled>Entrar al chat</button>
+    </header>
+
+    <div class="panel">
+      <div class="select-actions">
+        <button type="button" class="btn ghost" id="btnCreateAi">Crear una IA</button>
+        <button type="button" class="btn ghost" id="btnPermanentMemory">Memoria permanente</button>
+      </div>
+      <div class="ai-grid" id="aiGrid"></div>
+      <p class="form-error" id="selectError" hidden></p>
+    </div>
+  </section>
+
+  <section id="screenCreateAi" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromCreate">←</button>
+      <div class="bar-titles">
+        <h2>Crear una IA</h2>
+        <p class="hint">La IA ayudante responde por esa elección y por la tuya</p>
+      </div>
+    </header>
+    <div class="panel create-form">
+      <label class="field">Nombre de IA
+        <input type="text" id="customName" maxlength="40" placeholder="Ejemplo: Gemini" />
+      </label>
+      <label class="field">Personalidad
+        <textarea id="customPersonality" rows="4" placeholder="Ejemplo: una IA buena que siempre ayuda"></textarea>
+      </label>
+      <label class="field">IA que ayuda
+        <select id="customHelper"></select>
+      </label>
+      <p class="form-error" id="createError" hidden></p>
+      <button type="button" class="btn primary" id="btnSaveCustom">Guardar IA</button>
+    </div>
+  </section>
+
+  <section id="screenPermanent" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromPermanent">←</button>
+      <div class="bar-titles">
+        <h2>Memoria permanente</h2>
+        <p class="hint">Se guarda para TODAS las IAs y no se borra al cerrar la pestaña</p>
+      </div>
+    </header>
+    <div class="panel">
+      <label class="field">Texto para todas las IAs
+        <textarea id="permanentInput" rows="12" placeholder="Escribí lo que sea… al guardar entra en la memoria de todas las IAs."></textarea>
+      </label>
+      <button type="button" class="btn primary" id="btnSavePermanent">Guardar en todas</button>
+      <p class="hint" id="permanentStatus"></p>
+    </div>
+  </section>
+
+  <section id="screenChat" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackFromChat">←</button>
+      <div class="bar-titles">
+        <h2>Reunión</h2>
+        <p class="hint" id="chatHint">Respondiendo…</p>
+      </div>
+    </header>
+    <div class="chat-wrap panel">
+      <div class="chat-log" id="chatLog"></div>
+      <form id="chatForm" class="chat-form">
+        <textarea id="chatInput" rows="3" placeholder="Escribí tu mensaje para las IAs…" required></textarea>
+        <button type="submit" class="btn primary" id="btnSend">Enviar</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="now-playing" id="nowPlaying">
+    <div class="now-playing-controls">
+      <button type="button" class="music-btn" id="btnMusicStop" title="Pausar">▶</button>
+      <button type="button" class="music-btn" id="btnMusicPrev" title="Anterior">⏮</button>
+      <button type="button" class="music-btn" id="btnMusicNext" title="Siguiente">⏭</button>
+    </div>
+    <p class="now-playing-info">
+      <span class="now-playing-label">Canción:</span>
+      <span class="now-playing-title" id="nowPlayingTitle">—</span>
+    </p>
+  </div>
+
+  <script src="../../shared-music.js?v=global5"></script>
+  <script src="game.js?v=ar1"></script>
+</body>
+</html>

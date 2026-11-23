@@ -26,6 +26,7 @@ const UI = {
     play: "Jugar",
     comingSoon: "Próximamente",
     creator: "Creador",
+    year: "Año",
     noDescription: "Sin descripción.",
     emptySearch: "No hay juegos que coincidan con la búsqueda.",
     emptyList: "No hay juegos registrados. Añade uno en games.json.",
@@ -45,6 +46,7 @@ const UI = {
     play: "Play",
     comingSoon: "Coming soon",
     creator: "Creator",
+    year: "Year",
     noDescription: "No description.",
     emptySearch: "No games match your search.",
     emptyList: "No games registered. Add one in games.json.",
@@ -64,6 +66,7 @@ const UI = {
     play: "Jouer",
     comingSoon: "Bientôt",
     creator: "Créateur",
+    year: "Année",
     noDescription: "Aucune description.",
     emptySearch: "Aucun jeu ne correspond à votre recherche.",
     emptyList: "Aucun jeu enregistré. Ajoutez-en un dans games.json.",
@@ -82,6 +85,7 @@ const UI = {
     play: "Spielen",
     comingSoon: "Demnächst",
     creator: "Ersteller",
+    year: "Jahr",
     noDescription: "Keine Beschreibung.",
     emptySearch: "Keine Spiele passen zur Suche.",
     emptyList: "Keine Spiele registriert. Füge eines in games.json hinzu.",
@@ -100,6 +104,7 @@ const UI = {
     play: "Jogar",
     comingSoon: "Em breve",
     creator: "Criador",
+    year: "Ano",
     noDescription: "Sem descrição.",
     emptySearch: "Nenhum jogo corresponde à busca.",
     emptyList: "Nenhum jogo registrado. Adicione um em games.json.",
@@ -118,6 +123,7 @@ const UI = {
     play: "Gioca",
     comingSoon: "Prossimamente",
     creator: "Creatore",
+    year: "Anno",
     noDescription: "Nessuna descrizione.",
     emptySearch: "Nessun gioco corrisponde alla ricerca.",
     emptyList: "Nessun gioco registrato. Aggiungine uno in games.json.",
@@ -136,6 +142,7 @@ const UI = {
     play: "Играть",
     comingSoon: "Скоро",
     creator: "Создатель",
+    year: "Год",
     noDescription: "Нет описания.",
     emptySearch: "Нет игр по вашему запросу.",
     emptyList: "Игры не зарегистрированы. Добавьте в games.json.",
@@ -154,6 +161,7 @@ const UI = {
     play: "Graj",
     comingSoon: "Wkrótce",
     creator: "Twórca",
+    year: "Rok",
     noDescription: "Brak opisu.",
     emptySearch: "Brak gier pasujących do wyszukiwania.",
     emptyList: "Brak zarejestrowanych gier. Dodaj w games.json.",
@@ -172,6 +180,7 @@ const UI = {
     play: "Spelen",
     comingSoon: "Binnenkort",
     creator: "Maker",
+    year: "Jaar",
     noDescription: "Geen beschrijving.",
     emptySearch: "Geen spellen gevonden voor je zoekopdracht.",
     emptyList: "Geen spellen geregistreerd. Voeg er een toe in games.json.",
@@ -190,6 +199,7 @@ const UI = {
     play: "游玩",
     comingSoon: "即将推出",
     creator: "创作者",
+    year: "年份",
     noDescription: "暂无描述。",
     emptySearch: "没有匹配的游戏。",
     emptyList: "没有注册的游戏。请在 games.json 中添加。",
@@ -208,6 +218,7 @@ const UI = {
     play: "プレイ",
     comingSoon: "近日公開",
     creator: "作成者",
+    year: "年",
     noDescription: "説明なし。",
     emptySearch: "検索に一致するゲームがありません。",
     emptyList: "登録されたゲームがありません。games.json に追加してください。",
@@ -226,6 +237,7 @@ const UI = {
     play: "플레이",
     comingSoon: "출시 예정",
     creator: "제작자",
+    year: "연도",
     noDescription: "설명 없음.",
     emptySearch: "검색과 일치하는 게임이 없습니다.",
     emptyList: "등록된 게임이 없습니다. games.json에 추가하세요.",
@@ -671,6 +683,20 @@ const GAME_I18N = {
     ja: { name: "分数の練習", description: "名前を入れ、分数の加減を解き、間違えたら脱落。トロフィーと1位のAI対戦。" },
     ko: { name: "분수 연습", description: "이름을 넣고 분수 덧셈/뺄셈을 풀며, 틀리면 탈락. 트로피와 1위의 AI 대결." },
   },
+  "ai-reunion": {
+    es: { name: "AI Reunión", description: "Elegí IAs, mandales un mensaje y responden en orden aleatorio. Memoria de chat por pestaña y memoria permanente para todas." },
+    en: { name: "AI Meeting", description: "Pick AIs, send a message, and get replies in random order. Tab chat memory plus permanent memory for everyone." },
+    fr: { name: "Réunion IA", description: "Choisis des IA, envoie un message et reçois des réponses dans un ordre aléatoire." },
+    de: { name: "KI-Treffen", description: "Wähle KIs, sende eine Nachricht und erhalte Antworten in zufälliger Reihenfolge." },
+    pt: { name: "Reunião de IA", description: "Escolha IAs, envie uma mensagem e receba respostas em ordem aleatória." },
+    it: { name: "Riunione IA", description: "Scegli IA, invia un messaggio e ricevi risposte in ordine casuale." },
+    ru: { name: "Встреча ИИ", description: "Выбери ИИ, отправь сообщение и получи ответы в случайном порядке." },
+    pl: { name: "Spotkanie AI", description: "Wybierz AI, wyślij wiadomość i otrzymaj odpowiedzi w losowej kolejności." },
+    nl: { name: "AI-vergadering", description: "Kies AI's, stuur een bericht en krijg antwoorden in willekeurige volgorde." },
+    zh: { name: "AI 会议", description: "选择 AI，发送消息，并按随机顺序收到回复。" },
+    ja: { name: "AI会議", description: "AIを選び、メッセージを送るとランダム順で返答します。" },
+    ko: { name: "AI 회의", description: "AI를 고르고 메시지를 보내면 무작위 순서로 답합니다." },
+  },
 };
 
 const FALLBACK_GAMES = [
@@ -965,6 +991,17 @@ const FALLBACK_GAMES = [
     icon: "½",
     tags: ["fracciones", "matemática", "eliminación", "tabla"],
     creator: ["José Rafael Rodriguez Morillo", "Rocío Biondi"],
+    year: 2026,
+  },
+  {
+    id: "ai-reunion",
+    name: "AI Reunión",
+    description: "Elegí IAs, mandales un mensaje y responden en orden aleatorio. Memoria de chat por pestaña y memoria permanente para todas.",
+    folder: "AI Reunión",
+    icon: "🤖",
+    tags: ["ia", "chat", "reunión", "memoria"],
+    creator: "José Rafael Rodriguez Morillo",
+    year: 2026,
   },
 ];
 
@@ -1026,6 +1063,7 @@ function normalizeGame(game) {
     creator: Array.isArray(game.creator)
       ? game.creator.filter(Boolean).join(" · ")
       : (game.creator || "José Rafael Rodriguez Morillo"),
+    year: Number(game.year) || 2026,
     comingSoon: Boolean(game.comingSoon),
   };
 }
@@ -1083,7 +1121,7 @@ function renderGames(games) {
           <h3>${name}</h3>
         </div>
       </div>
-      <p class="game-creator">${strings.creator}: ${game.creator}</p>
+      <p class="game-creator">${strings.creator}: ${game.creator} · ${strings.year || "Año"}: ${game.year || 2026}</p>
       <p class="game-desc">${description}</p>
       ${tags ? `<div class="tag-row">${tags}</div>` : ""}
       ${playButton}
@@ -1155,7 +1193,7 @@ async function loadGames() {
     if (location.protocol === "file:") {
       throw new Error("file-protocol");
     }
-    const response = await fetch("games.json?v=menu38", { cache: "no-store" });
+    const response = await fetch("games.json?v=menu39", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudo leer games.json");
     const data = await response.json();
     allGames = (data.games || [])

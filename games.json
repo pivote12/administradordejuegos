@@ -6,8 +6,13 @@
       "description": "Create games, design balls and compete in the Algicosathlon.",
       "folder": "Algicosathlon Maker In English",
       "icon": "🏅",
-      "tags": ["creator", "multiplayer", "minigames"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "creator",
+        "multiplayer",
+        "minigames"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "decimal-explorer",
@@ -15,8 +20,12 @@
       "description": "Discover which famous numbers share the same starting digits.",
       "folder": "Decimal Explorer",
       "icon": "🔢",
-      "tags": ["minigame", "math"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "minigame",
+        "math"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "bruchimichis",
@@ -24,8 +33,13 @@
       "description": "Creá gatitos, movelos y hacelos correr en carreras.",
       "folder": "bruchimichis",
       "icon": "🐱",
-      "tags": ["gatos", "carrera", "creator"],
-      "creator": "Lourdes Roulier"
+      "tags": [
+        "gatos",
+        "carrera",
+        "creator"
+      ],
+      "creator": "Lourdes Roulier",
+      "year": 2026
     },
     {
       "id": "neymarmichis",
@@ -33,8 +47,13 @@
       "description": "Creá gatos futbolistas con camiseta y stats, cuidalos y jugá Fuchibol contra la IA.",
       "folder": "Neymarmichis",
       "icon": "🐱",
-      "tags": ["gatos", "fútbol", "creator"],
-      "creator": "Lourdes Roulier"
+      "tags": [
+        "gatos",
+        "fútbol",
+        "creator"
+      ],
+      "creator": "Lourdes Roulier",
+      "year": 2026
     },
     {
       "id": "creador-2d",
@@ -42,8 +61,13 @@
       "description": "Crea tu propio mundo en 2D con un editor de bloques.",
       "folder": "Creador 2D",
       "icon": "🎨",
-      "tags": ["2D", "creator", "bloques"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "2D",
+        "creator",
+        "bloques"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "object-battle",
@@ -51,8 +75,13 @@
       "description": "Create objects with faces, drop from the sky, and switch characters with Z.",
       "folder": "Object Battle",
       "icon": "⚔️",
-      "tags": ["battle", "creator", "objects"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "battle",
+        "creator",
+        "objects"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "bloc-de-notas",
@@ -60,8 +89,12 @@
       "description": "Bloc de notas simple para anotar lo que quieras.",
       "folder": "Bloc De Notas",
       "icon": "📝",
-      "tags": ["notas", "utilidad"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "notas",
+        "utilidad"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "country-notes",
@@ -69,8 +102,13 @@
       "description": "Creá países y aparecen en el mapa como bloques 128×128.",
       "folder": "Country Notes",
       "icon": "🌐",
-      "tags": ["países", "notas", "creator"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "países",
+        "notas",
+        "creator"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "shape-bowl-race",
@@ -78,8 +116,13 @@
       "description": "Create balls, race them in a bowl with Salto and Vuelta, and track Ganancias.",
       "folder": "Shape Bowl Race",
       "icon": "🥣",
-      "tags": ["creator", "race", "balls"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "creator",
+        "race",
+        "balls"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "ruleta-especial",
@@ -87,8 +130,13 @@
       "description": "Escribí opciones, girá la ruleta y guardá el historial de ganadores.",
       "folder": "Ruleta Especial",
       "icon": "🎡",
-      "tags": ["ruleta", "azar", "utilidad"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "ruleta",
+        "azar",
+        "utilidad"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "cronometro-loco",
@@ -96,8 +144,13 @@
       "description": "Un cronómetro con chances locas en cada segundo.",
       "folder": "Cronometro Loco",
       "icon": "⏱️",
-      "tags": ["cronómetro", "azar", "minigame"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "cronómetro",
+        "azar",
+        "minigame"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "marble-escape",
@@ -105,8 +158,13 @@
       "description": "Crea marbles y guíalos por una fábrica difícil llena de bloques, lava y una zona segura.",
       "folder": "Marble Escape",
       "icon": "🔵",
-      "tags": ["marbles", "física", "plataformas"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "marbles",
+        "física",
+        "plataformas"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "tipo-knowledge",
@@ -114,8 +172,13 @@
       "description": "Creá Lugares De Tipo, armá equipos con logo y asigná un tipo a cada pelotita.",
       "folder": "Tipo Knowledge",
       "icon": "🧠",
-      "tags": ["tipos", "preguntas", "pelotitas"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "tipos",
+        "preguntas",
+        "pelotitas"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "pinball",
@@ -123,7 +186,11 @@
       "description": "Elegí pelotitas de tus packs y jugá en una mesa con túnel, círculos de punto y círculos de dinero.",
       "folder": "Pinball",
       "icon": "🎱",
-      "tags": ["pinball", "pelotitas", "packs"],
+      "tags": [
+        "pinball",
+        "pelotitas",
+        "packs"
+      ],
       "creator": [
         "José Rafael Rodriguez Morillo",
         "Reddo",
@@ -132,7 +199,8 @@
         "Bifer",
         "Bifer3000",
         "PinVilet"
-      ]
+      ],
+      "year": 2026
     },
     {
       "id": "carrera-blitz",
@@ -140,8 +208,13 @@
       "description": "Elegí una pelotita de tus packs y corré una pista neón: speedrun contra el reloj o carrera contra la IA y tu pack.",
       "folder": "Carrera Blitz",
       "icon": "🏁",
-      "tags": ["carrera", "pelotitas", "packs"],
-      "creator": "Reddo"
+      "tags": [
+        "carrera",
+        "pelotitas",
+        "packs"
+      ],
+      "creator": "Reddo",
+      "year": 2026
     },
     {
       "id": "pinki-glamour",
@@ -149,8 +222,13 @@
       "description": "Elegí una pelotita, cruzá 50 pasarelas al ritmo y juntá estilo. También hay carrera contra 3 rivales y una tienda de accesorios.",
       "folder": "Pinki Glamour Rush",
       "icon": "🎀",
-      "tags": ["pasarela", "pelotitas", "packs"],
-      "creator": "Pinki"
+      "tags": [
+        "pasarela",
+        "pelotitas",
+        "packs"
+      ],
+      "creator": "Pinki",
+      "year": 2026
     },
     {
       "id": "yeller-jackpot",
@@ -158,8 +236,13 @@
       "description": "Elegí una pelotita, tirá el dado de 12 caras y cruzá 20 tableros de suerte. En el Royale, 4 pelotitas compiten por 1.000 monedas o por el Jackpot.",
       "folder": "Yeller Lucky Jackpot",
       "icon": "🪙",
-      "tags": ["suerte", "pelotitas", "packs"],
-      "creator": "Yeller"
+      "tags": [
+        "suerte",
+        "pelotitas",
+        "packs"
+      ],
+      "creator": "Yeller",
+      "year": 2026
     },
     {
       "id": "bifer-cyber",
@@ -167,11 +250,16 @@
       "description": "Elegí una pelotita como núcleo de datos, girá espejos y conectá el láser en 40 nodos. En la Matriz, 4 pelotitas compiten por hackear el servidor.",
       "folder": "Bifer Cyber Matrix",
       "icon": "🧠",
-      "tags": ["hackeo", "pelotitas", "packs"],
+      "tags": [
+        "hackeo",
+        "pelotitas",
+        "packs"
+      ],
       "creator": [
         "Bifer",
         "Bifer3000"
-      ]
+      ],
+      "year": 2026
     },
     {
       "id": "pinvilet-font",
@@ -179,8 +267,13 @@
       "description": "Elegí una pelotita y una fuente, y rebotá por 30 mapas de letras gigantes. En la sopa de letras, 4 pelotitas compiten por la palabra más larga.",
       "folder": "PinVilet Font Chaos",
       "icon": "🟣",
-      "tags": ["letras", "pelotitas", "packs"],
-      "creator": "PinVilet"
+      "tags": [
+        "letras",
+        "pelotitas",
+        "packs"
+      ],
+      "creator": "PinVilet",
+      "year": 2026
     },
     {
       "id": "platafacido",
@@ -188,8 +281,13 @@
       "description": "Elegí un pack y sobreviví en una plataforma 3D sobre ácido. La última pelotita en pie gana.",
       "folder": "PlatafAcido",
       "icon": "🧪",
-      "tags": ["ácido", "pelotitas", "packs"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "ácido",
+        "pelotitas",
+        "packs"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "temperatura",
@@ -197,8 +295,13 @@
       "description": "Buscá la temperatura y el clima reales de tu zona, hora por hora hasta el día 22, hora 24.",
       "folder": "Temperatura",
       "icon": "🌡️",
-      "tags": ["clima", "temperatura", "utilidad"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "clima",
+        "temperatura",
+        "utilidad"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "grupos",
@@ -206,8 +309,13 @@
       "description": "Elegí un pack, tocá un divisor y formá equipos respetando amistades, enemistades, grupos y familias.",
       "folder": "Grupos",
       "icon": "🧩",
-      "tags": ["packs", "equipos", "pelotitas"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "packs",
+        "equipos",
+        "pelotitas"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "colegio-creado",
@@ -215,8 +323,14 @@
       "description": "Armá tu colegio con packs o pelotitas, mandalas a aulas y dá clase corrigiendo trabajos con A o F.",
       "folder": "Colegio Creado",
       "icon": "🏫",
-      "tags": ["colegio", "pelotitas", "packs", "clases"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "colegio",
+        "pelotitas",
+        "packs",
+        "clases"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "carrera-y-ruleta-rusa",
@@ -224,8 +338,13 @@
       "description": "Elegí un pack y sobreviví en un pinball de dos destinos. Completá todos los packs, jugá el Final y ganá medallas.",
       "folder": "Carrera y Ruleta Rusa",
       "icon": "🎰",
-      "tags": ["packs", "pinball", "eliminación"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "packs",
+        "pinball",
+        "eliminación"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "universe-maker",
@@ -233,8 +352,13 @@
       "description": "Creá universos con un pack, acelerá los eones, formá estrellas, planetas y vida.",
       "folder": "Universe Maker",
       "icon": "🌌",
-      "tags": ["universo", "packs", "simulación"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "universo",
+        "packs",
+        "simulación"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "surprise-huevo",
@@ -242,8 +366,14 @@
       "description": "Comprá huevos en la tienda, abrí zonas y coleccioná figuras sorpresa.",
       "folder": "Surprise Huevo",
       "icon": "🥚",
-      "tags": ["sorpresa", "huevo", "tienda", "colección"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "sorpresa",
+        "huevo",
+        "tienda",
+        "colección"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "tiempo-anti-2038",
@@ -251,8 +381,14 @@
       "description": "Contador de segundos con fecha real, Unix y 210 luces binarias que no se rompe en 2038.",
       "folder": "Tiempo Anti-2038",
       "icon": "⏳",
-      "tags": ["tiempo", "unix", "contador", "binario"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "tiempo",
+        "unix",
+        "contador",
+        "binario"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "idiomas",
@@ -261,8 +397,14 @@
       "folder": "Idiomas",
       "playUrl": "https://servidordejose.com/Juegos/Idiomas/index.html?v=mb9",
       "icon": "🗣️",
-      "tags": ["idiomas", "traducir", "crear", "guardados"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "idiomas",
+        "traducir",
+        "crear",
+        "guardados"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "shape-battle",
@@ -270,8 +412,13 @@
       "description": "Batallas con círculos matemáticos o Obstacle Course con cuadrados RGB.",
       "folder": "Shape Battle",
       "icon": "⬡",
-      "tags": ["batalla", "formas", "obstáculos"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "batalla",
+        "formas",
+        "obstáculos"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "math-ball",
@@ -280,8 +427,13 @@
       "folder": "Math Ball",
       "playUrl": "https://servidordejose.com/Juegos/Math%20Ball/index.html?v=mb9",
       "icon": "🔵",
-      "tags": ["matemática", "collatz", "números"],
-      "creator": "José Rafael Rodriguez Morillo"
+      "tags": [
+        "matemática",
+        "collatz",
+        "números"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     },
     {
       "id": "practica-de-fracciones",
@@ -289,8 +441,32 @@
       "description": "Nombres por renglón, sumas y restas con fracciones: fallás y quedás eliminado. El último gana trofeo; el 1.º de la tabla juega vs IA.",
       "folder": "Practica De Fracciones",
       "icon": "½",
-      "tags": ["fracciones", "matemática", "eliminación", "tabla"],
-      "creator": ["José Rafael Rodriguez Morillo", "Rocío Biondi"]
+      "tags": [
+        "fracciones",
+        "matemática",
+        "eliminación",
+        "tabla"
+      ],
+      "creator": [
+        "José Rafael Rodriguez Morillo",
+        "Rocío Biondi"
+      ],
+      "year": 2026
+    },
+    {
+      "id": "ai-reunion",
+      "name": "AI Reunión",
+      "description": "Elegí IAs, mandales un mensaje y responden en orden aleatorio. Memoria de chat por pestaña y memoria permanente para todas.",
+      "folder": "AI Reunión",
+      "icon": "🤖",
+      "tags": [
+        "ia",
+        "chat",
+        "reunión",
+        "memoria"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     }
   ]
 }
