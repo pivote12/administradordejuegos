@@ -1726,6 +1726,45 @@
         "sw": "hofu",
         "ga": "eagla"
       }
+    },
+    {
+      "chunna": "ϡϡ⋈⋈Ϡ",
+      "ipa": "fʌɪfʌtɪltʌ",
+      "help": "faifutilta",
+      "words": {
+        "es": "país",
+        "en": "country",
+        "fr": "pays",
+        "de": "land",
+        "pt": "país",
+        "it": "paese",
+        "ru": "страна",
+        "pl": "kraj",
+        "nl": "land",
+        "zh": "国家",
+        "ja": "国",
+        "ko": "나라",
+        "ar": "بلد",
+        "hi": "देश",
+        "tr": "ülke",
+        "sv": "land",
+        "no": "land",
+        "da": "land",
+        "fi": "maa",
+        "el": "χώρα",
+        "he": "מדינה",
+        "th": "ประเทศ",
+        "vi": "quốc gia",
+        "id": "negara",
+        "ms": "negara",
+        "uk": "країна",
+        "cs": "země",
+        "ro": "țară",
+        "hu": "ország",
+        "ca": "país",
+        "sw": "nchi",
+        "ga": "tír"
+      }
     }
   ]
 }
