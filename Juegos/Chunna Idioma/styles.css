@@ -41,6 +41,16 @@ html, body {
   display: grid;
   gap: 10px;
 }
+.title-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 4px 0;
+}
+.title-actions .btn {
+  width: 100%;
+  min-height: 48px;
+}
 
 .badge {
   margin: 0;
@@ -236,4 +246,20 @@ h1, h2, h3 { margin: 0 0 8px; }
 
 @media (max-width: 720px) {
   .translate-grid { grid-template-columns: 1fr; }
+  #screenTitle.active {
+    align-items: stretch;
+    padding-top: 10px;
+  }
+  .card {
+    margin-top: 2vh;
+    padding: 20px 16px;
+  }
+  .title-actions {
+    grid-template-columns: 1fr;
+  }
+  .title-actions .btn,
+  .card > .btn {
+    width: 100%;
+    min-height: 48px;
+  }
 }

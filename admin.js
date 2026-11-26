@@ -1022,6 +1022,7 @@ const FALLBACK_GAMES = [
     name: "Chunna Idioma",
     description: "Traductor y modo aprender con 5 niveles por palabra, voz robótica y datos del alfabeto Chunna.",
     folder: "Chunna Idioma",
+    playUrl: "https://servidordejose.com/Juegos/Chunna%20Idioma/index.html?v=ci9",
     icon: "≬⩤",
     tags: ["idioma", "chunna", "traductor", "aprender", "alfabeto"],
     creator: "José Rafael Rodriguez Morillo",
@@ -1217,7 +1218,7 @@ async function loadGames() {
     if (location.protocol === "file:") {
       throw new Error("file-protocol");
     }
-    const response = await fetch("games.json?v=menu40", { cache: "no-store" });
+    const response = await fetch("games.json?v=menu42", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudo leer games.json");
     const data = await response.json();
     allGames = (data.games || [])

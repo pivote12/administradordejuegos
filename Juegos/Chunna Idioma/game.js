@@ -570,7 +570,7 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci8", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci9", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
@@ -586,11 +586,15 @@
     show("screenTranslate");
     textSource.focus();
   });
-  document.getElementById("btnLearn").addEventListener("click", () => {
+  function openLearnHub() {
+    stopSpeak();
     loadProgress();
     renderLearnHub();
     show("screenLearnHub");
-  });
+  }
+
+  document.getElementById("btnLearn").addEventListener("click", openLearnHub);
+  document.getElementById("btnLearnFromTranslate").addEventListener("click", openLearnHub);
   document.getElementById("btnStartLesson").addEventListener("click", () => {
     show("screenLearn");
     startLessonRound();
