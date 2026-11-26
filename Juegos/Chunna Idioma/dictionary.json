@@ -1,5 +1,5 @@
 {
-  "alphabet": "⩤⫲⫵⊟⊴⋈⊥⋑ϖ≬⊘⨖⋒⨿⨔ϡϠ⌖⋓⋲⊩≡≘⪮⋹",
+  "alphabet": "⩤⫲⫵⊟⊴⋈⊥⋑ϖ≬⊘⨖⋒⨿⨔ϡϠ⌖⋓⋺⊩≡≘⪮⋹",
   "letters": [
     {
       "g": "Ϡ",
@@ -34,7 +34,7 @@
     {
       "g": "⊴",
       "ipa": "fɪvɪ",
-      "help": "f como en fish, ɪ como en ship, f como en fish y ɪ como en ship"
+      "help": "f como en fish, ɪ como en ship, f omo en fish y ɪ como en ship"
     },
     {
       "g": "⨿",
@@ -89,7 +89,7 @@
     {
       "g": "⩤",
       "ipa": "tətrʌ",
-      "help": "t como en town, ə como en above, t como en town, r como en run, ʌ como en colour"
+      "help": "t como en town, ə como n above, t como en town, r como n run, ʌ como en colour"
     },
     {
       "g": "⋈",
@@ -112,14 +112,14 @@
       "help": "t como en town, u como en blue, t como en town y ɔɪ como en boy"
     },
     {
-      "g": "⋲",
+      "g": "⋺",
       "ipa": "tʃʊəfə",
-      "help": "tʃ como en chico, ʊə como en pure, f como en fish y ə como en above"
+      "help": "tʃ como en chico, ʊə como en pure, como en fish y ə como en above"
     },
     {
       "g": "⋓",
       "ipa": "ioʊː.ju",
-      "help": "i como en ship, oʊ como en nose, j como en yes y u como en blue"
+      "help": "i como en ship, oʊ como en nose, j como es yes y u como en blue"
     },
     {
       "g": "⪮",
@@ -1143,7 +1143,7 @@
       }
     },
     {
-      "chunna": "⋲⋒⋒",
+      "chunna": "⋺⋒⋒",
       "ipa": "tʃʊəfənænæ",
       "help": "chuafenaná",
       "words": {
@@ -1299,7 +1299,7 @@
       }
     },
     {
-      "chunna": "⌖≡⋲",
+      "chunna": "⌖≡⋺",
       "ipa": "tɑːlɪltʃʊə",
       "help": "talichué",
       "words": {

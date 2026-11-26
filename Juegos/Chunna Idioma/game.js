@@ -36,6 +36,8 @@
     { id: "ga", name: "Irlandés" }
   ];
 
+  const SKIP_PUNCT = /[¿?¡!,.;:]/;
+
   /** @type {{alphabet:string,letters:Array,entries:Array}|null} */
   let dict = null;
   let lock = false;
@@ -56,12 +58,12 @@
     });
   }
 
-  function escapeRegExp(text) {
-    return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  }
-
-  function norm(text) {
-    return String(text || "").toLowerCase().normalize("NFC");
+  function fold(text) {
+    return String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .normalize("NFC");
   }
 
   function currentLang() {
@@ -72,80 +74,108 @@
     const toChunna = new Map();
     const toSource = new Map();
     (dict.entries || []).forEach((entry) => {
-      const word = entry.words && entry.words[lang];
-      if (word) {
-        toChunna.set(norm(word), entry);
-        toSource.set(norm(entry.chunna), { word: word, entry: entry });
+      const local = entry.words && entry.words[lang];
+      const spanish = entry.words && entry.words.es;
+      if (local) {
+        toChunna.set(fold(local), entry);
+        toSource.set(entry.chunna, { word: local, entry: entry });
       }
-      // Also allow Spanish lookup always as fallback keying to same entry
-      if (entry.words && entry.words.es) {
-        if (!toChunna.has(norm(entry.words.es))) toChunna.set(norm(entry.words.es), entry);
+      if (spanish) {
+        toChunna.set(fold(spanish), entry);
       }
-      toSource.set(norm(entry.chunna), {
-        word: (entry.words && (entry.words[lang] || entry.words.es)) || entry.chunna,
-        entry: entry
-      });
+      if (!toSource.has(entry.chunna)) {
+        toSource.set(entry.chunna, {
+          word: local || spanish || entry.chunna,
+          entry: entry
+        });
+      }
     });
     return { toChunna, toSource };
   }
 
-  function tokenizeKeep(text) {
-    return String(text || "").split(/(\s+|[,.!?;:¡¿]+)/);
+  // Conserva espacios y signos ¿?¡!,.;: sin traducirlos.
+  function splitKeeping(text) {
+    return String(text || "").split(/(\s+|[¿?¡!,.;:]+)/);
   }
 
   function translateSourceToChunna(text, lang) {
     const { toChunna } = buildMaps(lang);
-    const keys = Array.from(toChunna.keys()).sort((a, b) => b.length - a.length);
-    if (!keys.length) return { text: text, hits: [] };
-    const pattern = new RegExp(
-      "(^|[\\s¡¿])(" + keys.map(escapeRegExp).join("|") + ")(?=[\\s!?\\.,:;¿]|$)",
-      "gi"
-    );
     const hits = [];
-    const out = text.replace(pattern, (full, sep, match) => {
-      const entry = toChunna.get(norm(match));
-      if (!entry) return full;
+    const parts = splitKeeping(text);
+    const out = parts.map((part) => {
+      if (!part) return part;
+      if (/^\s+$/.test(part) || SKIP_PUNCT.test(part[0])) return part;
+      const entry = toChunna.get(fold(part));
+      if (!entry) return part;
       hits.push(entry);
-      return sep + entry.chunna;
+      return entry.chunna;
     });
-    return { text: out, hits: hits };
+    return { text: out.join(""), hits: hits };
   }
 
   function translateChunnaToSource(text, lang) {
     const { toSource } = buildMaps(lang);
     const keys = Array.from(toSource.keys()).sort((a, b) => b.length - a.length);
-    if (!keys.length) return { text: text, hits: [] };
-    const pattern = new RegExp("(" + keys.map(escapeRegExp).join("|") + ")", "g");
     const hits = [];
-    const out = text.replace(pattern, (match) => {
-      const found = toSource.get(norm(match));
-      if (!found) return match;
-      hits.push(found.entry);
-      return found.word;
-    });
-    return { text: out, hits: hits };
+    if (!keys.length) return { text: text, hits: hits };
+
+    let i = 0;
+    let result = "";
+    const src = String(text || "");
+    while (i < src.length) {
+      const ch = src[i];
+      if (/\s/.test(ch) || SKIP_PUNCT.test(ch)) {
+        result += ch;
+        i += 1;
+        continue;
+      }
+      let matched = null;
+      for (let k = 0; k < keys.length; k += 1) {
+        const key = keys[k];
+        if (src.slice(i, i + key.length) === key) {
+          matched = key;
+          break;
+        }
+      }
+      if (matched) {
+        const found = toSource.get(matched);
+        hits.push(found.entry);
+        result += found.word;
+        i += matched.length;
+      } else {
+        result += ch;
+        i += 1;
+      }
+    }
+    return { text: result, hits: hits };
   }
 
   function syncFromSource() {
     if (!dict || lock) return;
     lock = true;
-    const result = translateSourceToChunna(textSource.value, currentLang());
-    textChunna.value = result.text;
-    lastHits = result.hits;
-    btnSpeak.disabled = lastHits.length === 0;
-    renderSpeakPreview();
-    lock = false;
+    try {
+      const result = translateSourceToChunna(textSource.value, currentLang());
+      textChunna.value = result.text;
+      lastHits = result.hits;
+      btnSpeak.disabled = lastHits.length === 0;
+      renderSpeakPreview();
+    } finally {
+      lock = false;
+    }
   }
 
   function syncFromChunna() {
     if (!dict || lock) return;
     lock = true;
-    const result = translateChunnaToSource(textChunna.value, currentLang());
-    textSource.value = result.text;
-    lastHits = result.hits;
-    btnSpeak.disabled = lastHits.length === 0;
-    renderSpeakPreview();
-    lock = false;
+    try {
+      const result = translateChunnaToSource(textChunna.value, currentLang());
+      textSource.value = result.text;
+      lastHits = result.hits;
+      btnSpeak.disabled = lastHits.length === 0;
+      renderSpeakPreview();
+    } finally {
+      lock = false;
+    }
   }
 
   function renderSpeakPreview() {
@@ -175,13 +205,13 @@
 
   function roboticVoice() {
     const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-    const preferred =
+    return (
       voices.find((v) => /es(-|_)AR/i.test(v.lang)) ||
       voices.find((v) => /^es/i.test(v.lang)) ||
       voices.find((v) => /Spanish/i.test(v.name)) ||
       voices[0] ||
-      null;
-    return preferred;
+      null
+    );
   }
 
   function speakHits() {
@@ -196,7 +226,7 @@
       const row = document.getElementById("speak-item-" + i);
       if (row) row.classList.add("active");
 
-      // Dice la /pronunciación/: usa la guía en ( ) porque es la misma /ipa/ escrita en español.
+      // Lee la /pronunciación/ usando la guía en ( ), que es la misma en español.
       const utter = new SpeechSynthesisUtterance(entry.help || entry.ipa);
       const voice = roboticVoice();
       if (voice) utter.voice = voice;
@@ -241,7 +271,7 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci1", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci2", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
@@ -254,6 +284,7 @@
     btnSpeak.disabled = true;
     speakList.hidden = true;
     show("screenTranslate");
+    textSource.focus();
   });
   document.getElementById("btnFacts").addEventListener("click", () => {
     renderFacts();
@@ -291,7 +322,11 @@
     window.speechSynthesis.onvoiceschanged = function () { /* cache voices */ };
   }
 
-  loadDict().catch((err) => {
-    window.alert(err.message || "Error cargando Chunna");
-  });
+  loadDict()
+    .then(() => {
+      // listo para traducir de una
+    })
+    .catch((err) => {
+      window.alert(err.message || "Error cargando Chunna");
+    });
 })();
