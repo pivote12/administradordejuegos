@@ -697,6 +697,20 @@ const GAME_I18N = {
     ja: { name: "AI会議", description: "AIを選び、メッセージを送るとランダム順で返答します。" },
     ko: { name: "AI 회의", description: "AI를 고르고 메시지를 보내면 무작위 순서로 답합니다." },
   },
+  "chunna-idioma": {
+    es: { name: "Chunna Idioma", description: "Traductor entre tu idioma y Chunna, con voz robótica de /pronunciación/ y datos curiosos del alfabeto." },
+    en: { name: "Chunna Language", description: "Translate between your language and Chunna, with robotic /pronunciation/ speech and alphabet facts." },
+    fr: { name: "Langue Chunna", description: "Traduisez entre votre langue et le Chunna, avec voix robotique et alphabet." },
+    de: { name: "Chunna-Sprache", description: "Übersetze zwischen deiner Sprache und Chunna, mit Roboterstimme und Alphabet." },
+    pt: { name: "Idioma Chunna", description: "Traduza entre seu idioma e Chunna, com voz robótica e alfabeto." },
+    it: { name: "Lingua Chunna", description: "Traduci tra la tua lingua e Chunna, con voce robotica e alfabeto." },
+    ru: { name: "Язык Чунна", description: "Переводите между вашим языком и Чунна, с робо-голосом и алфавитом." },
+    pl: { name: "Język Chunna", description: "Tłumacz między swoim językiem a Chunna, z robotycznym głosem i alfabetem." },
+    nl: { name: "Chunna-taal", description: "Vertaal tussen jouw taal en Chunna, met robotstem en alfabet." },
+    zh: { name: "Chunna 语言", description: "在你的语言与 Chunna 之间翻译，含机器人发音与字母表。" },
+    ja: { name: "チュンナ語", description: "あなたの言語とチュンナの翻訳。ロボット音声とアルファベット。" },
+    ko: { name: "춘나 언어", description: "내 언어와 춘나 사이 번역, 로봇 발음과 알파벳." },
+  },
 };
 
 const FALLBACK_GAMES = [
@@ -1003,6 +1017,16 @@ const FALLBACK_GAMES = [
     creator: "José Rafael Rodriguez Morillo",
     year: 2026,
   },
+  {
+    id: "chunna-idioma",
+    name: "Chunna Idioma",
+    description: "Traductor entre tu idioma y Chunna, con voz robótica de /pronunciación/ y datos curiosos del alfabeto.",
+    folder: "Chunna Idioma",
+    icon: "≬⩤",
+    tags: ["idioma", "chunna", "traductor", "alfabeto"],
+    creator: "José Rafael Rodriguez Morillo",
+    year: 2026,
+  },
 ];
 
 const gameGrid = document.getElementById("gameGrid");
@@ -1193,7 +1217,7 @@ async function loadGames() {
     if (location.protocol === "file:") {
       throw new Error("file-protocol");
     }
-    const response = await fetch("games.json?v=menu39", { cache: "no-store" });
+    const response = await fetch("games.json?v=menu40", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudo leer games.json");
     const data = await response.json();
     allGames = (data.games || [])

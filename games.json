@@ -467,6 +467,21 @@
       ],
       "creator": "José Rafael Rodriguez Morillo",
       "year": 2026
+    },
+    {
+      "id": "chunna-idioma",
+      "name": "Chunna Idioma",
+      "description": "Traductor entre tu idioma y Chunna, con voz robótica de /pronunciación/ y datos curiosos del alfabeto.",
+      "folder": "Chunna Idioma",
+      "icon": "≬⩤",
+      "tags": [
+        "idioma",
+        "chunna",
+        "traductor",
+        "alfabeto"
+      ],
+      "creator": "José Rafael Rodriguez Morillo",
+      "year": 2026
     }
   ]
 }
