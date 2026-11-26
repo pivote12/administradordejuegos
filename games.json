@@ -471,13 +471,14 @@
     {
       "id": "chunna-idioma",
       "name": "Chunna Idioma",
-      "description": "Traductor entre tu idioma y Chunna, con voz robótica de /pronunciación/ y datos curiosos del alfabeto.",
+      "description": "Traductor y modo aprender con 5 niveles por palabra, voz robótica y datos del alfabeto Chunna.",
       "folder": "Chunna Idioma",
       "icon": "≬⩤",
       "tags": [
         "idioma",
         "chunna",
         "traductor",
+        "aprender",
         "alfabeto"
       ],
       "creator": "José Rafael Rodriguez Morillo",

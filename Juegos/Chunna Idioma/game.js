@@ -299,8 +299,278 @@
     });
   }
 
+  const LEARN_KEY = "chunna-idioma-learn-v1";
+  /** @type {Record<string, number>} */
+  let learnProgress = {};
+  /** @type {{entry:object, level:number, kind:string}|null} */
+  let currentLesson = null;
+
+  const learnStats = document.getElementById("learnStats");
+  const progressList = document.getElementById("progressList");
+  const learnHint = document.getElementById("learnHint");
+  const learnPrompt = document.getElementById("learnPrompt");
+  const learnMain = document.getElementById("learnMain");
+  const learnSub = document.getElementById("learnSub");
+  const learnOptions = document.getElementById("learnOptions");
+  const learnActions = document.getElementById("learnActions");
+  const learnFeedback = document.getElementById("learnFeedback");
+
+  function wordKey(entry) {
+    return fold((entry.words && entry.words.es) || entry.chunna);
+  }
+
+  function loadProgress() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(LEARN_KEY) || "{}");
+      learnProgress = parsed && typeof parsed === "object" ? parsed : {};
+    } catch (_err) {
+      learnProgress = {};
+    }
+  }
+
+  function saveProgress() {
+    try {
+      localStorage.setItem(LEARN_KEY, JSON.stringify(learnProgress));
+    } catch (_err) {
+      /* ignore */
+    }
+  }
+
+  function getLevel(entry) {
+    const key = wordKey(entry);
+    const n = Math.floor(Number(learnProgress[key]) || 0);
+    return Math.max(0, Math.min(5, n));
+  }
+
+  function setLevel(entry, level) {
+    learnProgress[wordKey(entry)] = Math.max(0, Math.min(5, level));
+    saveProgress();
+  }
+
+  function shuffle(list) {
+    const arr = list.slice();
+    for (let i = arr.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function allEntries() {
+    return (dict && dict.entries) || [];
+  }
+
+  function renderLearnHub() {
+    const entries = allEntries();
+    let mastered = 0;
+    let learning = 0;
+    let fresh = 0;
+    progressList.innerHTML = "";
+    entries
+      .slice()
+      .sort((a, b) => getLevel(b) - getLevel(a) || wordKey(a).localeCompare(wordKey(b)))
+      .forEach((entry) => {
+        const level = getLevel(entry);
+        if (level >= 5) mastered += 1;
+        else if (level > 0) learning += 1;
+        else fresh += 1;
+        const row = document.createElement("div");
+        row.className = "progress-row";
+        const pips = [1, 2, 3, 4, 5]
+          .map((n) => "<span class='" + (level >= n ? "on" : "") + "'></span>")
+          .join("");
+        row.innerHTML =
+          "<div><strong>" +
+          (entry.words && entry.words.es ? entry.words.es : "?") +
+          "</strong><span class='mono'>" +
+          entry.chunna +
+          "</span></div>" +
+          "<div class='level-pips' title='Nivel " +
+          level +
+          "/5'>" +
+          pips +
+          "</div>";
+        progressList.appendChild(row);
+      });
+    learnStats.textContent =
+      "Dominadas: " +
+      mastered +
+      " · En progreso: " +
+      learning +
+      " · Nuevas: " +
+      fresh +
+      " · Total: " +
+      entries.length;
+  }
+
+  function pickLessonEntry() {
+    const entries = allEntries();
+    if (!entries.length) return null;
+    const review = entries.filter((e) => {
+      const lv = getLevel(e);
+      return lv >= 1 && lv < 5;
+    });
+    const fresh = entries.filter((e) => getLevel(e) === 0);
+    const mastered = entries.filter((e) => getLevel(e) >= 5);
+
+    // 60% practicar aprendidas, 30% nuevas, 10% repaso de dominadas
+    const roll = Math.random();
+    let pool = review;
+    if (roll < 0.3 && fresh.length) pool = fresh;
+    else if (roll > 0.9 && mastered.length) pool = mastered;
+    else if (!pool.length && fresh.length) pool = fresh;
+    else if (!pool.length) pool = entries;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function distractors(entry, field, count) {
+    const others = shuffle(allEntries().filter((e) => wordKey(e) !== wordKey(entry)));
+    const out = [];
+    for (let i = 0; i < others.length && out.length < count; i += 1) {
+      let value = "";
+      if (field === "chunna") value = others[i].chunna;
+      else if (field === "es") value = others[i].words && others[i].words.es;
+      else if (field === "help") value = others[i].help;
+      if (value) out.push(value);
+    }
+    return out;
+  }
+
+  function clearLessonUi() {
+    learnOptions.innerHTML = "";
+    learnActions.innerHTML = "";
+    learnFeedback.hidden = true;
+    learnFeedback.textContent = "";
+    learnFeedback.className = "learn-feedback";
+  }
+
+  function showFeedback(ok, message) {
+    learnFeedback.hidden = false;
+    learnFeedback.className = "learn-feedback " + (ok ? "ok" : "bad");
+    learnFeedback.textContent = message;
+  }
+
+  function addAction(label, primary, onClick) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn " + (primary ? "primary" : "ghost");
+    btn.textContent = label;
+    btn.addEventListener("click", onClick);
+    learnActions.appendChild(btn);
+  }
+
+  function finishRound(ok) {
+    if (!currentLesson) return;
+    const entry = currentLesson.entry;
+    const level = getLevel(entry);
+    if (ok) {
+      if (level < 5) setLevel(entry, level + 1);
+      showFeedback(true, "¡Bien! Nivel " + getLevel(entry) + "/5");
+    } else {
+      if (level > 1) setLevel(entry, level - 1);
+      else if (level === 0) setLevel(entry, 1);
+      showFeedback(false, "Casi. Quedó en nivel " + getLevel(entry) + "/5");
+    }
+    learnOptions.querySelectorAll("button").forEach((btn) => {
+      btn.disabled = true;
+    });
+    learnActions.innerHTML = "";
+    addAction("Siguiente", true, () => startLessonRound());
+    addAction("Salir", false, () => {
+      renderLearnHub();
+      show("screenLearnHub");
+    });
+  }
+
+  function askMultiple(prompt, main, sub, options, answer) {
+    clearLessonUi();
+    learnPrompt.textContent = prompt;
+    learnMain.textContent = main;
+    learnSub.textContent = sub || "";
+    shuffle(options).forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn ghost";
+      btn.textContent = opt;
+      btn.addEventListener("click", () => {
+        finishRound(opt === answer);
+      });
+      learnOptions.appendChild(btn);
+    });
+  }
+
+  function startLessonRound() {
+    if (!dict) return;
+    const entry = pickLessonEntry();
+    if (!entry) return;
+    const level = getLevel(entry);
+    // El ejercicio del próximo tramo: nivel 0 → intro (pasa a 1); 1-4 → práctica de ese nivel; 5 → repaso
+    const stage = level >= 5 ? 5 : level + 1;
+    currentLesson = { entry: entry, level: level, stage: stage };
+    learnHint.textContent =
+      (entry.words && entry.words.es ? entry.words.es : "?") +
+      " · ahora nivel " +
+      level +
+      "/5 → objetivo " +
+      Math.min(5, stage);
+
+    const es = (entry.words && entry.words.es) || "?";
+    if (stage === 1) {
+      clearLessonUi();
+      learnPrompt.textContent = "Nivel 1 · Memorizá esta palabra";
+      learnMain.textContent = entry.chunna;
+      learnSub.textContent = es + " · /" + entry.ipa + "/ (" + entry.help + ")";
+      addAction("Ya la memorizé", true, () => finishRound(true));
+      return;
+    }
+    if (stage === 2) {
+      const opts = [entry.chunna].concat(distractors(entry, "chunna", 3));
+      askMultiple(
+        "Nivel 2 · ¿Cómo se escribe en Chunna?",
+        es,
+        "Elegí la forma correcta",
+        opts,
+        entry.chunna
+      );
+      return;
+    }
+    if (stage === 3) {
+      const opts = [es].concat(distractors(entry, "es", 3));
+      askMultiple(
+        "Nivel 3 · ¿Qué significa esto?",
+        entry.chunna,
+        "/" + entry.ipa + "/",
+        opts,
+        es
+      );
+      return;
+    }
+    if (stage === 4) {
+      const opts = [es].concat(distractors(entry, "es", 3));
+      askMultiple(
+        "Nivel 4 · Escuchá/leé la pronunciación",
+        "/" + entry.ipa + "/",
+        "(" + entry.help + ")",
+        opts,
+        es
+      );
+      return;
+    }
+    // Nivel 5 / repaso final
+    const opts = [entry.chunna].concat(distractors(entry, "chunna", 3));
+    askMultiple(
+      level >= 5 ? "Repaso · palabra dominada" : "Nivel 5 · Dominio final",
+      es + " → Chunna",
+      "(" + entry.help + ")",
+      opts,
+      entry.chunna
+    );
+  }
+
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci7", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci8", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
@@ -315,6 +585,26 @@
     renderMissing([]);
     show("screenTranslate");
     textSource.focus();
+  });
+  document.getElementById("btnLearn").addEventListener("click", () => {
+    loadProgress();
+    renderLearnHub();
+    show("screenLearnHub");
+  });
+  document.getElementById("btnStartLesson").addEventListener("click", () => {
+    show("screenLearn");
+    startLessonRound();
+  });
+  document.getElementById("btnResetProgress").addEventListener("click", () => {
+    if (!window.confirm("¿Reiniciar todo el progreso de aprendizaje?")) return;
+    learnProgress = {};
+    saveProgress();
+    renderLearnHub();
+  });
+  document.getElementById("btnBackLearnHub").addEventListener("click", () => show("screenTitle"));
+  document.getElementById("btnBackLearn").addEventListener("click", () => {
+    renderLearnHub();
+    show("screenLearnHub");
   });
   document.getElementById("btnFacts").addEventListener("click", () => {
     renderFacts();
@@ -353,9 +643,10 @@
     window.speechSynthesis.onvoiceschanged = function () { /* cache voices */ };
   }
 
+  loadProgress();
   loadDict()
     .then(() => {
-      // listo para traducir de una
+      /* listo */
     })
     .catch((err) => {
       window.alert(err.message || "Error cargando Chunna");
