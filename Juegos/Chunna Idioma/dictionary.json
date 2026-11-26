@@ -1765,6 +1765,45 @@
         "sw": "nchi",
         "ga": "tír"
       }
+    },
+    {
+      "chunna": "ϖ⨔⊘",
+      "ipa": "nəpʊəɒlæ",
+      "help": "nepuolá",
+      "words": {
+        "es": "nación",
+        "en": "nation",
+        "fr": "nation",
+        "de": "nation",
+        "pt": "nação",
+        "it": "nazione",
+        "ru": "нация",
+        "pl": "naród",
+        "nl": "natie",
+        "zh": "民族",
+        "ja": "国家",
+        "ko": "민족",
+        "ar": "أمة",
+        "hi": "राष्ट्र",
+        "tr": "ulus",
+        "sv": "nation",
+        "no": "nasjon",
+        "da": "nation",
+        "fi": "kansakunta",
+        "el": "έθνος",
+        "he": "אומה",
+        "th": "ชาติ",
+        "vi": "quốc gia",
+        "id": "bangsa",
+        "ms": "bangsa",
+        "uk": "нація",
+        "cs": "národ",
+        "ro": "națiune",
+        "hu": "nemzet",
+        "ca": "nació",
+        "sw": "taifa",
+        "ga": "náisiún"
+      }
     }
   ]
 }
