@@ -119,6 +119,16 @@ h1, h2, h3 { margin: 0 0 8px; }
   margin: 4px 0 10px;
 }
 
+.missing-words {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgb(251 191 36 / 0.45);
+  background: rgb(251 191 36 / 0.08);
+  color: #fde68a;
+  font-weight: 700;
+}
+
 .speak-list {
   display: grid;
   gap: 8px;

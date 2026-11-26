@@ -49,6 +49,7 @@
   const labelSource = document.getElementById("labelSource");
   const btnSpeak = document.getElementById("btnSpeak");
   const speakList = document.getElementById("speakList");
+  const missingWords = document.getElementById("missingWords");
   const alphabetText = document.getElementById("alphabetText");
   const letterList = document.getElementById("letterList");
 
@@ -101,16 +102,20 @@
   function translateSourceToChunna(text, lang) {
     const { toChunna } = buildMaps(lang);
     const hits = [];
+    const missing = [];
     const parts = splitKeeping(text);
     const out = parts.map((part) => {
       if (!part) return part;
       if (/^\s+$/.test(part) || SKIP_PUNCT.test(part[0])) return part;
       const entry = toChunna.get(fold(part));
-      if (!entry) return part;
+      if (!entry) {
+        missing.push(part);
+        return part;
+      }
       hits.push(entry);
       return entry.chunna;
     });
-    return { text: out.join(""), hits: hits };
+    return { text: out.join(""), hits: hits, missing: missing };
   }
 
   function translateChunnaToSource(text, lang) {
@@ -150,6 +155,28 @@
     return { text: result, hits: hits };
   }
 
+  function renderMissing(missing) {
+    if (!missingWords) return;
+    const unique = [];
+    const seen = new Set();
+    (missing || []).forEach((word) => {
+      const key = fold(word);
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      unique.push(word);
+    });
+    if (!unique.length) {
+      missingWords.hidden = true;
+      missingWords.textContent = "";
+      return;
+    }
+    missingWords.hidden = false;
+    missingWords.textContent =
+      "Todavía no hechas en Chunna: " +
+      unique.join(", ") +
+      ". Si una palabra sigue en español, es que no se hizo aún.";
+  }
+
   function syncFromSource() {
     if (!dict || lock) return;
     lock = true;
@@ -159,6 +186,7 @@
       lastHits = result.hits;
       btnSpeak.disabled = lastHits.length === 0;
       renderSpeakPreview();
+      renderMissing(result.missing);
     } finally {
       lock = false;
     }
@@ -173,6 +201,7 @@
       lastHits = result.hits;
       btnSpeak.disabled = lastHits.length === 0;
       renderSpeakPreview();
+      renderMissing([]);
     } finally {
       lock = false;
     }
@@ -283,6 +312,7 @@
     lastHits = [];
     btnSpeak.disabled = true;
     speakList.hidden = true;
+    renderMissing([]);
     show("screenTranslate");
     textSource.focus();
   });
@@ -316,6 +346,7 @@
     lastHits = [];
     btnSpeak.disabled = true;
     speakList.hidden = true;
+    renderMissing([]);
   });
 
   if (window.speechSynthesis) {
