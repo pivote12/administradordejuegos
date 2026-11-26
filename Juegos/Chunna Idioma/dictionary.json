@@ -1687,6 +1687,45 @@
         "sw": "zoo",
         "ga": "zú"
       }
+    },
+    {
+      "chunna": "⊟⫲⊟⫲",
+      "ipa": "kəʊdəʊpə",
+      "help": "koudoupa",
+      "words": {
+        "es": "miedo",
+        "en": "fear",
+        "fr": "peur",
+        "de": "angst",
+        "pt": "medo",
+        "it": "paura",
+        "ru": "страх",
+        "pl": "strach",
+        "nl": "angst",
+        "zh": "害怕",
+        "ja": "恐れ",
+        "ko": "두려움",
+        "ar": "خوف",
+        "hi": "डर",
+        "tr": "korku",
+        "sv": "rädsla",
+        "no": "frykt",
+        "da": "frygt",
+        "fi": "pelko",
+        "el": "φόβος",
+        "he": "פחד",
+        "th": "ความกลัว",
+        "vi": "nỗi sợ",
+        "id": "takut",
+        "ms": "takut",
+        "uk": "страх",
+        "cs": "strach",
+        "ro": "frică",
+        "hu": "félelem",
+        "ca": "por",
+        "sw": "hofu",
+        "ga": "eagla"
+      }
     }
   ]
 }

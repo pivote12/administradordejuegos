@@ -300,7 +300,7 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci2", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci4", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
