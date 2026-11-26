@@ -725,7 +725,9 @@
   const sentenceOptions = document.getElementById("sentenceOptions");
   const sentenceActions = document.getElementById("sentenceActions");
   const sentenceFeedback = document.getElementById("sentenceFeedback");
+  const talkTitle = document.getElementById("talkTitle");
   const talkHint = document.getElementById("talkHint");
+  const talkTypeWrap = document.getElementById("talkTypeWrap");
   const talkTypeSelect = document.getElementById("talkTypeSelect");
   const talkCountHint = document.getElementById("talkCountHint");
   const chatLog = document.getElementById("chatLog");
@@ -735,6 +737,10 @@
   const talkVoiceToggle = document.getElementById("talkVoiceToggle");
   const btnTalkSend = document.getElementById("btnTalkSend");
   const btnTalkHear = document.getElementById("btnTalkHear");
+  const btnTalkRecord = document.getElementById("btnTalkRecord");
+  const btnTalkUseRecord = document.getElementById("btnTalkUseRecord");
+  const recordStatus = document.getElementById("recordStatus");
+  const recordResult = document.getElementById("recordResult");
   const talkActions = document.getElementById("talkActions");
   const talkFeedback = document.getElementById("talkFeedback");
   const matchHint = document.getElementById("matchHint");
@@ -746,6 +752,10 @@
   const VOICE_PREF_KEY = "chunna-idioma-talk-voice-v1";
   let lastSpokenEs = "";
   let awaitingTalkReply = false;
+  let talkMode = "guided";
+  let recognition = null;
+  let recording = false;
+  let lastRecorded = { es: "", chunna: "" };
 
   function wordKey(entry) {
     return fold((entry.words && entry.words.es) || entry.chunna);
@@ -1394,8 +1404,151 @@
     }
   }
 
+  function resetRecordUi() {
+    stopRecording();
+    lastRecorded = { es: "", chunna: "" };
+    recordStatus.hidden = true;
+    recordStatus.textContent = "";
+    recordResult.hidden = true;
+    recordResult.innerHTML = "";
+    btnTalkUseRecord.hidden = true;
+    btnTalkRecord.classList.remove("recording");
+    btnTalkRecord.textContent = "Grabar";
+  }
+
+  function stopRecording() {
+    recording = false;
+    if (recognition) {
+      try {
+        recognition.onresult = null;
+        recognition.onerror = null;
+        recognition.onend = null;
+        recognition.stop();
+      } catch (_err) {
+        /* ignore */
+      }
+      recognition = null;
+    }
+    btnTalkRecord.classList.remove("recording");
+    btnTalkRecord.textContent = "Grabar";
+  }
+
+  function applyRecordedToChunna(spokenEs) {
+    const result = translateSourceToChunna(spokenEs, "es");
+    lastRecorded = { es: spokenEs, chunna: result.text };
+    recordResult.hidden = false;
+    recordResult.innerHTML =
+      "<div>Texto: <strong>" +
+      spokenEs +
+      "</strong></div>" +
+      "<div>Chunna: <span class='mono'>" +
+      result.text +
+      "</span></div>";
+    btnTalkUseRecord.hidden = !normalizePhrase(result.text);
+    if (result.missing && result.missing.length) {
+      recordStatus.hidden = false;
+      recordStatus.textContent =
+        "Algunas palabras aún no están en Chunna: " + result.missing.join(", ");
+    } else {
+      recordStatus.hidden = false;
+      recordStatus.textContent = "Listo: texto convertido a Chunna.";
+    }
+  }
+
+  function startRecording() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      window.alert("Este navegador no permite grabar voz a texto. Probá Chrome en el celular.");
+      return;
+    }
+    if (recording) {
+      stopRecording();
+      recordStatus.hidden = false;
+      recordStatus.textContent = "Grabación detenida.";
+      return;
+    }
+    hideChunnaKeyboard();
+    recognition = new SR();
+    recognition.lang = "es-AR";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+    recording = true;
+    btnTalkRecord.classList.add("recording");
+    btnTalkRecord.textContent = "Detener";
+    recordStatus.hidden = false;
+    recordStatus.textContent = "Escuchando… hablá en español.";
+    recordResult.hidden = true;
+    btnTalkUseRecord.hidden = true;
+
+    recognition.onresult = (ev) => {
+      const said = ev.results && ev.results[0] && ev.results[0][0]
+        ? ev.results[0][0].transcript
+        : "";
+      stopRecording();
+      if (!normalizePhrase(said)) {
+        recordStatus.hidden = false;
+        recordStatus.textContent = "No se escuchó nada. Probá de nuevo.";
+        return;
+      }
+      applyRecordedToChunna(said);
+    };
+    recognition.onerror = () => {
+      stopRecording();
+      recordStatus.hidden = false;
+      recordStatus.textContent = "No se pudo grabar. Revisá el micrófono y el permiso.";
+    };
+    recognition.onend = () => {
+      if (recording) stopRecording();
+    };
+    try {
+      recognition.start();
+    } catch (_err) {
+      stopRecording();
+      recordStatus.hidden = false;
+      recordStatus.textContent = "No se pudo iniciar la grabación.";
+    }
+  }
+
+  function useRecordedChunna() {
+    if (!lastRecorded.chunna) return;
+    talkInput.disabled = false;
+    talkInput.value = lastRecorded.chunna;
+    talkInput.dispatchEvent(new Event("input", { bubbles: true }));
+    showChunnaKeyboard(talkInput);
+    recordStatus.hidden = false;
+    recordStatus.textContent = "Chunna cargado en el cuadro. Podés editarlo o enviar.";
+  }
+
+  function infiniteNpcReply(userEs) {
+    const text = fold(userEs);
+    const pools = TALK_PHRASES;
+    if (/hola|amigo/.test(text)) return pools.greet[Math.floor(Math.random() * pools.greet.length)];
+    if (/como|quien|estas|sos/.test(text)) return pools.ask[Math.floor(Math.random() * pools.ask.length)];
+    if (/tiempo|manana|mañana/.test(text)) return pools.time[Math.floor(Math.random() * pools.time.length)];
+    if (/agua|mar|dinero|idea|pais|nacion|postre|carpa/.test(text)) {
+      return pools.thing[Math.floor(Math.random() * pools.thing.length)];
+    }
+    if (/genial|bueno|malo|miedo|nada|libre/.test(text)) {
+      return pools.feel[Math.floor(Math.random() * pools.feel.length)];
+    }
+    const mix = pools.ask.concat(pools.feel, pools.plan, pools.greet);
+    return mix[Math.floor(Math.random() * mix.length)];
+  }
+
+  function openTalkCompose(promptText) {
+    talkPrompt.textContent = promptText;
+    talkCompose.hidden = false;
+    talkInput.disabled = false;
+    btnTalkSend.disabled = false;
+    talkInput.value = "";
+    awaitingTalkReply = true;
+    resetRecordUi();
+  }
+
   function finishTalk(ok) {
     awaitingTalkReply = false;
+    stopRecording();
     talkCompose.hidden = true;
     talkInput.value = "";
     talkInput.disabled = true;
@@ -1409,16 +1562,17 @@
       talkFeedback.textContent = "Casi. Revisá el texto y probá otra conversación.";
     }
     talkActions.innerHTML = "";
-    addAction("Otra conversación", true, () => startTalk(), talkActions);
+    addAction("Otra conversación", true, () => startTalk("guided"), talkActions);
     addAction("Salir", false, () => {
       stopSpeak();
+      stopRecording();
       renderLearnHub();
       show("screenLearnHub");
     }, talkActions);
   }
 
   function playTalkTurn() {
-    if (!currentTalk) return;
+    if (!currentTalk || currentTalk.mode !== "guided") return;
     talkActions.innerHTML = "";
     talkFeedback.hidden = true;
     talkCompose.hidden = true;
@@ -1431,15 +1585,9 @@
         currentTalk.turn += 1;
         continue;
       }
-      talkHint.textContent = currentTalk.title + " · tu turno (texto)";
-      talkPrompt.textContent =
-        "Escribí tu respuesta en Chunna. Idea en español: “" + step.es + "”";
+      talkHint.textContent = currentTalk.title + " · tu turno (2 mensajes c/u)";
       currentTalk.expectedEs = step.es;
-      talkCompose.hidden = false;
-      talkInput.disabled = false;
-      btnTalkSend.disabled = false;
-      talkInput.value = "";
-      awaitingTalkReply = true;
+      openTalkCompose("Escribí tu respuesta en Chunna. Idea en español: “" + step.es + "”");
       talkInput.focus();
       return;
     }
@@ -1451,6 +1599,47 @@
     const typed = talkInput.value;
     if (!normalizePhrase(typed)) return;
     const shown = displayReply(typed);
+
+    if (currentTalk.mode === "infinite") {
+      const contextEs =
+        lastRecorded.chunna &&
+        normalizePhrase(typed) === normalizePhrase(lastRecorded.chunna) &&
+        lastRecorded.es
+          ? lastRecorded.es
+          : shown.es;
+      appendChat("you", contextEs, shown.chunna);
+      markPracticeDay();
+      const replyEs = infiniteNpcReply(contextEs);
+      const reply = translateEsPhrase(replyEs);
+      window.setTimeout(() => {
+        appendChat("npc", replyEs, reply.chunna);
+        openTalkCompose("Charla infinita · seguí escribiendo en Chunna (o grabá para convertir).");
+        talkHint.textContent = "Charla infinita · mensaje #" + (currentTalk.turn + 1);
+        currentTalk.turn += 1;
+        talkCountHint.textContent = "Mensajes tuyos: " + currentTalk.turn + " · sin límite";
+        talkActions.innerHTML = "";
+        addAction("Terminar charla", false, () => {
+          const streak = markPracticeDay();
+          talkFeedback.hidden = false;
+          talkFeedback.className = "learn-feedback ok";
+          talkFeedback.textContent = "Charla infinita guardada en la racha (" + streak + ").";
+          awaitingTalkReply = false;
+          talkCompose.hidden = true;
+          talkActions.innerHTML = "";
+          addAction("Seguir charlando", true, () => startTalk("infinite"), talkActions);
+          addAction("Salir", false, () => {
+            stopSpeak();
+            stopRecording();
+            renderLearnHub();
+            show("screenLearnHub");
+          }, talkActions);
+        }, talkActions);
+      }, 350);
+      talkInput.value = "";
+      resetRecordUi();
+      return;
+    }
+
     const expectedEs = currentTalk.expectedEs;
     appendChat("you", shown.es, shown.chunna);
     if (!replyMatches(typed, expectedEs)) {
@@ -1469,7 +1658,7 @@
     playTalkTurn();
   }
 
-  function startTalk() {
+  function startTalk(mode) {
     if (!allMastered()) {
       window.alert("Primero dominá todas las palabras (nivel 5).");
       renderLearnHub();
@@ -1477,10 +1666,41 @@
       return;
     }
     stopSpeak();
+    stopRecording();
     loadVoicePref();
+    talkMode = mode === "infinite" ? "infinite" : "guided";
+    chatLog.innerHTML = "";
+    talkFeedback.hidden = true;
+    talkActions.innerHTML = "";
+    talkInput.value = "";
+    talkInput.disabled = false;
+    btnTalkSend.disabled = false;
+    resetRecordUi();
+
+    if (talkMode === "infinite") {
+      talkTypeWrap.hidden = true;
+      talkTitle.textContent = "Charla infinita";
+      currentTalk = {
+        mode: "infinite",
+        title: "Charla infinita",
+        turns: [],
+        turn: 0,
+        expectedEs: ""
+      };
+      talkHint.textContent = "Sin fin · texto + grabar → Chunna";
+      talkCountHint.textContent = "Mensajes tuyos: 0 · sin límite";
+      const hello = translateEsPhrase("hola amigo");
+      appendChat("npc", "hola amigo", hello.chunna);
+      openTalkCompose("Respondé en Chunna. También podés grabar en español y convertirlo.");
+      return;
+    }
+
+    talkTypeWrap.hidden = false;
+    talkTitle.textContent = "Conversaciones";
     if (!talkTypeSelect.options.length) fillTalkTypes();
     const script = pickTalkScript();
     currentTalk = {
+      mode: "guided",
       title: script.title,
       turns: script.turns,
       turn: 0,
@@ -1488,21 +1708,14 @@
       typeId: script.typeId,
       index: script.index
     };
-    chatLog.innerHTML = "";
-    talkFeedback.hidden = true;
-    talkActions.innerHTML = "";
-    talkInput.value = "";
-    talkInput.disabled = false;
-    btnTalkSend.disabled = false;
-    talkHint.textContent = script.title + " · chat de texto";
+    talkHint.textContent = script.title + " · 2 mensajes cada uno";
     talkCountHint.textContent =
       currentTalkType().title + ": opción " + (script.index + 1) + " de " + TALK_PER_TYPE;
-    talkPrompt.textContent = "Leé el chat y escribí tu respuesta";
     playTalkTurn();
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci14", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci15", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
     buildChunnaKeyboard();
@@ -1541,7 +1754,11 @@
   document.getElementById("btnTalk").addEventListener("click", () => {
     fillTalkTypes();
     show("screenTalk");
-    startTalk();
+    startTalk("guided");
+  });
+  document.getElementById("btnInfiniteTalk").addEventListener("click", () => {
+    show("screenTalk");
+    startTalk("infinite");
   });
   document.getElementById("btnMatch").addEventListener("click", () => {
     show("screenMatch");
@@ -1550,7 +1767,7 @@
   talkTypeSelect.addEventListener("change", () => {
     talkCountHint.textContent =
       currentTalkType().title + ": 1000 opciones distintas · tocá “Otra conversación”";
-    startTalk();
+    startTalk("guided");
   });
   talkVoiceToggle.addEventListener("change", () => {
     saveVoicePref();
@@ -1566,6 +1783,8 @@
   btnTalkHear.addEventListener("click", () => {
     if (lastSpokenEs) speakEsPhrase(lastSpokenEs);
   });
+  btnTalkRecord.addEventListener("click", startRecording);
+  btnTalkUseRecord.addEventListener("click", useRecordedChunna);
   document.getElementById("btnResetProgress").addEventListener("click", () => {
     if (!window.confirm("¿Reiniciar progreso y racha?")) return;
     learnProgress = {};
@@ -1585,6 +1804,8 @@
   });
   document.getElementById("btnBackTalk").addEventListener("click", () => {
     stopSpeak();
+    stopRecording();
+    hideChunnaKeyboard();
     renderLearnHub();
     show("screenLearnHub");
   });

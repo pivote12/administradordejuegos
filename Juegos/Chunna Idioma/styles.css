@@ -386,6 +386,30 @@ h1, h2, h3 { margin: 0 0 8px; }
   resize: vertical;
   min-height: 64px;
 }
+.say-practice {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(2 6 23 / 0.4);
+  text-align: left;
+}
+.say-practice .hint { margin-bottom: 8px; }
+.record-result {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgb(251 191 36 / 0.35);
+  background: rgb(251 191 36 / 0.08);
+  color: var(--ink);
+  font-weight: 700;
+}
+.record-result .mono { color: var(--accent); }
+#btnTalkRecord.recording {
+  background: rgb(251 113 133 / 0.25);
+  border: 1px solid #fb7185;
+  color: #fecdd3;
+}
 
 .chunna-kb {
   position: fixed;
