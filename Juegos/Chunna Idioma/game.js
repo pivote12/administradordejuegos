@@ -369,44 +369,216 @@
     "el dinero"
   ];
 
-  const TALKS = [
+  const TALK_PER_TYPE = 1000;
+
+  const TALK_PHRASES = {
+    greet: [
+      "hola",
+      "hola amigo",
+      "hola amigos",
+      "hola chunna",
+      "amigo hola",
+      "hola genial",
+      "hola bueno",
+      "hola libre",
+      "hola nación",
+      "hola país"
+    ],
+    ask: [
+      "cómo estás",
+      "quién sos",
+      "quién está",
+      "cómo estás amigo",
+      "quién sos amigo",
+      "el tiempo",
+      "la idea",
+      "quién está libre",
+      "cómo estás mañana",
+      "quién sos chunna"
+    ],
+    feel: [
+      "genial",
+      "bueno",
+      "malo",
+      "no malo",
+      "nada",
+      "libre",
+      "no miedo",
+      "nada malo",
+      "amigo genial",
+      "bueno amigo"
+    ],
+    who: [
+      "amigo",
+      "amigos",
+      "chunna",
+      "nación",
+      "país",
+      "amigo bueno",
+      "amigo libre",
+      "amigos genial",
+      "chunna bueno",
+      "nación libre"
+    ],
+    thing: [
+      "el agua",
+      "el dinero",
+      "el mar",
+      "el tiempo",
+      "la idea",
+      "la nación",
+      "el país",
+      "el postre",
+      "la carpa",
+      "la bandeja",
+      "el zoologico",
+      "matemáticas",
+      "la linterna",
+      "el grito",
+      "el dado",
+      "agua de mar"
+    ],
+    time: [
+      "mañana",
+      "mañana genial",
+      "el tiempo",
+      "mañana bueno",
+      "mañana libre",
+      "nada mañana",
+      "tiempo genial",
+      "mañana malo",
+      "el tiempo libre",
+      "mañana amigo"
+    ],
+    plan: [
+      "mañana genial",
+      "el mar",
+      "la idea",
+      "matemáticas",
+      "el zoologico",
+      "agua de mar",
+      "el postre",
+      "la carpa",
+      "no miedo",
+      "amigo libre"
+    ],
+    objectAsk: [
+      "el agua",
+      "quién está",
+      "la linterna",
+      "el dinero",
+      "la bandeja",
+      "el postre",
+      "la idea",
+      "el dado",
+      "matemáticas",
+      "el grito"
+    ]
+  };
+
+  const TALK_TYPES = [
     {
+      id: "saludo",
       title: "Saludo",
-      turns: [
-        { role: "npc", es: "hola" },
-        { role: "you", es: "hola amigo", options: ["hola amigo", "no malo", "quién sos"] },
-        { role: "npc", es: "cómo estás" },
-        { role: "you", es: "genial", options: ["genial", "malo", "nada"] }
-      ]
+      slots: ["greet", "greet", "ask", "feel"]
     },
     {
+      id: "preguntar",
       title: "Preguntar",
-      turns: [
-        { role: "npc", es: "quién sos" },
-        { role: "you", es: "amigo", options: ["amigo", "agua", "miedo"] },
-        { role: "npc", es: "cómo estás" },
-        { role: "you", es: "bueno", options: ["bueno", "malo", "no"] }
-      ]
+      slots: ["ask", "who", "ask", "feel"]
     },
     {
+      id: "planes",
       title: "Planes",
-      turns: [
-        { role: "npc", es: "hola" },
-        { role: "you", es: "hola", options: ["hola", "matar", "fregar"] },
-        { role: "npc", es: "el tiempo" },
-        { role: "you", es: "mañana genial", options: ["mañana genial", "malo miedo", "nada agua"] }
-      ]
+      slots: ["greet", "greet", "time", "plan"]
     },
     {
+      id: "amigos",
       title: "Amigos",
-      turns: [
-        { role: "npc", es: "hola amigos" },
-        { role: "you", es: "hola", options: ["hola", "no", "dado"] },
-        { role: "npc", es: "cómo estás" },
-        { role: "you", es: "no malo", options: ["no malo", "el mar", "la bandeja"] }
-      ]
+      slots: ["greet", "who", "ask", "feel"]
+    },
+    {
+      id: "pais",
+      title: "País",
+      slots: ["greet", "who", "thing", "feel"]
+    },
+    {
+      id: "cosas",
+      title: "Cosas",
+      slots: ["objectAsk", "thing", "ask", "feel"]
+    },
+    {
+      id: "tiempo",
+      title: "Tiempo",
+      slots: ["greet", "time", "ask", "plan"]
+    },
+    {
+      id: "ideas",
+      title: "Ideas",
+      slots: ["ask", "thing", "greet", "feel"]
     }
   ];
+
+  let lastTalkKey = "";
+
+  function talkSlotPhrase(slotName, index) {
+    const bank = TALK_PHRASES[slotName] || TALK_PHRASES.greet;
+    return bank[((index % bank.length) + bank.length) % bank.length];
+  }
+
+  function buildTalkVariant(type, index) {
+    const i = ((index % TALK_PER_TYPE) + TALK_PER_TYPE) % TALK_PER_TYPE;
+    const slots = type.slots;
+    const sizes = slots.map((name) => (TALK_PHRASES[name] || TALK_PHRASES.greet).length);
+    let rest = i;
+    const picks = [];
+    for (let s = 0; s < slots.length; s += 1) {
+      const size = sizes[s];
+      picks.push(talkSlotPhrase(slots[s], rest % size));
+      rest = Math.floor(rest / size);
+    }
+    const turns = [];
+    for (let t = 0; t < picks.length; t += 1) {
+      turns.push({ role: t % 2 === 0 ? "npc" : "you", es: picks[t] });
+    }
+    if (turns[0].role !== "npc") {
+      turns.unshift({ role: "npc", es: talkSlotPhrase("greet", i) });
+    }
+    if (turns[turns.length - 1].role !== "you") {
+      turns.push({ role: "you", es: talkSlotPhrase("feel", i * 5) });
+    }
+    return {
+      title: type.title + " · #" + (i + 1) + "/" + TALK_PER_TYPE,
+      typeId: type.id,
+      index: i,
+      turns: turns
+    };
+  }
+
+  function fillTalkTypes() {
+    const prev = talkTypeSelect.value;
+    talkTypeSelect.innerHTML = "";
+    TALK_TYPES.forEach((type) => {
+      const opt = document.createElement("option");
+      opt.value = type.id;
+      opt.textContent = type.title + " (1000)";
+      talkTypeSelect.appendChild(opt);
+    });
+    if (prev && TALK_TYPES.some((t) => t.id === prev)) talkTypeSelect.value = prev;
+  }
+
+  function currentTalkType() {
+    return TALK_TYPES.find((t) => t.id === talkTypeSelect.value) || TALK_TYPES[0];
+  }
+
+  function pickTalkScript() {
+    const type = currentTalkType();
+    let index = Math.floor(Math.random() * TALK_PER_TYPE);
+    const key = type.id + ":" + index;
+    if (key === lastTalkKey) index = (index + 1) % TALK_PER_TYPE;
+    lastTalkKey = type.id + ":" + index;
+    return buildTalkVariant(type, index);
+  }
 
   const learnStats = document.getElementById("learnStats");
   const progressList = document.getElementById("progressList");
@@ -429,6 +601,8 @@
   const sentenceActions = document.getElementById("sentenceActions");
   const sentenceFeedback = document.getElementById("sentenceFeedback");
   const talkHint = document.getElementById("talkHint");
+  const talkTypeSelect = document.getElementById("talkTypeSelect");
+  const talkCountHint = document.getElementById("talkCountHint");
   const chatLog = document.getElementById("chatLog");
   const talkPrompt = document.getElementById("talkPrompt");
   const talkCompose = document.getElementById("talkCompose");
@@ -1022,8 +1196,16 @@
     }
     stopSpeak();
     loadVoicePref();
-    const script = shuffle(TALKS)[0];
-    currentTalk = { title: script.title, turns: script.turns, turn: 0, expectedEs: "" };
+    if (!talkTypeSelect.options.length) fillTalkTypes();
+    const script = pickTalkScript();
+    currentTalk = {
+      title: script.title,
+      turns: script.turns,
+      turn: 0,
+      expectedEs: "",
+      typeId: script.typeId,
+      index: script.index
+    };
     chatLog.innerHTML = "";
     talkFeedback.hidden = true;
     talkActions.innerHTML = "";
@@ -1031,12 +1213,14 @@
     talkInput.disabled = false;
     btnTalkSend.disabled = false;
     talkHint.textContent = script.title + " · chat de texto";
+    talkCountHint.textContent =
+      currentTalkType().title + ": opción " + (script.index + 1) + " de " + TALK_PER_TYPE;
     talkPrompt.textContent = "Leé el chat y escribí tu respuesta";
     playTalkTurn();
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci11", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci12", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
@@ -1072,7 +1256,13 @@
     startSentenceRound();
   });
   document.getElementById("btnTalk").addEventListener("click", () => {
+    fillTalkTypes();
     show("screenTalk");
+    startTalk();
+  });
+  talkTypeSelect.addEventListener("change", () => {
+    talkCountHint.textContent =
+      currentTalkType().title + ": 1000 opciones distintas · tocá “Otra conversación”";
     startTalk();
   });
   talkVoiceToggle.addEventListener("change", () => {
