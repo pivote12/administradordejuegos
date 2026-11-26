@@ -243,14 +243,14 @@
     );
   }
 
-  function speakHits() {
-    if (!lastHits.length || !window.speechSynthesis) return;
+  function speakEntryList(entries) {
+    if (!entries.length || !window.speechSynthesis) return;
     stopSpeak();
     let i = 0;
 
     function next() {
-      if (i >= lastHits.length) return;
-      const entry = lastHits[i];
+      if (i >= entries.length) return;
+      const entry = entries[i];
       document.querySelectorAll(".speak-item.active").forEach((el) => el.classList.remove("active"));
       const row = document.getElementById("speak-item-" + i);
       if (row) row.classList.add("active");
@@ -270,6 +270,40 @@
     }
 
     next();
+  }
+
+  function speakHits() {
+    speakEntryList(lastHits);
+  }
+
+  function entriesFromEsPhrase(esText) {
+    const out = [];
+    String(esText || "")
+      .split(/\s+|·/)
+      .forEach((part) => {
+        if (!part || !part.trim()) return;
+        const entry = entryByEs(part);
+        if (entry) out.push(entry);
+      });
+    return out;
+  }
+
+  function entriesFromAnyPhrase(text) {
+    let out = entriesFromEsPhrase(text);
+    if (out.length) return out;
+    out = [];
+    String(text || "")
+      .split(/\s+|·/)
+      .forEach((part) => {
+        if (!part || !part.trim()) return;
+        const hit = allEntries().find((e) => e.chunna === part);
+        if (hit) out.push(hit);
+      });
+    return out;
+  }
+
+  function speakEsPhrase(esText) {
+    speakEntryList(entriesFromAnyPhrase(esText));
   }
 
   function fillLangs() {
@@ -397,9 +431,16 @@
   const talkHint = document.getElementById("talkHint");
   const chatLog = document.getElementById("chatLog");
   const talkPrompt = document.getElementById("talkPrompt");
-  const talkOptions = document.getElementById("talkOptions");
+  const talkCompose = document.getElementById("talkCompose");
+  const talkInput = document.getElementById("talkInput");
+  const talkVoiceToggle = document.getElementById("talkVoiceToggle");
+  const btnTalkSend = document.getElementById("btnTalkSend");
+  const btnTalkHear = document.getElementById("btnTalkHear");
   const talkActions = document.getElementById("talkActions");
   const talkFeedback = document.getElementById("talkFeedback");
+  const VOICE_PREF_KEY = "chunna-idioma-talk-voice-v1";
+  let lastSpokenEs = "";
+  let awaitingTalkReply = false;
 
   function wordKey(entry) {
     return fold((entry.words && entry.words.es) || entry.chunna);
@@ -828,6 +869,52 @@
     });
   }
 
+  function voiceEnabled() {
+    return Boolean(talkVoiceToggle && talkVoiceToggle.checked);
+  }
+
+  function loadVoicePref() {
+    try {
+      talkVoiceToggle.checked = localStorage.getItem(VOICE_PREF_KEY) === "1";
+    } catch (_err) {
+      talkVoiceToggle.checked = false;
+    }
+    btnTalkHear.hidden = !voiceEnabled();
+  }
+
+  function saveVoicePref() {
+    try {
+      localStorage.setItem(VOICE_PREF_KEY, voiceEnabled() ? "1" : "0");
+    } catch (_err) {
+      /* ignore */
+    }
+    btnTalkHear.hidden = !voiceEnabled();
+  }
+
+  function normalizePhrase(text) {
+    return fold(String(text || ""))
+      .replace(/[·]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function displayReply(typed) {
+    const asChunna = translateEsPhrase(typed);
+    if (asChunna.ok) return { es: typed, chunna: asChunna.chunna };
+    return { es: typed, chunna: typed };
+  }
+
+  function replyMatches(typed, expectedEs) {
+    const expected = translateEsPhrase(expectedEs);
+    const nTyped = normalizePhrase(typed);
+    if (!nTyped) return false;
+    if (nTyped === normalizePhrase(expected.chunna)) return true;
+    if (nTyped === normalizePhrase(expectedEs)) return true;
+    const fromEs = translateEsPhrase(typed);
+    if (fromEs.ok && normalizePhrase(fromEs.chunna) === normalizePhrase(expected.chunna)) return true;
+    return false;
+  }
+
   function appendChat(role, esText, chunnaText) {
     const bubble = document.createElement("div");
     bubble.className = "chat-bubble " + (role === "you" ? "you" : "npc");
@@ -843,23 +930,32 @@
       "</div>";
     chatLog.appendChild(bubble);
     chatLog.scrollTop = chatLog.scrollHeight;
+    if (role === "npc") {
+      lastSpokenEs = esText;
+      if (voiceEnabled()) speakEsPhrase(esText);
+    } else if (voiceEnabled()) {
+      speakEsPhrase(esText);
+    }
   }
 
   function finishTalk(ok) {
-    talkOptions.querySelectorAll("button").forEach((btn) => {
-      btn.disabled = true;
-    });
+    awaitingTalkReply = false;
+    talkCompose.hidden = true;
+    talkInput.value = "";
+    talkInput.disabled = true;
+    btnTalkSend.disabled = true;
     talkFeedback.hidden = false;
     talkFeedback.className = "learn-feedback " + (ok ? "ok" : "bad");
     if (ok) {
       const streak = markPracticeDay();
       talkFeedback.textContent = "¡Buena charla! Racha " + streak;
     } else {
-      talkFeedback.textContent = "Casi. Probá otra conversación.";
+      talkFeedback.textContent = "Casi. Revisá el texto y probá otra conversación.";
     }
     talkActions.innerHTML = "";
     addAction("Otra conversación", true, () => startTalk(), talkActions);
     addAction("Salir", false, () => {
+      stopSpeak();
       renderLearnHub();
       show("screenLearnHub");
     }, talkActions);
@@ -867,9 +963,10 @@
 
   function playTalkTurn() {
     if (!currentTalk) return;
-    talkOptions.innerHTML = "";
     talkActions.innerHTML = "";
     talkFeedback.hidden = true;
+    talkCompose.hidden = true;
+    awaitingTalkReply = false;
     while (currentTalk.turn < currentTalk.turns.length) {
       const step = currentTalk.turns[currentTalk.turn];
       const translated = translateEsPhrase(step.es);
@@ -878,36 +975,42 @@
         currentTalk.turn += 1;
         continue;
       }
-      talkHint.textContent = currentTalk.title + " · tu turno";
-      talkPrompt.textContent = "Respondé en Chunna (idea: “" + step.es + "”)";
-      const answer = translateEsPhrase(step.es).chunna;
-      const optionLabels = (step.options || [step.es]).map((esOpt) => {
-        const t = translateEsPhrase(esOpt);
-        return { es: esOpt, chunna: t.chunna };
-      });
-      shuffle(optionLabels).forEach((opt) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "btn ghost";
-        btn.textContent = opt.chunna;
-        btn.addEventListener("click", () => {
-          appendChat("you", opt.es, opt.chunna);
-          if (opt.chunna !== answer) {
-            finishTalk(false);
-            return;
-          }
-          currentTalk.turn += 1;
-          if (currentTalk.turn >= currentTalk.turns.length) {
-            finishTalk(true);
-            return;
-          }
-          playTalkTurn();
-        });
-        talkOptions.appendChild(btn);
-      });
+      talkHint.textContent = currentTalk.title + " · tu turno (texto)";
+      talkPrompt.textContent =
+        "Escribí tu respuesta en Chunna. Idea en español: “" + step.es + "”";
+      currentTalk.expectedEs = step.es;
+      talkCompose.hidden = false;
+      talkInput.disabled = false;
+      btnTalkSend.disabled = false;
+      talkInput.value = "";
+      awaitingTalkReply = true;
+      talkInput.focus();
       return;
     }
     finishTalk(true);
+  }
+
+  function submitTalkReply() {
+    if (!currentTalk || !awaitingTalkReply) return;
+    const typed = talkInput.value;
+    if (!normalizePhrase(typed)) return;
+    const shown = displayReply(typed);
+    const expectedEs = currentTalk.expectedEs;
+    appendChat("you", shown.es, shown.chunna);
+    if (!replyMatches(typed, expectedEs)) {
+      const right = translateEsPhrase(expectedEs);
+      talkFeedback.hidden = false;
+      talkFeedback.className = "learn-feedback bad";
+      talkFeedback.textContent = "Casi. Podía ser: " + right.chunna + " (“" + expectedEs + "”)";
+      finishTalk(false);
+      return;
+    }
+    currentTalk.turn += 1;
+    if (currentTalk.turn >= currentTalk.turns.length) {
+      finishTalk(true);
+      return;
+    }
+    playTalkTurn();
   }
 
   function startTalk() {
@@ -917,19 +1020,23 @@
       show("screenLearnHub");
       return;
     }
+    stopSpeak();
+    loadVoicePref();
     const script = shuffle(TALKS)[0];
-    currentTalk = { title: script.title, turns: script.turns, turn: 0 };
+    currentTalk = { title: script.title, turns: script.turns, turn: 0, expectedEs: "" };
     chatLog.innerHTML = "";
     talkFeedback.hidden = true;
     talkActions.innerHTML = "";
-    talkOptions.innerHTML = "";
-    talkHint.textContent = script.title;
-    talkPrompt.textContent = "Leé el chat y respondé";
+    talkInput.value = "";
+    talkInput.disabled = false;
+    btnTalkSend.disabled = false;
+    talkHint.textContent = script.title + " · chat de texto";
+    talkPrompt.textContent = "Leé el chat y escribí tu respuesta";
     playTalkTurn();
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci10", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci11", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
@@ -968,6 +1075,20 @@
     show("screenTalk");
     startTalk();
   });
+  talkVoiceToggle.addEventListener("change", () => {
+    saveVoicePref();
+    if (!voiceEnabled()) stopSpeak();
+  });
+  btnTalkSend.addEventListener("click", submitTalkReply);
+  talkInput.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" && !ev.shiftKey) {
+      ev.preventDefault();
+      submitTalkReply();
+    }
+  });
+  btnTalkHear.addEventListener("click", () => {
+    if (lastSpokenEs) speakEsPhrase(lastSpokenEs);
+  });
   document.getElementById("btnResetProgress").addEventListener("click", () => {
     if (!window.confirm("¿Reiniciar progreso y racha?")) return;
     learnProgress = {};
@@ -986,6 +1107,7 @@
     show("screenLearnHub");
   });
   document.getElementById("btnBackTalk").addEventListener("click", () => {
+    stopSpeak();
     renderLearnHub();
     show("screenLearnHub");
   });

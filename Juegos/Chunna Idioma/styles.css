@@ -296,6 +296,38 @@ h1, h2, h3 { margin: 0 0 8px; }
 }
 .chat-bubble .mono { color: var(--accent); font-weight: 800; }
 
+.voice-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+.voice-toggle input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--accent);
+}
+.talk-compose {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.talk-compose textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  color: var(--ink);
+  background: rgb(2 6 23 / 0.55);
+  resize: vertical;
+  min-height: 64px;
+}
+
 @media (max-width: 720px) {
   .translate-grid { grid-template-columns: 1fr; }
   #screenTitle.active {
