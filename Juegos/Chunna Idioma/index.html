@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Chunna Idioma</title>
-  <link rel="stylesheet" href="styles.css?v=ci12" />
+  <link rel="stylesheet" href="styles.css?v=ci13" />
   <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
@@ -68,7 +68,7 @@
       <button type="button" class="btn ghost" id="btnBackLearnHub">←</button>
       <div class="bar-titles">
         <h2>Aprender Chunna</h2>
-        <p class="hint">5 niveles por palabra · después oraciones, charlas y racha</p>
+        <p class="hint">5 niveles · oraciones · charlas · emparejar · racha</p>
       </div>
     </header>
     <div class="panel">
@@ -85,6 +85,7 @@
         <div class="title-actions advanced-actions" id="advancedActions" hidden>
           <button type="button" class="btn primary" id="btnSentences">Hacer oraciones</button>
           <button type="button" class="btn primary" id="btnTalk">Conversaciones</button>
+          <button type="button" class="btn primary" id="btnMatch">Emparejar palabras</button>
         </div>
       </div>
 
@@ -160,6 +161,31 @@
     </div>
   </section>
 
+  <section id="screenMatch" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackMatch">←</button>
+      <div class="bar-titles">
+        <h2>Emparejar palabras</h2>
+        <p class="hint" id="matchHint">Tocá una en español y su par en Chunna</p>
+      </div>
+    </header>
+    <div class="panel">
+      <p class="hint" id="matchStats">—</p>
+      <div class="match-board">
+        <div class="match-col">
+          <h3>Español</h3>
+          <div class="match-list" id="matchEsList"></div>
+        </div>
+        <div class="match-col">
+          <h3>Chunna</h3>
+          <div class="match-list" id="matchChList"></div>
+        </div>
+      </div>
+      <div class="toolbar" id="matchActions"></div>
+      <p class="learn-feedback" id="matchFeedback" hidden></p>
+    </div>
+  </section>
+
   <section id="screenFacts" class="screen">
     <header class="bar">
       <button type="button" class="btn ghost" id="btnBackFacts">←</button>
@@ -189,6 +215,6 @@
   </div>
 
   <script src="../../shared-music.js?v=global5"></script>
-  <script src="game.js?v=ci12"></script>
+  <script src="game.js?v=ci13"></script>
 </body>
 </html>

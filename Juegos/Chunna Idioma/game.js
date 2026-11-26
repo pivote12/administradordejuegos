@@ -345,6 +345,8 @@
   let currentSentence = null;
   /** @type {{title:string, turns:Array, turn:number}|null} */
   let currentTalk = null;
+  /** @type {{pairs:Array, matched:Set<string>, selectedEs:string|null, selectedCh:string|null, mistakes:number}|null} */
+  let currentMatch = null;
 
   const SENTENCE_ES = [
     "hola amigo",
@@ -612,6 +614,12 @@
   const btnTalkHear = document.getElementById("btnTalkHear");
   const talkActions = document.getElementById("talkActions");
   const talkFeedback = document.getElementById("talkFeedback");
+  const matchHint = document.getElementById("matchHint");
+  const matchStats = document.getElementById("matchStats");
+  const matchEsList = document.getElementById("matchEsList");
+  const matchChList = document.getElementById("matchChList");
+  const matchActions = document.getElementById("matchActions");
+  const matchFeedback = document.getElementById("matchFeedback");
   const VOICE_PREF_KEY = "chunna-idioma-talk-voice-v1";
   let lastSpokenEs = "";
   let awaitingTalkReply = false;
@@ -995,6 +1003,157 @@
     return out;
   }
 
+  function updateMatchStats() {
+    if (!currentMatch) {
+      matchStats.textContent = "—";
+      return;
+    }
+    matchStats.textContent =
+      "Emparejadas: " +
+      currentMatch.matched.size +
+      "/" +
+      currentMatch.pairs.length +
+      " · Errores: " +
+      currentMatch.mistakes;
+  }
+
+  function finishMatchRound() {
+    const streak = markPracticeDay();
+    matchFeedback.hidden = false;
+    matchFeedback.className = "learn-feedback ok";
+    matchFeedback.textContent =
+      "¡Todas emparejadas! Errores: " + currentMatch.mistakes + " · Racha " + streak;
+    matchActions.innerHTML = "";
+    addAction("Otra ronda", true, () => startMatchRound(), matchActions);
+    addAction("Salir", false, () => {
+      renderLearnHub();
+      show("screenLearnHub");
+    }, matchActions);
+  }
+
+  function renderMatchBoard() {
+    if (!currentMatch) return;
+    matchEsList.innerHTML = "";
+    matchChList.innerHTML = "";
+    const esOrder = shuffle(currentMatch.pairs.slice());
+    const chOrder = shuffle(currentMatch.pairs.slice());
+
+    esOrder.forEach((pair) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "match-card";
+      btn.textContent = pair.es;
+      btn.dataset.key = pair.key;
+      if (currentMatch.matched.has(pair.key)) {
+        btn.classList.add("matched");
+        btn.disabled = true;
+      } else if (currentMatch.selectedEs === pair.key) {
+        btn.classList.add("selected");
+      }
+      btn.addEventListener("click", () => onMatchPick("es", pair.key, btn));
+      matchEsList.appendChild(btn);
+    });
+
+    chOrder.forEach((pair) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "match-card mono";
+      btn.textContent = pair.chunna;
+      btn.dataset.key = pair.key;
+      if (currentMatch.matched.has(pair.key)) {
+        btn.classList.add("matched");
+        btn.disabled = true;
+      } else if (currentMatch.selectedCh === pair.key) {
+        btn.classList.add("selected");
+      }
+      btn.addEventListener("click", () => onMatchPick("ch", pair.key, btn));
+      matchChList.appendChild(btn);
+    });
+    updateMatchStats();
+  }
+
+  function onMatchPick(side, key, btn) {
+    if (!currentMatch || currentMatch.matched.has(key)) return;
+    if (side === "es") currentMatch.selectedEs = key;
+    else currentMatch.selectedCh = key;
+
+    matchEsList.querySelectorAll(".match-card").forEach((el) => {
+      el.classList.toggle("selected", el.dataset.key === currentMatch.selectedEs && !el.classList.contains("matched"));
+    });
+    matchChList.querySelectorAll(".match-card").forEach((el) => {
+      el.classList.toggle("selected", el.dataset.key === currentMatch.selectedCh && !el.classList.contains("matched"));
+    });
+
+    if (!currentMatch.selectedEs || !currentMatch.selectedCh) return;
+
+    if (currentMatch.selectedEs === currentMatch.selectedCh) {
+      currentMatch.matched.add(key);
+      currentMatch.selectedEs = null;
+      currentMatch.selectedCh = null;
+      matchFeedback.hidden = false;
+      matchFeedback.className = "learn-feedback ok";
+      matchFeedback.textContent = "¡Bien!";
+      renderMatchBoard();
+      if (currentMatch.matched.size >= currentMatch.pairs.length) finishMatchRound();
+      return;
+    }
+
+    currentMatch.mistakes += 1;
+    matchFeedback.hidden = false;
+    matchFeedback.className = "learn-feedback bad";
+    matchFeedback.textContent = "No coinciden · probá otra vez";
+    btn.classList.add("wrong");
+    const esBtn = matchEsList.querySelector('.match-card.selected');
+    const chBtn = matchChList.querySelector('.match-card.selected');
+    if (esBtn) esBtn.classList.add("wrong");
+    if (chBtn) chBtn.classList.add("wrong");
+    const badEs = currentMatch.selectedEs;
+    const badCh = currentMatch.selectedCh;
+    currentMatch.selectedEs = null;
+    currentMatch.selectedCh = null;
+    updateMatchStats();
+    window.setTimeout(() => {
+      matchEsList.querySelectorAll(".match-card").forEach((el) => {
+        el.classList.remove("wrong", "selected");
+        if (el.dataset.key === badEs && !currentMatch.matched.has(el.dataset.key)) {
+          /* cleared */
+        }
+      });
+      matchChList.querySelectorAll(".match-card").forEach((el) => {
+        el.classList.remove("wrong", "selected");
+      });
+    }, 320);
+  }
+
+  function startMatchRound() {
+    if (!allMastered()) {
+      window.alert("Primero dominá todas las palabras (nivel 5).");
+      renderLearnHub();
+      show("screenLearnHub");
+      return;
+    }
+    const pool = shuffle(allEntries()).slice(0, Math.min(6, allEntries().length));
+    if (pool.length < 2) {
+      window.alert("Hacen falta más palabras en el diccionario.");
+      return;
+    }
+    currentMatch = {
+      pairs: pool.map((entry) => ({
+        key: wordKey(entry),
+        es: (entry.words && entry.words.es) || "?",
+        chunna: entry.chunna
+      })),
+      matched: new Set(),
+      selectedEs: null,
+      selectedCh: null,
+      mistakes: 0
+    };
+    matchActions.innerHTML = "";
+    matchFeedback.hidden = true;
+    matchHint.textContent = "Tocá una en español y su par en Chunna";
+    renderMatchBoard();
+  }
+
   function startSentenceRound() {
     if (!allMastered()) {
       window.alert("Primero dominá todas las palabras (nivel 5).");
@@ -1220,7 +1379,7 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci12", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci13", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
@@ -1260,6 +1419,10 @@
     show("screenTalk");
     startTalk();
   });
+  document.getElementById("btnMatch").addEventListener("click", () => {
+    show("screenMatch");
+    startMatchRound();
+  });
   talkTypeSelect.addEventListener("change", () => {
     talkCountHint.textContent =
       currentTalkType().title + ": 1000 opciones distintas · tocá “Otra conversación”";
@@ -1298,6 +1461,10 @@
   });
   document.getElementById("btnBackTalk").addEventListener("click", () => {
     stopSpeak();
+    renderLearnHub();
+    show("screenLearnHub");
+  });
+  document.getElementById("btnBackMatch").addEventListener("click", () => {
     renderLearnHub();
     show("screenLearnHub");
   });

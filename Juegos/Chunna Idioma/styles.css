@@ -265,7 +265,66 @@ h1, h2, h3 { margin: 0 0 8px; }
   border-color: rgb(74 222 128 / 0.45);
   background: rgb(74 222 128 / 0.08);
 }
-.advanced-actions { margin-top: 10px; }
+.advanced-actions {
+  margin-top: 10px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 560px) {
+  .advanced-actions { grid-template-columns: 1fr 1fr; }
+}
+
+.match-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 10px 0 12px;
+}
+.match-col h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.match-list {
+  display: grid;
+  gap: 8px;
+}
+.match-card {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgb(2 6 23 / 0.55);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+.match-card.mono { color: var(--accent); }
+.match-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgb(251 191 36 / 0.35);
+}
+.match-card.matched {
+  opacity: 0.45;
+  border-color: rgb(74 222 128 / 0.55);
+  background: rgb(74 222 128 / 0.12);
+  cursor: default;
+}
+.match-card.wrong {
+  border-color: #fb7185;
+  animation: matchShake 0.28s ease;
+}
+@keyframes matchShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+@media (max-width: 720px) {
+  .match-board { gap: 8px; }
+  .match-card { min-height: 44px; font-size: 0.92rem; }
+}
 
 .chat-log {
   display: grid;
