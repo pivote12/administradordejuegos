@@ -496,54 +496,90 @@
 
   const TALK_PER_TYPE = 1000;
 
+  // Solo frases naturales con el vocabulario Chunna actual (nada tipo "hola libre").
   const TALK_PHRASES = {
-    greet: [
-      "hola",
-      "hola amigo",
-      "hola amigos",
-      "hola chunna",
-      "amigo hola",
-      "hola genial",
-      "hola bueno",
-      "hola libre",
-      "hola nación",
-      "hola país"
-    ],
-    ask: [
+    greet: ["hola", "hola amigo", "hola amigos", "hola chunna"],
+    greetBack: ["hola", "hola amigo", "hola amigos"],
+    askHow: [
       "cómo estás",
-      "quién sos",
-      "quién está",
       "cómo estás amigo",
-      "quién sos amigo",
+      "estás genial",
+      "estás libre",
+      "quién sos",
+      "quién está"
+    ],
+    answerHow: [
+      "genial",
+      "bueno",
+      "no malo",
+      "no miedo",
+      "libre",
+      "nada malo",
+      "nada",
+      "está bueno"
+    ],
+    askWho: ["quién sos", "quién está", "quién sos amigo", "quién está libre"],
+    answerWho: ["amigo", "amigos", "chunna", "amigo bueno", "sos amigo"],
+    askAbout: [
       "el tiempo",
       "la idea",
-      "quién está libre",
-      "cómo estás mañana",
-      "quién sos chunna"
+      "el mar",
+      "el dinero",
+      "el país",
+      "la nación",
+      "matemáticas",
+      "el zoologico",
+      "agua de mar",
+      "el postre"
+    ],
+    answerAbout: [
+      "está genial",
+      "está bueno",
+      "está malo",
+      "está vacío",
+      "genial",
+      "bueno",
+      "no malo",
+      "la idea está genial",
+      "el tiempo está bueno"
+    ],
+    askPlan: [
+      "mañana",
+      "el mar",
+      "el zoologico",
+      "matemáticas",
+      "agua de mar",
+      "el postre",
+      "la carpa",
+      "cómo estás"
+    ],
+    answerPlan: [
+      "mañana",
+      "el mar",
+      "genial",
+      "la idea",
+      "matemáticas",
+      "no miedo",
+      "el zoologico",
+      "agua de mar"
+    ],
+    // alias usados por la charla infinita / fallbacks
+    ask: [
+      "cómo estás",
+      "cómo estás amigo",
+      "quién sos",
+      "quién está",
+      "estás libre",
+      "estás genial"
     ],
     feel: [
       "genial",
       "bueno",
-      "malo",
       "no malo",
-      "nada",
-      "libre",
       "no miedo",
+      "libre",
       "nada malo",
-      "amigo genial",
-      "bueno amigo"
-    ],
-    who: [
-      "amigo",
-      "amigos",
-      "chunna",
-      "nación",
-      "país",
-      "amigo bueno",
-      "amigo libre",
-      "amigos genial",
-      "chunna bueno",
-      "nación libre"
+      "nada"
     ],
     thing: [
       "el agua",
@@ -554,94 +590,32 @@
       "la nación",
       "el país",
       "el postre",
-      "la carpa",
-      "la bandeja",
       "el zoologico",
       "matemáticas",
-      "la linterna",
-      "el grito",
-      "el dado",
       "agua de mar"
     ],
-    time: [
-      "mañana",
-      "mañana genial",
-      "el tiempo",
-      "mañana bueno",
-      "mañana libre",
-      "nada mañana",
-      "tiempo genial",
-      "mañana malo",
-      "el tiempo libre",
-      "mañana amigo"
-    ],
+    time: ["mañana", "el tiempo", "el tiempo está bueno", "mañana está genial"],
     plan: [
-      "mañana genial",
+      "mañana",
       "el mar",
       "la idea",
       "matemáticas",
       "el zoologico",
       "agua de mar",
       "el postre",
-      "la carpa",
-      "no miedo",
-      "amigo libre"
-    ],
-    objectAsk: [
-      "el agua",
-      "quién está",
-      "la linterna",
-      "el dinero",
-      "la bandeja",
-      "el postre",
-      "la idea",
-      "el dado",
-      "matemáticas",
-      "el grito"
+      "no miedo"
     ]
   };
 
   const TALK_TYPES = [
-    {
-      id: "saludo",
-      title: "Saludo",
-      slots: ["greet", "greet", "ask", "feel"]
-    },
-    {
-      id: "preguntar",
-      title: "Preguntar",
-      slots: ["ask", "who", "ask", "feel"]
-    },
-    {
-      id: "planes",
-      title: "Planes",
-      slots: ["greet", "greet", "time", "plan"]
-    },
-    {
-      id: "amigos",
-      title: "Amigos",
-      slots: ["greet", "who", "ask", "feel"]
-    },
-    {
-      id: "pais",
-      title: "País",
-      slots: ["greet", "who", "thing", "feel"]
-    },
-    {
-      id: "cosas",
-      title: "Cosas",
-      slots: ["objectAsk", "thing", "ask", "feel"]
-    },
-    {
-      id: "tiempo",
-      title: "Tiempo",
-      slots: ["greet", "time", "ask", "plan"]
-    },
-    {
-      id: "ideas",
-      title: "Ideas",
-      slots: ["ask", "thing", "greet", "feel"]
-    }
+    { id: "saludo", title: "Saludo", slots: ["greet", "greetBack", "askHow", "answerHow"] },
+    { id: "preguntar", title: "Preguntar", slots: ["askWho", "answerWho", "askHow", "answerHow"] },
+    { id: "planes", title: "Planes", slots: ["greet", "greetBack", "askPlan", "answerPlan"] },
+    { id: "amigos", title: "Amigos", slots: ["greet", "greetBack", "askWho", "answerWho"] },
+    { id: "pais", title: "País", slots: ["greet", "greetBack", "askAbout", "answerAbout"] },
+    { id: "cosas", title: "Cosas", slots: ["askAbout", "answerAbout", "askHow", "answerHow"] },
+    { id: "tiempo", title: "Tiempo", slots: ["greet", "greetBack", "askPlan", "answerHow"] },
+    { id: "ideas", title: "Ideas", slots: ["askAbout", "answerAbout", "askHow", "answerPlan"] }
   ];
 
   let lastTalkKey = "";
@@ -1398,6 +1372,7 @@
     chatLog.scrollTop = chatLog.scrollHeight;
     if (role === "npc") {
       lastSpokenEs = esText;
+      if (currentTalk) currentTalk.lastNpcEs = esText;
       if (voiceEnabled()) speakEsPhrase(esText);
     } else if (voiceEnabled()) {
       speakEsPhrase(esText);
@@ -1520,20 +1495,75 @@
     recordStatus.textContent = "Chunna cargado en el cuadro. Podés editarlo o enviar.";
   }
 
+  function pickNatural(list, avoidText) {
+    const avoid = fold(avoidText || "");
+    const filtered = (list || []).filter((item) => fold(item) !== avoid);
+    const pool = filtered.length ? filtered : list || ["hola"];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
   function infiniteNpcReply(userEs) {
     const text = fold(userEs);
-    const pools = TALK_PHRASES;
-    if (/hola|amigo/.test(text)) return pools.greet[Math.floor(Math.random() * pools.greet.length)];
-    if (/como|quien|estas|sos/.test(text)) return pools.ask[Math.floor(Math.random() * pools.ask.length)];
-    if (/tiempo|manana|mañana/.test(text)) return pools.time[Math.floor(Math.random() * pools.time.length)];
-    if (/agua|mar|dinero|idea|pais|nacion|postre|carpa/.test(text)) {
-      return pools.thing[Math.floor(Math.random() * pools.thing.length)];
+    const last = currentTalk && currentTalk.lastNpcEs;
+
+    // Saludo → saluda de vuelta y pregunta cómo estás
+    if (/\bhola\b/.test(text) && !/como|quien|estas|sos|tiempo|mar|idea/.test(text)) {
+      return pickNatural(["hola", "hola amigo", "cómo estás", "cómo estás amigo"], last);
     }
+    // Pregunta por estado → responde natural
+    if (/como estas|estas genial|estas libre/.test(text)) {
+      return pickNatural(
+        ["genial", "bueno", "no malo", "no miedo", "libre", "nada malo", "cómo estás"],
+        last
+      );
+    }
+    // Quién sos / quién está
+    if (/quien sos|quien esta/.test(text)) {
+      return pickNatural(["amigo", "amigos", "chunna", "sos amigo", "amigo bueno"], last);
+    }
+    // Planes / tiempo
+    if (/manana|tiempo|zoologico|matematicas/.test(text)) {
+      return pickNatural(
+        ["mañana", "el tiempo está bueno", "mañana está genial", "genial", "el mar", "la idea"],
+        last
+      );
+    }
+    // Cosas / lugares
+    if (/agua|mar|dinero|idea|pais|nacion|postre|carpa|bandeja|linterna/.test(text)) {
+      return pickNatural(
+        [
+          "está genial",
+          "está bueno",
+          "está malo",
+          "la idea está genial",
+          "el tiempo está bueno",
+          "genial",
+          "cómo estás"
+        ],
+        last
+      );
+    }
+    // Ánimo / valoración
     if (/genial|bueno|malo|miedo|nada|libre/.test(text)) {
-      return pools.feel[Math.floor(Math.random() * pools.feel.length)];
+      return pickNatural(
+        ["genial", "bueno", "cómo estás", "quién sos", "la idea", "mañana", "hola amigo"],
+        last
+      );
     }
-    const mix = pools.ask.concat(pools.feel, pools.plan, pools.greet);
-    return mix[Math.floor(Math.random() * mix.length)];
+    // Continuación por defecto (siempre frase creíble)
+    return pickNatural(
+      [
+        "cómo estás",
+        "quién sos",
+        "hola amigo",
+        "la idea está genial",
+        "el tiempo está bueno",
+        "mañana",
+        "genial",
+        "no malo"
+      ],
+      last
+    );
   }
 
   function openTalkCompose(promptText) {
@@ -1715,7 +1745,7 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci15", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci16", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
     buildChunnaKeyboard();
