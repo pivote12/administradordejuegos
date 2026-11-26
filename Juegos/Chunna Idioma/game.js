@@ -300,13 +300,86 @@
   }
 
   const LEARN_KEY = "chunna-idioma-learn-v1";
+  const STREAK_KEY = "chunna-idioma-streak-v1";
   /** @type {Record<string, number>} */
   let learnProgress = {};
-  /** @type {{entry:object, level:number, kind:string}|null} */
+  /** @type {{count:number,lastDate:string}} */
+  let streakData = { count: 0, lastDate: "" };
+  /** @type {{entry:object, level:number, stage:number}|null} */
   let currentLesson = null;
+  /** @type {{es:string, chunna:string}|null} */
+  let currentSentence = null;
+  /** @type {{title:string, turns:Array, turn:number}|null} */
+  let currentTalk = null;
+
+  const SENTENCE_ES = [
+    "hola amigo",
+    "cómo estás",
+    "quién sos",
+    "hola · cómo estás",
+    "el agua",
+    "amigo genial",
+    "no malo",
+    "la idea",
+    "el tiempo",
+    "mañana genial",
+    "hola amigos",
+    "no miedo",
+    "el país",
+    "la nación",
+    "agua de mar",
+    "nada malo",
+    "bueno amigo",
+    "cómo estás amigo",
+    "quién está",
+    "el dinero"
+  ];
+
+  const TALKS = [
+    {
+      title: "Saludo",
+      turns: [
+        { role: "npc", es: "hola" },
+        { role: "you", es: "hola amigo", options: ["hola amigo", "no malo", "quién sos"] },
+        { role: "npc", es: "cómo estás" },
+        { role: "you", es: "genial", options: ["genial", "malo", "nada"] }
+      ]
+    },
+    {
+      title: "Preguntar",
+      turns: [
+        { role: "npc", es: "quién sos" },
+        { role: "you", es: "amigo", options: ["amigo", "agua", "miedo"] },
+        { role: "npc", es: "cómo estás" },
+        { role: "you", es: "bueno", options: ["bueno", "malo", "no"] }
+      ]
+    },
+    {
+      title: "Planes",
+      turns: [
+        { role: "npc", es: "hola" },
+        { role: "you", es: "hola", options: ["hola", "matar", "fregar"] },
+        { role: "npc", es: "el tiempo" },
+        { role: "you", es: "mañana genial", options: ["mañana genial", "malo miedo", "nada agua"] }
+      ]
+    },
+    {
+      title: "Amigos",
+      turns: [
+        { role: "npc", es: "hola amigos" },
+        { role: "you", es: "hola", options: ["hola", "no", "dado"] },
+        { role: "npc", es: "cómo estás" },
+        { role: "you", es: "no malo", options: ["no malo", "el mar", "la bandeja"] }
+      ]
+    }
+  ];
 
   const learnStats = document.getElementById("learnStats");
   const progressList = document.getElementById("progressList");
+  const streakBanner = document.getElementById("streakBanner");
+  const advancedBox = document.getElementById("advancedBox");
+  const advancedLockHint = document.getElementById("advancedLockHint");
+  const advancedActions = document.getElementById("advancedActions");
   const learnHint = document.getElementById("learnHint");
   const learnPrompt = document.getElementById("learnPrompt");
   const learnMain = document.getElementById("learnMain");
@@ -314,6 +387,19 @@
   const learnOptions = document.getElementById("learnOptions");
   const learnActions = document.getElementById("learnActions");
   const learnFeedback = document.getElementById("learnFeedback");
+  const sentenceHint = document.getElementById("sentenceHint");
+  const sentencePrompt = document.getElementById("sentencePrompt");
+  const sentenceMain = document.getElementById("sentenceMain");
+  const sentenceSub = document.getElementById("sentenceSub");
+  const sentenceOptions = document.getElementById("sentenceOptions");
+  const sentenceActions = document.getElementById("sentenceActions");
+  const sentenceFeedback = document.getElementById("sentenceFeedback");
+  const talkHint = document.getElementById("talkHint");
+  const chatLog = document.getElementById("chatLog");
+  const talkPrompt = document.getElementById("talkPrompt");
+  const talkOptions = document.getElementById("talkOptions");
+  const talkActions = document.getElementById("talkActions");
+  const talkFeedback = document.getElementById("talkFeedback");
 
   function wordKey(entry) {
     return fold((entry.words && entry.words.es) || entry.chunna);
@@ -334,6 +420,67 @@
     } catch (_err) {
       /* ignore */
     }
+  }
+
+  function loadStreak() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STREAK_KEY) || "{}");
+      streakData = {
+        count: Math.max(0, Math.floor(Number(parsed.count) || 0)),
+        lastDate: typeof parsed.lastDate === "string" ? parsed.lastDate : ""
+      };
+    } catch (_err) {
+      streakData = { count: 0, lastDate: "" };
+    }
+  }
+
+  function saveStreak() {
+    try {
+      localStorage.setItem(STREAK_KEY, JSON.stringify(streakData));
+    } catch (_err) {
+      /* ignore */
+    }
+  }
+
+  function todayKey() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+
+  function shiftDay(iso, delta) {
+    const parts = String(iso || "").split("-").map(Number);
+    if (parts.length !== 3 || parts.some((n) => !n)) return "";
+    const dt = new Date(parts[0], parts[1] - 1, parts[2]);
+    dt.setDate(dt.getDate() + delta);
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+
+  function liveStreakCount() {
+    const today = todayKey();
+    if (!streakData.lastDate) return 0;
+    if (streakData.lastDate === today || streakData.lastDate === shiftDay(today, -1)) {
+      return streakData.count;
+    }
+    return 0;
+  }
+
+  function markPracticeDay() {
+    const today = todayKey();
+    if (streakData.lastDate === today) return liveStreakCount();
+    if (streakData.lastDate === shiftDay(today, -1)) {
+      streakData.count = Math.max(1, streakData.count + 1);
+    } else {
+      streakData.count = 1;
+    }
+    streakData.lastDate = today;
+    saveStreak();
+    return streakData.count;
   }
 
   function getLevel(entry) {
@@ -362,20 +509,76 @@
     return (dict && dict.entries) || [];
   }
 
-  function renderLearnHub() {
+  function masteryStats() {
     const entries = allEntries();
     let mastered = 0;
     let learning = 0;
     let fresh = 0;
+    entries.forEach((entry) => {
+      const level = getLevel(entry);
+      if (level >= 5) mastered += 1;
+      else if (level > 0) learning += 1;
+      else fresh += 1;
+    });
+    return { entries: entries, mastered: mastered, learning: learning, fresh: fresh, total: entries.length };
+  }
+
+  function allMastered() {
+    const stats = masteryStats();
+    return stats.total > 0 && stats.mastered === stats.total;
+  }
+
+  function entryByEs(word) {
+    const key = fold(word);
+    return allEntries().find((e) => fold((e.words && e.words.es) || "") === key) || null;
+  }
+
+  function translateEsPhrase(esText) {
+    const parts = String(esText || "").split(/(\s+|·)/);
+    const out = [];
+    const helps = [];
+    let ok = true;
+    parts.forEach((part) => {
+      if (!part || /^\s+$/.test(part) || part === "·") {
+        out.push(part === "·" ? "·" : part);
+        return;
+      }
+      const entry = entryByEs(part);
+      if (!entry) {
+        ok = false;
+        out.push(part);
+        return;
+      }
+      out.push(entry.chunna);
+      helps.push(entry.help);
+    });
+    return {
+      ok: ok,
+      es: esText,
+      chunna: out.join("").replace(/\s+/g, " ").trim(),
+      help: helps.join(" · ")
+    };
+  }
+
+  function renderStreakBanner() {
+    const count = liveStreakCount();
+    const today = todayKey();
+    const doneToday = streakData.lastDate === today;
+    streakBanner.textContent =
+      "Racha: " +
+      count +
+      (count === 1 ? " día" : " días") +
+      (doneToday ? " · ¡Practicaste hoy!" : " · Practicá hoy para sumar");
+  }
+
+  function renderLearnHub() {
+    const stats = masteryStats();
     progressList.innerHTML = "";
-    entries
+    stats.entries
       .slice()
       .sort((a, b) => getLevel(b) - getLevel(a) || wordKey(a).localeCompare(wordKey(b)))
       .forEach((entry) => {
         const level = getLevel(entry);
-        if (level >= 5) mastered += 1;
-        else if (level > 0) learning += 1;
-        else fresh += 1;
         const row = document.createElement("div");
         row.className = "progress-row";
         const pips = [1, 2, 3, 4, 5]
@@ -396,13 +599,28 @@
       });
     learnStats.textContent =
       "Dominadas: " +
-      mastered +
+      stats.mastered +
       " · En progreso: " +
-      learning +
+      stats.learning +
       " · Nuevas: " +
-      fresh +
+      stats.fresh +
       " · Total: " +
-      entries.length;
+      stats.total;
+    renderStreakBanner();
+    const unlocked = allMastered();
+    advancedBox.classList.toggle("unlocked", unlocked);
+    advancedActions.hidden = !unlocked;
+    advancedLockHint.hidden = unlocked;
+    if (!unlocked) {
+      advancedLockHint.textContent =
+        "Dominá las 5 cosas de todas las palabras para desbloquear oraciones y conversaciones (" +
+        stats.mastered +
+        "/" +
+        stats.total +
+        ").";
+    } else {
+      advancedLockHint.hidden = true;
+    }
   }
 
   function pickLessonEntry() {
@@ -414,8 +632,6 @@
     });
     const fresh = entries.filter((e) => getLevel(e) === 0);
     const mastered = entries.filter((e) => getLevel(e) >= 5);
-
-    // 60% practicar aprendidas, 30% nuevas, 10% repaso de dominadas
     const roll = Math.random();
     let pool = review;
     if (roll < 0.3 && fresh.length) pool = fresh;
@@ -452,13 +668,13 @@
     learnFeedback.textContent = message;
   }
 
-  function addAction(label, primary, onClick) {
+  function addAction(label, primary, onClick, target) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn " + (primary ? "primary" : "ghost");
     btn.textContent = label;
     btn.addEventListener("click", onClick);
-    learnActions.appendChild(btn);
+    (target || learnActions).appendChild(btn);
   }
 
   function finishRound(ok) {
@@ -467,7 +683,8 @@
     const level = getLevel(entry);
     if (ok) {
       if (level < 5) setLevel(entry, level + 1);
-      showFeedback(true, "¡Bien! Nivel " + getLevel(entry) + "/5");
+      const streak = markPracticeDay();
+      showFeedback(true, "¡Bien! Nivel " + getLevel(entry) + "/5 · Racha " + streak);
     } else {
       if (level > 1) setLevel(entry, level - 1);
       else if (level === 0) setLevel(entry, 1);
@@ -506,7 +723,6 @@
     const entry = pickLessonEntry();
     if (!entry) return;
     const level = getLevel(entry);
-    // El ejercicio del próximo tramo: nivel 0 → intro (pasa a 1); 1-4 → práctica de ese nivel; 5 → repaso
     const stage = level >= 5 ? 5 : level + 1;
     currentLesson = { entry: entry, level: level, stage: stage };
     learnHint.textContent =
@@ -527,38 +743,19 @@
     }
     if (stage === 2) {
       const opts = [entry.chunna].concat(distractors(entry, "chunna", 3));
-      askMultiple(
-        "Nivel 2 · ¿Cómo se escribe en Chunna?",
-        es,
-        "Elegí la forma correcta",
-        opts,
-        entry.chunna
-      );
+      askMultiple("Nivel 2 · ¿Cómo se escribe en Chunna?", es, "Elegí la forma correcta", opts, entry.chunna);
       return;
     }
     if (stage === 3) {
       const opts = [es].concat(distractors(entry, "es", 3));
-      askMultiple(
-        "Nivel 3 · ¿Qué significa esto?",
-        entry.chunna,
-        "/" + entry.ipa + "/",
-        opts,
-        es
-      );
+      askMultiple("Nivel 3 · ¿Qué significa esto?", entry.chunna, "/" + entry.ipa + "/", opts, es);
       return;
     }
     if (stage === 4) {
       const opts = [es].concat(distractors(entry, "es", 3));
-      askMultiple(
-        "Nivel 4 · Escuchá/leé la pronunciación",
-        "/" + entry.ipa + "/",
-        "(" + entry.help + ")",
-        opts,
-        es
-      );
+      askMultiple("Nivel 4 · Escuchá/leé la pronunciación", "/" + entry.ipa + "/", "(" + entry.help + ")", opts, es);
       return;
     }
-    // Nivel 5 / repaso final
     const opts = [entry.chunna].concat(distractors(entry, "chunna", 3));
     askMultiple(
       level >= 5 ? "Repaso · palabra dominada" : "Nivel 5 · Dominio final",
@@ -569,8 +766,170 @@
     );
   }
 
+  function sentenceDistractors(correct, count) {
+    const pool = shuffle(
+      SENTENCE_ES.map(translateEsPhrase).filter((item) => item.ok && item.chunna !== correct.chunna)
+    );
+    const out = [];
+    for (let i = 0; i < pool.length && out.length < count; i += 1) out.push(pool[i].chunna);
+    while (out.length < count) {
+      const fake = shuffle(allEntries()).slice(0, 2).map((e) => e.chunna).join(" ");
+      if (fake && fake !== correct.chunna && out.indexOf(fake) < 0) out.push(fake);
+      else break;
+    }
+    return out;
+  }
+
+  function startSentenceRound() {
+    if (!allMastered()) {
+      window.alert("Primero dominá todas las palabras (nivel 5).");
+      renderLearnHub();
+      show("screenLearnHub");
+      return;
+    }
+    const candidates = shuffle(SENTENCE_ES.map(translateEsPhrase).filter((item) => item.ok));
+    const item = candidates[0];
+    if (!item) return;
+    currentSentence = item;
+    sentenceFeedback.hidden = true;
+    sentenceActions.innerHTML = "";
+    sentenceOptions.innerHTML = "";
+    sentenceHint.textContent = "Elegí la oración correcta en Chunna";
+    sentencePrompt.textContent = "¿Cómo se dice esta oración?";
+    sentenceMain.textContent = item.es;
+    sentenceSub.textContent = item.help ? "(" + item.help + ")" : "";
+    const opts = shuffle([item.chunna].concat(sentenceDistractors(item, 3)));
+    opts.forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn ghost";
+      btn.textContent = opt;
+      btn.addEventListener("click", () => {
+        const ok = opt === item.chunna;
+        sentenceOptions.querySelectorAll("button").forEach((b) => {
+          b.disabled = true;
+        });
+        sentenceFeedback.hidden = false;
+        sentenceFeedback.className = "learn-feedback " + (ok ? "ok" : "bad");
+        if (ok) {
+          const streak = markPracticeDay();
+          sentenceFeedback.textContent = "¡Oración correcta! Racha " + streak;
+        } else {
+          sentenceFeedback.textContent = "Casi. Era: " + item.chunna;
+        }
+        sentenceActions.innerHTML = "";
+        addAction("Siguiente oración", true, () => startSentenceRound(), sentenceActions);
+        addAction("Salir", false, () => {
+          renderLearnHub();
+          show("screenLearnHub");
+        }, sentenceActions);
+      });
+      sentenceOptions.appendChild(btn);
+    });
+  }
+
+  function appendChat(role, esText, chunnaText) {
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble " + (role === "you" ? "you" : "npc");
+    bubble.innerHTML =
+      "<span class='who'>" +
+      (role === "you" ? "Vos" : "Amigo Chunna") +
+      "</span>" +
+      "<span class='mono'>" +
+      chunnaText +
+      "</span>" +
+      "<div class='hint'>" +
+      esText +
+      "</div>";
+    chatLog.appendChild(bubble);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function finishTalk(ok) {
+    talkOptions.querySelectorAll("button").forEach((btn) => {
+      btn.disabled = true;
+    });
+    talkFeedback.hidden = false;
+    talkFeedback.className = "learn-feedback " + (ok ? "ok" : "bad");
+    if (ok) {
+      const streak = markPracticeDay();
+      talkFeedback.textContent = "¡Buena charla! Racha " + streak;
+    } else {
+      talkFeedback.textContent = "Casi. Probá otra conversación.";
+    }
+    talkActions.innerHTML = "";
+    addAction("Otra conversación", true, () => startTalk(), talkActions);
+    addAction("Salir", false, () => {
+      renderLearnHub();
+      show("screenLearnHub");
+    }, talkActions);
+  }
+
+  function playTalkTurn() {
+    if (!currentTalk) return;
+    talkOptions.innerHTML = "";
+    talkActions.innerHTML = "";
+    talkFeedback.hidden = true;
+    while (currentTalk.turn < currentTalk.turns.length) {
+      const step = currentTalk.turns[currentTalk.turn];
+      const translated = translateEsPhrase(step.es);
+      if (step.role === "npc") {
+        appendChat("npc", step.es, translated.chunna);
+        currentTalk.turn += 1;
+        continue;
+      }
+      talkHint.textContent = currentTalk.title + " · tu turno";
+      talkPrompt.textContent = "Respondé en Chunna (idea: “" + step.es + "”)";
+      const answer = translateEsPhrase(step.es).chunna;
+      const optionLabels = (step.options || [step.es]).map((esOpt) => {
+        const t = translateEsPhrase(esOpt);
+        return { es: esOpt, chunna: t.chunna };
+      });
+      shuffle(optionLabels).forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn ghost";
+        btn.textContent = opt.chunna;
+        btn.addEventListener("click", () => {
+          appendChat("you", opt.es, opt.chunna);
+          if (opt.chunna !== answer) {
+            finishTalk(false);
+            return;
+          }
+          currentTalk.turn += 1;
+          if (currentTalk.turn >= currentTalk.turns.length) {
+            finishTalk(true);
+            return;
+          }
+          playTalkTurn();
+        });
+        talkOptions.appendChild(btn);
+      });
+      return;
+    }
+    finishTalk(true);
+  }
+
+  function startTalk() {
+    if (!allMastered()) {
+      window.alert("Primero dominá todas las palabras (nivel 5).");
+      renderLearnHub();
+      show("screenLearnHub");
+      return;
+    }
+    const script = shuffle(TALKS)[0];
+    currentTalk = { title: script.title, turns: script.turns, turn: 0 };
+    chatLog.innerHTML = "";
+    talkFeedback.hidden = true;
+    talkActions.innerHTML = "";
+    talkOptions.innerHTML = "";
+    talkHint.textContent = script.title;
+    talkPrompt.textContent = "Leé el chat y respondé";
+    playTalkTurn();
+  }
+
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci9", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci10", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
   }
@@ -586,9 +945,11 @@
     show("screenTranslate");
     textSource.focus();
   });
+
   function openLearnHub() {
     stopSpeak();
     loadProgress();
+    loadStreak();
     renderLearnHub();
     show("screenLearnHub");
   }
@@ -599,14 +960,32 @@
     show("screenLearn");
     startLessonRound();
   });
+  document.getElementById("btnSentences").addEventListener("click", () => {
+    show("screenSentence");
+    startSentenceRound();
+  });
+  document.getElementById("btnTalk").addEventListener("click", () => {
+    show("screenTalk");
+    startTalk();
+  });
   document.getElementById("btnResetProgress").addEventListener("click", () => {
-    if (!window.confirm("¿Reiniciar todo el progreso de aprendizaje?")) return;
+    if (!window.confirm("¿Reiniciar progreso y racha?")) return;
     learnProgress = {};
+    streakData = { count: 0, lastDate: "" };
     saveProgress();
+    saveStreak();
     renderLearnHub();
   });
   document.getElementById("btnBackLearnHub").addEventListener("click", () => show("screenTitle"));
   document.getElementById("btnBackLearn").addEventListener("click", () => {
+    renderLearnHub();
+    show("screenLearnHub");
+  });
+  document.getElementById("btnBackSentence").addEventListener("click", () => {
+    renderLearnHub();
+    show("screenLearnHub");
+  });
+  document.getElementById("btnBackTalk").addEventListener("click", () => {
     renderLearnHub();
     show("screenLearnHub");
   });
@@ -648,6 +1027,7 @@
   }
 
   loadProgress();
+  loadStreak();
   loadDict()
     .then(() => {
       /* listo */

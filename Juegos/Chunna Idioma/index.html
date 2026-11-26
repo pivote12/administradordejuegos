@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Chunna Idioma</title>
-  <link rel="stylesheet" href="styles.css?v=ci9" />
+  <link rel="stylesheet" href="styles.css?v=ci10" />
   <link rel="stylesheet" href="../../shared-music.css?v=global1" />
 </head>
 <body>
@@ -68,15 +68,26 @@
       <button type="button" class="btn ghost" id="btnBackLearnHub">←</button>
       <div class="bar-titles">
         <h2>Aprender Chunna</h2>
-        <p class="hint">5 niveles por palabra · aprendé nuevas y practicá las ya vistas</p>
+        <p class="hint">5 niveles por palabra · después oraciones, charlas y racha</p>
       </div>
     </header>
     <div class="panel">
+      <p class="streak-banner" id="streakBanner">Racha: 0 días</p>
       <p class="hint" id="learnStats">—</p>
       <div class="toolbar">
         <button type="button" class="btn primary" id="btnStartLesson">Seguir aprendiendo</button>
         <button type="button" class="btn ghost" id="btnResetProgress">Reiniciar progreso</button>
       </div>
+
+      <div class="advanced-box" id="advancedBox">
+        <h3>Práctica avanzada</h3>
+        <p class="hint" id="advancedLockHint">Dominá las 5 cosas de todas las palabras para desbloquear.</p>
+        <div class="title-actions advanced-actions" id="advancedActions" hidden>
+          <button type="button" class="btn primary" id="btnSentences">Hacer oraciones</button>
+          <button type="button" class="btn primary" id="btnTalk">Conversaciones</button>
+        </div>
+      </div>
+
       <h3>Progreso por palabra</h3>
       <div class="progress-list" id="progressList"></div>
     </div>
@@ -97,6 +108,41 @@
       <div class="learn-options" id="learnOptions"></div>
       <div class="toolbar" id="learnActions"></div>
       <p class="learn-feedback" id="learnFeedback" hidden></p>
+    </div>
+  </section>
+
+  <section id="screenSentence" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackSentence">←</button>
+      <div class="bar-titles">
+        <h2>Hacer oraciones</h2>
+        <p class="hint" id="sentenceHint">Armá la frase en Chunna</p>
+      </div>
+    </header>
+    <div class="panel learn-card">
+      <p class="learn-prompt" id="sentencePrompt">—</p>
+      <p class="learn-main" id="sentenceMain">—</p>
+      <p class="hint mono" id="sentenceSub"></p>
+      <div class="learn-options" id="sentenceOptions"></div>
+      <div class="toolbar" id="sentenceActions"></div>
+      <p class="learn-feedback" id="sentenceFeedback" hidden></p>
+    </div>
+  </section>
+
+  <section id="screenTalk" class="screen">
+    <header class="bar">
+      <button type="button" class="btn ghost" id="btnBackTalk">←</button>
+      <div class="bar-titles">
+        <h2>Conversaciones</h2>
+        <p class="hint" id="talkHint">Charlá en Chunna</p>
+      </div>
+    </header>
+    <div class="panel">
+      <div class="chat-log" id="chatLog"></div>
+      <p class="hint" id="talkPrompt">—</p>
+      <div class="learn-options" id="talkOptions"></div>
+      <div class="toolbar" id="talkActions"></div>
+      <p class="learn-feedback" id="talkFeedback" hidden></p>
     </div>
   </section>
 
@@ -129,6 +175,6 @@
   </div>
 
   <script src="../../shared-music.js?v=global5"></script>
-  <script src="game.js?v=ci9"></script>
+  <script src="game.js?v=ci10"></script>
 </body>
 </html>
