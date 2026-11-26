@@ -52,11 +52,134 @@
   const missingWords = document.getElementById("missingWords");
   const alphabetText = document.getElementById("alphabetText");
   const letterList = document.getElementById("letterList");
+  const chunnaKeyboard = document.getElementById("chunnaKeyboard");
+  const chunnaKbKeys = document.getElementById("chunnaKbKeys");
+  const btnKbClose = document.getElementById("btnKbClose");
+  const btnKbEnter = document.getElementById("btnKbEnter");
+  /** @type {HTMLTextAreaElement|null} */
+  let kbTarget = null;
 
   function show(id) {
     document.querySelectorAll(".screen").forEach((screen) => {
       screen.classList.toggle("active", screen.id === id);
     });
+    if (id !== "screenTranslate" && id !== "screenTalk") hideChunnaKeyboard();
+  }
+
+  function chunnaGlyphs() {
+    if (dict && Array.isArray(dict.letters) && dict.letters.length) {
+      return dict.letters.map((letter) => letter.g).filter(Boolean);
+    }
+    if (dict && dict.alphabet) return Array.from(dict.alphabet);
+    return Array.from("⩤⫲⫼⊟⊴⋈⊥⋑ϖ≬⊘肺结核⋒⨿⫬ϡϠ⌖⋓⋲⊩≡≘⪮⋹");
+  }
+
+  function buildChunnaKeyboard() {
+    chunnaKbKeys.innerHTML = "";
+    chunnaGlyphs().forEach((glyph) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "kb-key";
+      btn.textContent = glyph;
+      btn.setAttribute("data-kb-char", glyph);
+      btn.addEventListener("pointerdown", (ev) => {
+        ev.preventDefault();
+        insertKbText(glyph);
+      });
+      chunnaKbKeys.appendChild(btn);
+    });
+  }
+
+  function showChunnaKeyboard(target) {
+    if (!target || target.disabled) return;
+    kbTarget = target;
+    chunnaKeyboard.hidden = false;
+    document.body.classList.add("kb-open");
+    btnKbEnter.textContent = target.id === "talkInput" ? "Enviar" : "↵";
+  }
+
+  function hideChunnaKeyboard() {
+    chunnaKeyboard.hidden = true;
+    document.body.classList.remove("kb-open");
+    kbTarget = null;
+  }
+
+  function insertKbText(chunk) {
+    const el = kbTarget;
+    if (!el || el.disabled) return;
+    const start = typeof el.selectionStart === "number" ? el.selectionStart : el.value.length;
+    const end = typeof el.selectionEnd === "number" ? el.selectionEnd : el.value.length;
+    const before = el.value.slice(0, start);
+    const after = el.value.slice(end);
+    el.value = before + chunk + after;
+    const pos = start + chunk.length;
+    try {
+      el.setSelectionRange(pos, pos);
+    } catch (_err) {
+      /* ignore */
+    }
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.focus({ preventScroll: true });
+  }
+
+  function kbBackspace() {
+    const el = kbTarget;
+    if (!el || el.disabled) return;
+    const start = typeof el.selectionStart === "number" ? el.selectionStart : el.value.length;
+    const end = typeof el.selectionEnd === "number" ? el.selectionEnd : el.value.length;
+    let nextValue = el.value;
+    let nextPos = start;
+    if (start !== end) {
+      nextValue = el.value.slice(0, start) + el.value.slice(end);
+      nextPos = start;
+    } else if (start > 0) {
+      const before = el.value.slice(0, start);
+      const after = el.value.slice(start);
+      const chars = Array.from(before);
+      chars.pop();
+      nextValue = chars.join("") + after;
+      nextPos = chars.join("").length;
+    } else {
+      return;
+    }
+    el.value = nextValue;
+    try {
+      el.setSelectionRange(nextPos, nextPos);
+    } catch (_err) {
+      /* ignore */
+    }
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.focus({ preventScroll: true });
+  }
+
+  function kbEnter() {
+    if (kbTarget && kbTarget.id === "talkInput") {
+      if (typeof submitTalkReply === "function") submitTalkReply();
+      return;
+    }
+    insertKbText("\n");
+  }
+
+  function bindChunnaField(el) {
+    if (!el) return;
+    el.setAttribute("inputmode", "none");
+    el.setAttribute("autocomplete", "off");
+    el.setAttribute("spellcheck", "false");
+    el.addEventListener("focus", () => {
+      // Evita el teclado del sistema en celulares.
+      el.setAttribute("readonly", "readonly");
+      showChunnaKeyboard(el);
+      window.setTimeout(() => {
+        el.removeAttribute("readonly");
+        try {
+          const pos = el.value.length;
+          el.setSelectionRange(pos, pos);
+        } catch (_err) {
+          /* ignore */
+        }
+      }, 40);
+    });
+    el.addEventListener("click", () => showChunnaKeyboard(el));
   }
 
   function fold(text) {
@@ -1379,9 +1502,10 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci13", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci14", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
+    buildChunnaKeyboard();
   }
 
   document.getElementById("btnPlay").addEventListener("click", () => {
@@ -1488,7 +1612,20 @@
     syncFromSource();
   });
   textSource.addEventListener("input", syncFromSource);
+  textSource.addEventListener("focus", hideChunnaKeyboard);
   textChunna.addEventListener("input", syncFromChunna);
+  bindChunnaField(textChunna);
+  bindChunnaField(talkInput);
+  btnKbClose.addEventListener("click", hideChunnaKeyboard);
+  chunnaKeyboard.querySelectorAll("[data-kb]").forEach((btn) => {
+    btn.addEventListener("pointerdown", (ev) => {
+      ev.preventDefault();
+      const action = btn.getAttribute("data-kb");
+      if (action === "space") insertKbText(" ");
+      else if (action === "back") kbBackspace();
+      else if (action === "enter") kbEnter();
+    });
+  });
   btnSpeak.addEventListener("click", speakHits);
   document.getElementById("btnStopSpeak").addEventListener("click", stopSpeak);
   document.getElementById("btnClear").addEventListener("click", () => {
