@@ -1843,6 +1843,45 @@
         "sw": "a",
         "ga": "a"
       }
+    },
+    {
+      "chunna": "⊥⊥Ϡ",
+      "ipa": "taːtaɪrf",
+      "help": "táatairf",
+      "words": {
+        "es": "rosa",
+        "en": "rose",
+        "fr": "rose",
+        "de": "rose",
+        "pt": "rosa",
+        "it": "rosa",
+        "ru": "роза",
+        "pl": "róża",
+        "nl": "roos",
+        "zh": "玫瑰",
+        "ja": "バラ",
+        "ko": "장미",
+        "ar": "وردة",
+        "hi": "गुलाब",
+        "tr": "gül",
+        "sv": "ros",
+        "no": "rose",
+        "da": "rose",
+        "fi": "ruusu",
+        "el": "τριαντάφυλλο",
+        "he": "ורד",
+        "th": "กุหลาบ",
+        "vi": "hoa hồng",
+        "id": "mawar",
+        "ms": "mawar",
+        "uk": "троянда",
+        "cs": "růže",
+        "ro": "trandafir",
+        "hu": "rózsa",
+        "ca": "rosa",
+        "sw": "waridi",
+        "ga": "rós"
+      }
     }
   ]
 }
