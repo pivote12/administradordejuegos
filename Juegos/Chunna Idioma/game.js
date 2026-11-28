@@ -1799,7 +1799,7 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci21", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci22", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
     buildChunnaKeyboard();
@@ -1900,6 +1900,10 @@
   }
 
   function saveLocalGroup(meta) {
+    if (meta && meta.deleted) {
+      removeLocalGroup(meta.code);
+      return;
+    }
     const list = loadLocalGroups().filter((g) => g.code !== meta.code);
     list.unshift({
       code: meta.code,
@@ -1914,6 +1918,17 @@
     renderSavedGroups();
   }
 
+  function removeLocalGroup(code) {
+    const key = String(code || "").toLowerCase();
+    const list = loadLocalGroups().filter((g) => g.code !== key);
+    try {
+      localStorage.setItem(ONLINE_GROUPS_KEY, JSON.stringify(list));
+    } catch (_err) {
+      /* ignore */
+    }
+    renderSavedGroups();
+  }
+
   function renderSavedGroups() {
     const list = loadLocalGroups();
     onlineSavedGroups.innerHTML = "";
@@ -1922,6 +1937,9 @@
       return;
     }
     list.forEach((g) => {
+      const row = document.createElement("div");
+      row.className = "saved-group-row";
+
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "saved-group-btn";
@@ -1936,7 +1954,20 @@
         onlineLogAdd("Grupo guardado elegido: " + g.code);
         loadGroupMeta(g.code).then(() => renderColorPicks("join"));
       });
-      onlineSavedGroups.appendChild(btn);
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "btn ghost saved-group-del";
+      del.textContent = "Borrar";
+      del.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        deleteOnlineGroup(g.code);
+      });
+
+      row.appendChild(btn);
+      row.appendChild(del);
+      onlineSavedGroups.appendChild(row);
     });
   }
 
@@ -2048,6 +2079,55 @@
     index.unshift({ code: code, name: name || code, updated: Date.now() });
     index = index.slice(0, 80);
     await kvSet("groups-index", index);
+  }
+
+  async function removeFromGroupIndex(code) {
+    let index = (await kvGet("groups-index")) || [];
+    if (!Array.isArray(index)) index = [];
+    const next = index.filter((item) => item && item.code !== code);
+    await kvSet("groups-index", next);
+  }
+
+  async function deleteOnlineGroup(code) {
+    const key = String(code || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    if (!key) {
+      setOnlineStatus("No hay código para borrar");
+      return;
+    }
+    if (!window.confirm("¿Borrar el grupo " + key + "? Nadie podrá entrar con ese código.")) {
+      return;
+    }
+    setOnlineStatus("Borrando grupo " + key + "…");
+    onlineLogAdd("DELETE group " + key);
+    try {
+      const meta = (await loadGroupMeta(key)) || { code: key, name: key };
+      meta.deleted = true;
+      meta.deletedAt = Date.now();
+      meta.members = {};
+      await kvSet(groupNoteKey(key), meta);
+      await removeFromGroupIndex(key);
+      removeLocalGroup(key);
+      if (onlineInChat && onlineRoomCode === key) {
+        leaveOnlineChat();
+      }
+      if (String(onlineCodeInput.value || "").toLowerCase() === key) {
+        onlineCodeInput.value = "";
+      }
+      onlineGroupMeta = null;
+      onlineCodeDisplay.textContent = "—";
+      onlineGroupTitle.textContent = "—";
+      refreshMembersInfo();
+      renderColorPicks("join");
+      setOnlineStatus("Grupo " + key + " borrado");
+      onlineLogAdd("Grupo borrado OK: " + key);
+    } catch (err) {
+      removeLocalGroup(key);
+      setOnlineStatus("Se borró en este dispositivo; red falló: " + (err && err.message ? err.message : err));
+      onlineLogAdd("DELETE parcial: " + (err && err.message ? err.message : err));
+    }
   }
 
   function chunnaLexicon() {
@@ -2293,10 +2373,14 @@
     try {
       let meta = await loadGroupMeta(code);
       if (!meta) {
-        // El código se conserva aunque nadie esté: si no está en red, lo recreamos localmente
-        // solo si el usuario insiste? Mejor fallar claro.
         setOnlineStatus("No encontré ese grupo en la red. Pedí el código de nuevo o creá uno.");
         onlineLogAdd("Grupo ausente en KV: " + code);
+        return;
+      }
+      if (meta.deleted) {
+        removeLocalGroup(code);
+        setOnlineStatus("Ese grupo fue borrado. Creá uno nuevo.");
+        onlineLogAdd("Join bloqueado: grupo borrado " + code);
         return;
       }
       if (!meta.members) meta.members = {};
@@ -2431,6 +2515,12 @@
   });
   document.getElementById("btnOnlineSend").addEventListener("click", sendOnlineMessage);
   document.getElementById("btnOnlineLeave").addEventListener("click", leaveOnlineChat);
+  document.getElementById("btnOnlineDelete").addEventListener("click", () => {
+    deleteOnlineGroup(onlineCodeInput.value || onlineRoomCode);
+  });
+  document.getElementById("btnOnlineDeleteChat").addEventListener("click", () => {
+    deleteOnlineGroup(onlineRoomCode || onlineCodeInput.value);
+  });
   document.getElementById("btnOnlineCopy").addEventListener("click", async () => {
     const code = onlineRoomCode || onlineCodeInput.value;
     try {

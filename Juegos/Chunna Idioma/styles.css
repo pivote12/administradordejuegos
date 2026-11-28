@@ -495,6 +495,12 @@ h1, h2, h3 { margin: 0 0 8px; }
   display: grid;
   gap: 8px;
 }
+.saved-group-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: stretch;
+}
 .saved-group-btn {
   width: 100%;
   text-align: left;
@@ -507,6 +513,9 @@ h1, h2, h3 { margin: 0 0 8px; }
   cursor: pointer;
 }
 .saved-group-btn strong { color: var(--accent); }
+.saved-group-del {
+  white-space: nowrap;
+}
 .chat-bubble .who-color {
   font-weight: 800;
 }

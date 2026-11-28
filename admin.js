@@ -1022,7 +1022,7 @@ const FALLBACK_GAMES = [
     name: "Chunna Idioma",
     description: "Traductor, aprendizaje, charlas, conversación online entre dispositivos y racha.",
     folder: "Chunna Idioma",
-    playUrl: "https://servidordejose.com/Juegos/Chunna%20Idioma/index.html?v=ci21",
+    playUrl: "https://servidordejose.com/Juegos/Chunna%20Idioma/index.html?v=ci22",
     icon: "≬⩤",
     tags: ["idioma", "chunna", "traductor", "aprender", "alfabeto"],
     creator: "José Rafael Rodriguez Morillo",
