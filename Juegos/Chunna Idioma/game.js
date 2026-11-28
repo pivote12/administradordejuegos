@@ -1799,20 +1799,38 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci20", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci21", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
     buildChunnaKeyboard();
   }
 
+  const ONLINE_API = "https://technocore.chat";
+  const ONLINE_NS = "chunna-idioma";
+  const ONLINE_GROUPS_KEY = "chunna-online-groups-v1";
+  const ONLINE_COLORS = [
+    "#fbbf24",
+    "#38bdf8",
+    "#4ade80",
+    "#fb7185",
+    "#c084fc",
+    "#f97316",
+    "#2dd4bf",
+    "#e879f9",
+    "#a3e635",
+    "#60a5fa"
+  ];
+
   const onlineStatus = document.getElementById("onlineStatus");
-  const onlineMyId = document.getElementById("onlineMyId");
-  const onlineHostId = document.getElementById("onlineHostId");
-  const onlineRole = document.getElementById("onlineRole");
-  const onlineConnState = document.getElementById("onlineConnState");
   const onlineLog = document.getElementById("onlineLog");
   const onlineCodeInput = document.getElementById("onlineCodeInput");
   const onlineCodeDisplay = document.getElementById("onlineCodeDisplay");
+  const onlineCodeBig = document.getElementById("onlineCodeBig");
+  const onlineGroupTitle = document.getElementById("onlineGroupTitle");
+  const onlineMeInfo = document.getElementById("onlineMeInfo");
+  const onlineRoomId = document.getElementById("onlineRoomId");
+  const onlineLastSeqEl = document.getElementById("onlineLastSeq");
+  const onlineMembersInfo = document.getElementById("onlineMembersInfo");
   const onlineChatWrap = document.getElementById("onlineChatWrap");
   const onlineChatLog = document.getElementById("onlineChatLog");
   const onlineInput = document.getElementById("onlineInput");
@@ -1820,39 +1838,216 @@
   const btnOnlineSend = document.getElementById("btnOnlineSend");
   const btnOnlineCopy = document.getElementById("btnOnlineCopy");
   const onlineLobby = document.getElementById("onlineLobby");
+  const onlineGroupName = document.getElementById("onlineGroupName");
+  const onlineNickCreate = document.getElementById("onlineNickCreate");
+  const onlineNickJoin = document.getElementById("onlineNickJoin");
+  const onlineColorsCreate = document.getElementById("onlineColorsCreate");
+  const onlineColorsJoin = document.getElementById("onlineColorsJoin");
+  const onlineSavedGroups = document.getElementById("onlineSavedGroups");
 
-  let onlinePeer = null;
-  let onlineConn = null;
   let onlineRoomCode = "";
-  let onlineIsHost = false;
+  let onlineNick = "";
+  let onlineColor = "";
+  let onlineGroupMeta = null;
+  let onlineLastSeq = 0;
+  let onlineInChat = false;
+  let onlinePollAbort = false;
+  let onlineSeenSeq = new Set();
+  let selectedCreateColor = "";
+  let selectedJoinColor = "";
+  let lastLocalSend = { body: "", t: 0 };
   const onlineLogLines = [];
 
   function onlineLogAdd(msg) {
     const stamp = new Date().toLocaleTimeString();
     onlineLogLines.push("[" + stamp + "] " + msg);
-    if (onlineLogLines.length > 80) onlineLogLines.shift();
+    if (onlineLogLines.length > 100) onlineLogLines.shift();
     onlineLog.textContent = onlineLogLines.join("\n");
     onlineLog.scrollTop = onlineLog.scrollHeight;
     console.log("[Chunna Online]", msg);
   }
 
-  function setOnlineUi( partial ) {
-    if (partial.status) onlineStatus.textContent = partial.status;
-    if (partial.myId) onlineMyId.textContent = partial.myId;
-    if (partial.hostId) onlineHostId.textContent = partial.hostId;
-    if (partial.role) onlineRole.textContent = partial.role;
-    if (partial.conn) onlineConnState.textContent = partial.conn;
+  function chatRoomName(code) {
+    return "chunna-g-" + String(code || "").toLowerCase();
+  }
+
+  function groupNoteKey(code) {
+    return "group-" + String(code || "").toLowerCase();
+  }
+
+  function sanitizeNick(nick) {
+    return String(nick || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, "")
+      .slice(0, 20);
   }
 
   function makeRoomCode() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const chars = "abcdefghjkmnpqrstuvwxyz23456789";
     let out = "";
     for (let i = 0; i < 6; i += 1) out += chars[Math.floor(Math.random() * chars.length)];
     return out;
   }
 
-  function hostPeerId(code) {
-    return "chunna-ol-" + String(code || "").toUpperCase();
+  function loadLocalGroups() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(ONLINE_GROUPS_KEY) || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_err) {
+      return [];
+    }
+  }
+
+  function saveLocalGroup(meta) {
+    const list = loadLocalGroups().filter((g) => g.code !== meta.code);
+    list.unshift({
+      code: meta.code,
+      name: meta.name,
+      updated: Date.now()
+    });
+    try {
+      localStorage.setItem(ONLINE_GROUPS_KEY, JSON.stringify(list.slice(0, 30)));
+    } catch (_err) {
+      /* ignore */
+    }
+    renderSavedGroups();
+  }
+
+  function renderSavedGroups() {
+    const list = loadLocalGroups();
+    onlineSavedGroups.innerHTML = "";
+    if (!list.length) {
+      onlineSavedGroups.textContent = "Todavía no hay grupos guardados en este dispositivo.";
+      return;
+    }
+    list.forEach((g) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "saved-group-btn";
+      btn.innerHTML =
+        "<strong>" +
+        (g.name || "Grupo") +
+        "</strong> · código <span class='mono'>" +
+        g.code +
+        "</span>";
+      btn.addEventListener("click", () => {
+        onlineCodeInput.value = g.code;
+        onlineLogAdd("Grupo guardado elegido: " + g.code);
+        loadGroupMeta(g.code).then(() => renderColorPicks("join"));
+      });
+      onlineSavedGroups.appendChild(btn);
+    });
+  }
+
+  function renderColorPicks(which) {
+    const host = which === "create" ? onlineColorsCreate : onlineColorsJoin;
+    const selected = which === "create" ? selectedCreateColor : selectedJoinColor;
+    const taken = new Set();
+    if (which === "join" && onlineGroupMeta && onlineGroupMeta.members) {
+      Object.keys(onlineGroupMeta.members).forEach((nick) => {
+        const mem = onlineGroupMeta.members[nick];
+        if (mem && mem.color && nick !== onlineNick) taken.add(mem.color.toLowerCase());
+      });
+    }
+    host.innerHTML = "";
+    ONLINE_COLORS.forEach((color) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "color-swatch";
+      btn.style.background = color;
+      btn.title = color;
+      const isTaken = taken.has(color.toLowerCase());
+      if (isTaken) btn.classList.add("taken");
+      if (selected === color) btn.classList.add("selected");
+      btn.addEventListener("click", () => {
+        if (isTaken) {
+          onlineLogAdd("Color ocupado: " + color);
+          setOnlineStatus("Ese color ya lo usa alguien del grupo");
+          return;
+        }
+        if (which === "create") selectedCreateColor = color;
+        else selectedJoinColor = color;
+        renderColorPicks(which);
+        onlineLogAdd("Color elegido (" + which + "): " + color);
+      });
+      host.appendChild(btn);
+    });
+  }
+
+  function setOnlineStatus(text) {
+    onlineStatus.textContent = text;
+  }
+
+  function refreshMembersInfo() {
+    if (!onlineGroupMeta || !onlineGroupMeta.members) {
+      onlineMembersInfo.textContent = "—";
+      return;
+    }
+    onlineMembersInfo.textContent = Object.keys(onlineGroupMeta.members)
+      .map((nick) => nick + "=" + (onlineGroupMeta.members[nick].color || "?"))
+      .join(" · ");
+  }
+
+  async function kvGet(key) {
+    const url = ONLINE_API + "/kv/" + ONLINE_NS + "/" + encodeURIComponent(key);
+    onlineLogAdd("KV GET " + url);
+    const res = await fetch(url, { cache: "no-store" });
+    const text = await res.text();
+    if (!res.ok) {
+      onlineLogAdd("KV GET fail " + res.status + ": " + text.slice(0, 160));
+      return null;
+    }
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) {
+      onlineLogAdd("KV sin JSON: " + text.slice(0, 120));
+      return null;
+    }
+    try {
+      return JSON.parse(match[0]);
+    } catch (_err) {
+      onlineLogAdd("KV parse fail: " + match[0].slice(0, 120));
+      return null;
+    }
+  }
+
+  async function kvSet(key, valueObj) {
+    const raw = JSON.stringify(valueObj);
+    const url =
+      ONLINE_API +
+      "/kv/" +
+      ONLINE_NS +
+      "/" +
+      encodeURIComponent(key) +
+      "/set/" +
+      encodeURIComponent(raw);
+    onlineLogAdd("KV SET " + key + " (" + raw.length + " chars)");
+    const res = await fetch(url, { cache: "no-store" });
+    const text = await res.text();
+    onlineLogAdd("KV SET -> " + res.status + " " + text.slice(0, 120));
+    if (!res.ok) throw new Error("No se pudo guardar el grupo");
+    return true;
+  }
+
+  async function loadGroupMeta(code) {
+    const meta = await kvGet(groupNoteKey(code));
+    if (meta && meta.code) {
+      onlineGroupMeta = meta;
+      refreshMembersInfo();
+      onlineGroupTitle.textContent = meta.name || code;
+      return meta;
+    }
+    onlineGroupMeta = null;
+    return null;
+  }
+
+  async function touchGroupIndex(code, name) {
+    let index = (await kvGet("groups-index")) || [];
+    if (!Array.isArray(index)) index = [];
+    index = index.filter((item) => item && item.code !== code);
+    index.unshift({ code: code, name: name || code, updated: Date.now() });
+    index = index.slice(0, 80);
+    await kvSet("groups-index", index);
   }
 
   function chunnaLexicon() {
@@ -1881,7 +2076,8 @@
     const check = validateOnlineChunna(onlineInput.value);
     if (check.empty) {
       onlineBadWords.hidden = true;
-      btnOnlineSend.disabled = true;
+      btnOnlineSend.disabled = !onlineInChat;
+      if (onlineInChat) btnOnlineSend.disabled = true;
       return;
     }
     if (!check.ok) {
@@ -1892,227 +2088,238 @@
       return;
     }
     onlineBadWords.hidden = true;
-    btnOnlineSend.disabled = !(onlineConn && onlineConn.open);
+    btnOnlineSend.disabled = !onlineInChat;
   }
 
-  function appendOnlineBubble(role, text) {
+  function parseChatPayload(rawText) {
+    const text = String(rawText || "");
+    const m = text.match(/^\[(#[0-9a-fA-F]{3,8})\]\s([\s\S]*)$/);
+    if (m) return { color: m[1], body: m[2] };
+    return { color: "#94a3b8", body: text };
+  }
+
+  function appendOnlineBubble(nick, color, body, mine) {
     const bubble = document.createElement("div");
-    bubble.className = "chat-bubble " + (role === "you" ? "you" : "npc");
+    bubble.className = "chat-bubble " + (mine ? "you" : "npc");
     bubble.innerHTML =
-      "<span class='who'>" +
-      (role === "you" ? "Vos" : "Otro dispositivo") +
+      "<span class='who who-color' style='color:" +
+      color +
+      "'>" +
+      nick +
+      (mine ? " (vos)" : "") +
       "</span>" +
-      "<span class='mono'>" +
-      text +
+      "<span class='mono' style='color:" +
+      color +
+      "'>" +
+      body +
       "</span>";
     onlineChatLog.appendChild(bubble);
     onlineChatLog.scrollTop = onlineChatLog.scrollHeight;
   }
 
-  function destroyOnline() {
-    try {
-      if (onlineConn) onlineConn.close();
-    } catch (_err) {
-      /* ignore */
-    }
-    try {
-      if (onlinePeer) onlinePeer.destroy();
-    } catch (_err) {
-      /* ignore */
-    }
-    onlineConn = null;
-    onlinePeer = null;
-    onlineRoomCode = "";
-    onlineIsHost = false;
+  function stopOnlinePoll() {
+    onlinePollAbort = true;
+    onlineInChat = false;
+  }
+
+  function leaveOnlineChat() {
+    stopOnlinePoll();
     onlineChatWrap.hidden = true;
     onlineLobby.hidden = false;
-    onlineCodeDisplay.hidden = true;
-    btnOnlineCopy.hidden = true;
     onlineInput.value = "";
     btnOnlineSend.disabled = true;
-    setOnlineUi({
-      status: "Desconectado",
-      myId: "—",
-      hostId: "—",
-      role: "—",
-      conn: "cerrada"
-    });
+    btnOnlineCopy.hidden = !onlineRoomCode;
+    setOnlineStatus(onlineRoomCode ? "Fuera del chat · el grupo " + onlineRoomCode + " sigue existiendo" : "En lobby");
+    onlineLogAdd("Saliste del chat. El código/grupo NO se borra.");
+    refreshOnlineSendState();
   }
 
-  function wireOnlineConnection(conn) {
-    onlineConn = conn;
-    setOnlineUi({ conn: "conectando data…" });
-    onlineLogAdd("DataConnection con peer=" + conn.peer);
-
-    conn.on("open", () => {
-      setOnlineUi({ status: "¡Conectados!", conn: "abierta" });
-      onlineLogAdd("DataConnection OPEN");
-      onlineChatWrap.hidden = false;
-      onlineLobby.hidden = false;
-      refreshOnlineSendState();
-      try {
-        conn.send({ type: "hello", from: onlinePeer ? onlinePeer.id : "?", t: Date.now() });
-      } catch (err) {
-        onlineLogAdd("Error enviando hello: " + (err && err.message ? err.message : err));
-      }
-    });
-
-    conn.on("data", (data) => {
-      onlineLogAdd("DATA recibida: " + JSON.stringify(data));
-      if (!data || typeof data !== "object") return;
-      if (data.type === "chat" && typeof data.text === "string") {
-        const check = validateOnlineChunna(data.text);
-        if (!check.ok) {
-          onlineLogAdd("Mensaje remoto rechazado localmente (palabras inválidas): " + check.bad.join(", "));
-          return;
-        }
-        appendOnlineBubble("npc", data.text);
-      }
-      if (data.type === "hello") {
-        onlineLogAdd("Handshake hello de " + (data.from || conn.peer));
-      }
-    });
-
-    conn.on("close", () => {
-      setOnlineUi({ status: "El otro dispositivo se desconectó", conn: "cerrada" });
-      onlineLogAdd("DataConnection CLOSE");
-      btnOnlineSend.disabled = true;
-    });
-
-    conn.on("error", (err) => {
-      setOnlineUi({ status: "Error de data: " + (err && err.type ? err.type : "desconocido") });
-      onlineLogAdd("DataConnection ERROR: " + (err && err.message ? err.message : String(err)));
-    });
-  }
-
-  function createOnlinePeer(preferredId) {
-    if (typeof window.Peer !== "function") {
-      throw new Error("PeerJS no cargó. Revisá la red / unpkg.");
+  async function fetchRoomMessages(since, waitSec) {
+    const room = chatRoomName(onlineRoomCode);
+    let url = ONLINE_API + "/r/" + encodeURIComponent(room) + "?format=json";
+    if (since) url += "&since=" + encodeURIComponent(String(since));
+    if (waitSec) url += "&wait=" + encodeURIComponent(String(waitSec));
+    url += "&n=" + Date.now();
+    const res = await fetch(url, { cache: "no-store" });
+    const text = await res.text();
+    if (!res.ok) {
+      onlineLogAdd("READ fail " + res.status + ": " + text.slice(0, 140));
+      return null;
     }
-    const opts = {
-      debug: 2,
-      config: {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:global.stun.twilio.com:3478" }
-        ]
-      }
-    };
-    return preferredId ? new window.Peer(preferredId, opts) : new window.Peer(opts);
+    try {
+      return JSON.parse(text);
+    } catch (_err) {
+      onlineLogAdd("READ parse fail: " + text.slice(0, 140));
+      return null;
+    }
   }
 
-  function startOnlineHost() {
-    destroyOnline();
-    onlineIsHost = true;
-    onlineRoomCode = makeRoomCode();
-    const hostId = hostPeerId(onlineRoomCode);
-    onlineCodeInput.value = onlineRoomCode;
-    onlineCodeDisplay.hidden = false;
-    onlineCodeDisplay.textContent = onlineRoomCode;
-    btnOnlineCopy.hidden = false;
-    setOnlineUi({
-      status: "Creando sala…",
-      role: "HOST (creador)",
-      hostId: hostId,
-      myId: "…",
-      conn: "esperando otro dispositivo"
+  function ingestMessages(payload) {
+    if (!payload || !Array.isArray(payload.messages)) return;
+    payload.messages.forEach((msg) => {
+      if (!msg || onlineSeenSeq.has(msg.seq)) return;
+      onlineSeenSeq.add(msg.seq);
+      if (msg.seq > onlineLastSeq) onlineLastSeq = msg.seq;
+      onlineLastSeqEl.textContent = String(onlineLastSeq);
+      const parsed = parseChatPayload(msg.text);
+      const nick = String(msg.from || "alguien").replace(/^~/, "");
+      const mine = sanitizeNick(nick) === sanitizeNick(onlineNick);
+      const check = validateOnlineChunna(parsed.body);
+      if (!check.ok && !check.empty) {
+        onlineLogAdd(
+          "Msg seq=" + msg.seq + " de " + nick + " con palabras inválidas (igual se muestra): " + check.bad.join(",")
+        );
+      }
+      const isEcho =
+        mine &&
+        parsed.body === lastLocalSend.body &&
+        Date.now() - lastLocalSend.t < 10000;
+      if (!isEcho) {
+        appendOnlineBubble(nick, parsed.color || "#94a3b8", parsed.body, mine);
+      } else {
+        onlineLogAdd("Echo propio seq=" + msg.seq + " (ya mostrado)");
+      }
+      onlineLogAdd("Msg #" + msg.seq + " <" + nick + "> " + parsed.body);
     });
-    onlineLogAdd("Creando host peer id=" + hostId);
+    if (typeof payload.last_seq === "number" && payload.last_seq > onlineLastSeq) {
+      onlineLastSeq = payload.last_seq;
+      onlineLastSeqEl.textContent = String(onlineLastSeq);
+    }
+  }
+
+  async function onlinePollLoop() {
+    onlinePollAbort = false;
+    onlineLogAdd("Poll loop ON room=" + chatRoomName(onlineRoomCode));
+    while (!onlinePollAbort && onlineInChat) {
+      try {
+        const data = await fetchRoomMessages(onlineLastSeq || 0, 10);
+        if (onlinePollAbort || !onlineInChat) break;
+        if (data) ingestMessages(data);
+      } catch (err) {
+        onlineLogAdd("Poll error: " + (err && err.message ? err.message : err));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+    }
+    onlineLogAdd("Poll loop OFF");
+  }
+
+  async function enterOnlineChat(meta, nick, color) {
+    onlineGroupMeta = meta;
+    onlineRoomCode = meta.code;
+    onlineNick = nick;
+    onlineColor = color;
+    onlineLastSeq = 0;
+    onlineSeenSeq = new Set();
+    onlineInChat = true;
+    onlineChatLog.innerHTML = "";
+    onlineLobby.hidden = true;
+    onlineChatWrap.hidden = false;
+    onlineCodeDisplay.textContent = meta.code;
+    onlineCodeBig.textContent = meta.code;
+    onlineGroupTitle.textContent = meta.name || meta.code;
+    onlineRoomId.textContent = chatRoomName(meta.code);
+    onlineMeInfo.textContent = nick + " · " + color;
+    onlineLastSeqEl.textContent = "0";
+    btnOnlineCopy.hidden = false;
+    refreshMembersInfo();
+    setOnlineStatus("En el chat · los mensajes aparecen en todos los dispositivos del grupo");
+    onlineLogAdd("Entraste a grupo " + meta.code + " como " + nick + " color " + color);
+    saveLocalGroup(meta);
+    refreshOnlineSendState();
 
     try {
-      onlinePeer = createOnlinePeer(hostId);
+      const boot = await fetchRoomMessages(0, 0);
+      if (boot) ingestMessages(boot);
     } catch (err) {
-      setOnlineUi({ status: String(err.message || err) });
-      onlineLogAdd(String(err.message || err));
+      onlineLogAdd("Boot history fail: " + (err && err.message ? err.message : err));
+    }
+    onlinePollLoop();
+  }
+
+  async function createOnlineGroup() {
+    const name = String(onlineGroupName.value || "").trim() || "Grupo Chunna";
+    const nick = sanitizeNick(onlineNickCreate.value);
+    const color = selectedCreateColor;
+    if (!nick) {
+      setOnlineStatus("Poné un apodo (solo a-z, 0-9, _ -)");
       return;
     }
+    if (!color) {
+      setOnlineStatus("Elegí un color obligatorio para tu texto");
+      return;
+    }
+    const code = makeRoomCode();
+    const meta = {
+      code: code,
+      name: name,
+      created: Date.now(),
+      members: {}
+    };
+    meta.members[nick] = { color: color, joined: Date.now() };
+    setOnlineStatus("Creando grupo " + code + "…");
+    onlineLogAdd("CREATE group " + code + " name=" + name);
+    try {
+      await kvSet(groupNoteKey(code), meta);
+      await touchGroupIndex(code, name);
+      onlineCodeInput.value = code;
+      await enterOnlineChat(meta, nick, color);
+    } catch (err) {
+      setOnlineStatus("No se pudo crear el grupo: " + (err && err.message ? err.message : err));
+      onlineLogAdd(String(err && err.message ? err.message : err));
+    }
+  }
 
-    onlinePeer.on("open", (id) => {
-      setOnlineUi({
-        status: "Sala lista. Esperando al otro dispositivo…",
-        myId: id,
-        hostId: hostId
-      });
-      onlineLogAdd("Peer OPEN como host id=" + id);
-    });
-
-    onlinePeer.on("connection", (conn) => {
-      onlineLogAdd("Incoming connection from " + conn.peer);
-      if (onlineConn && onlineConn.open) {
-        onlineLogAdd("Ya hay alguien conectado; rechazo extra de " + conn.peer);
-        conn.close();
+  async function joinOnlineGroup(presetCode) {
+    const code = String(presetCode || onlineCodeInput.value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    const nick = sanitizeNick(onlineNickJoin.value);
+    const color = selectedJoinColor;
+    if (code.length < 4) {
+      setOnlineStatus("Escribí el código del grupo");
+      return;
+    }
+    if (!nick) {
+      setOnlineStatus("Poné un apodo (solo a-z, 0-9, _ -)");
+      return;
+    }
+    if (!color) {
+      setOnlineStatus("Elegí un color obligatorio para tu texto");
+      return;
+    }
+    setOnlineStatus("Buscando grupo " + code + "…");
+    onlineLogAdd("JOIN group " + code + " as " + nick);
+    try {
+      let meta = await loadGroupMeta(code);
+      if (!meta) {
+        // El código se conserva aunque nadie esté: si no está en red, lo recreamos localmente
+        // solo si el usuario insiste? Mejor fallar claro.
+        setOnlineStatus("No encontré ese grupo en la red. Pedí el código de nuevo o creá uno.");
+        onlineLogAdd("Grupo ausente en KV: " + code);
         return;
       }
-      wireOnlineConnection(conn);
-      setOnlineUi({ status: "Alguien se está conectando…", role: "HOST (creador)" });
-    });
-
-    onlinePeer.on("error", (err) => {
-      const msg = err && (err.type || err.message) ? (err.type || err.message) : String(err);
-      setOnlineUi({ status: "Error PeerJS host: " + msg });
-      onlineLogAdd("Peer ERROR: " + msg + " · " + JSON.stringify(err));
-    });
-
-    onlinePeer.on("disconnected", () => {
-      onlineLogAdd("Peer DISCONNECTED del broker");
-      setOnlineUi({ status: "Broker desconectado (host)" });
-    });
-  }
-
-  function startOnlineJoin() {
-    const code = String(onlineCodeInput.value || "")
-      .trim()
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, "");
-    if (code.length < 4) {
-      setOnlineUi({ status: "Escribí el código de sala completo" });
-      onlineLogAdd("Join abortado: código inválido [" + code + "]");
-      return;
-    }
-    destroyOnline();
-    onlineIsHost = false;
-    onlineRoomCode = code;
-    const hostId = hostPeerId(code);
-    onlineCodeDisplay.hidden = false;
-    onlineCodeDisplay.textContent = code;
-    btnOnlineCopy.hidden = false;
-    setOnlineUi({
-      status: "Conectando a la sala…",
-      role: "GUEST (invitado)",
-      hostId: hostId,
-      myId: "…",
-      conn: "abriendo"
-    });
-    onlineLogAdd("Join room code=" + code + " hostId=" + hostId);
-
-    try {
-      onlinePeer = createOnlinePeer();
+      if (!meta.members) meta.members = {};
+      const takenColors = Object.keys(meta.members)
+        .filter((n) => n !== nick)
+        .map((n) => String(meta.members[n].color || "").toLowerCase());
+      if (takenColors.indexOf(color.toLowerCase()) >= 0) {
+        setOnlineStatus("Ese color ya está usado. Elegí otro.");
+        renderColorPicks("join");
+        return;
+      }
+      meta.members[nick] = { color: color, joined: Date.now() };
+      meta.updated = Date.now();
+      await kvSet(groupNoteKey(code), meta);
+      await touchGroupIndex(code, meta.name || code);
+      await enterOnlineChat(meta, nick, color);
     } catch (err) {
-      setOnlineUi({ status: String(err.message || err) });
-      onlineLogAdd(String(err.message || err));
-      return;
+      setOnlineStatus("No se pudo entrar: " + (err && err.message ? err.message : err));
+      onlineLogAdd(String(err && err.message ? err.message : err));
     }
-
-    onlinePeer.on("open", (id) => {
-      setOnlineUi({ myId: id, status: "Peer listo · conectando al host…" });
-      onlineLogAdd("Peer OPEN como guest id=" + id + " → connect(" + hostId + ")");
-      const conn = onlinePeer.connect(hostId, { reliable: true });
-      wireOnlineConnection(conn);
-    });
-
-    onlinePeer.on("error", (err) => {
-      const msg = err && (err.type || err.message) ? (err.type || err.message) : String(err);
-      setOnlineUi({ status: "Error PeerJS guest: " + msg });
-      onlineLogAdd("Peer ERROR: " + msg + " · " + JSON.stringify(err));
-    });
-
-    onlinePeer.on("disconnected", () => {
-      onlineLogAdd("Peer DISCONNECTED del broker (guest)");
-      setOnlineUi({ status: "Broker desconectado (guest)" });
-    });
   }
 
-  function sendOnlineMessage() {
+  async function sendOnlineMessage() {
     const text = String(onlineInput.value || "").trim();
     const check = validateOnlineChunna(text);
     if (check.empty) return;
@@ -2121,22 +2328,42 @@
       onlineLogAdd("Envío bloqueado. Inválidas: " + check.bad.join(", "));
       return;
     }
-    if (!onlineConn || !onlineConn.open) {
-      setOnlineUi({ status: "No hay conexión abierta para enviar" });
-      onlineLogAdd("Envío falló: conn no abierta");
+    if (!onlineInChat || !onlineRoomCode || !onlineNick || !onlineColor) {
+      setOnlineStatus("Entrá a un grupo antes de enviar");
       return;
     }
-    const payload = { type: "chat", text: text, t: Date.now() };
+    const payload = "[" + onlineColor + "] " + text;
+    const room = chatRoomName(onlineRoomCode);
+    const url =
+      ONLINE_API +
+      "/r/" +
+      encodeURIComponent(room) +
+      "/say/" +
+      encodeURIComponent(onlineNick) +
+      "/" +
+      encodeURIComponent(payload);
+    onlineLogAdd("SAY " + url);
     try {
-      onlineConn.send(payload);
-      appendOnlineBubble("you", text);
-      onlineLogAdd("Enviado OK: " + text);
+      const res = await fetch(url, { cache: "no-store" });
+      const body = await res.text();
+      onlineLogAdd("SAY -> " + res.status + " " + body.slice(0, 160));
+      if (!res.ok) {
+        setOnlineStatus("No se pudo enviar el mensaje");
+        return;
+      }
+      lastLocalSend = { body: text, t: Date.now() };
+      appendOnlineBubble(onlineNick, onlineColor, text, true);
       onlineInput.value = "";
       refreshOnlineSendState();
       markPracticeDay();
+      // tocar meta para que el grupo no expire por inactividad
+      if (onlineGroupMeta) {
+        onlineGroupMeta.updated = Date.now();
+        kvSet(groupNoteKey(onlineRoomCode), onlineGroupMeta).catch(() => {});
+      }
     } catch (err) {
-      onlineLogAdd("Error send: " + (err && err.message ? err.message : err));
-      setOnlineUi({ status: "Error al enviar mensaje" });
+      onlineLogAdd("SAY error: " + (err && err.message ? err.message : err));
+      setOnlineStatus("Error de red al enviar");
     }
   }
 
@@ -2144,16 +2371,11 @@
     stopSpeak();
     hideChunnaKeyboard();
     show("screenOnline");
-    onlineLogAdd("Pantalla Online abierta · PeerJS=" + (typeof window.Peer === "function" ? "sí" : "NO"));
-    if (!onlinePeer) {
-      setOnlineUi({
-        status: "Elegí Crear sala o Unirme",
-        myId: "—",
-        hostId: "—",
-        role: "—",
-        conn: "cerrada"
-      });
-    }
+    renderColorPicks("create");
+    renderColorPicks("join");
+    renderSavedGroups();
+    onlineLogAdd("Pantalla Online abierta · chat grupal (sin PeerJS)");
+    if (!onlineInChat) setOnlineStatus("Creá un grupo o entrá con un código");
   }
 
   document.getElementById("btnPlay").addEventListener("click", () => {
@@ -2201,33 +2423,43 @@
   });
   document.getElementById("btnOnlineTitle").addEventListener("click", openOnlineScreen);
   document.getElementById("btnOnlineHub").addEventListener("click", openOnlineScreen);
-  document.getElementById("btnOnlineCreate").addEventListener("click", startOnlineHost);
-  document.getElementById("btnOnlineJoin").addEventListener("click", startOnlineJoin);
-  document.getElementById("btnOnlineSend").addEventListener("click", sendOnlineMessage);
-  document.getElementById("btnOnlineDisconnect").addEventListener("click", () => {
-    onlineLogAdd("Desconectar manual");
-    destroyOnline();
+  document.getElementById("btnOnlineCreate").addEventListener("click", () => {
+    createOnlineGroup();
   });
+  document.getElementById("btnOnlineJoin").addEventListener("click", () => {
+    joinOnlineGroup();
+  });
+  document.getElementById("btnOnlineSend").addEventListener("click", sendOnlineMessage);
+  document.getElementById("btnOnlineLeave").addEventListener("click", leaveOnlineChat);
   document.getElementById("btnOnlineCopy").addEventListener("click", async () => {
     const code = onlineRoomCode || onlineCodeInput.value;
     try {
-      await navigator.clipboard.writeText(String(code || "").toUpperCase());
-      setOnlineUi({ status: "Código copiado: " + String(code || "").toUpperCase() });
-      onlineLogAdd("Código copiado al portapapeles: " + code);
+      await navigator.clipboard.writeText(String(code || "").toLowerCase());
+      setOnlineStatus("Código copiado: " + String(code || "").toLowerCase());
+      onlineLogAdd("Código copiado: " + code);
     } catch (_err) {
-      setOnlineUi({ status: "No se pudo copiar. Código: " + code });
+      setOnlineStatus("No se pudo copiar. Código: " + code);
       onlineLogAdd("Clipboard falló");
     }
   });
   onlineInput.addEventListener("input", refreshOnlineSendState);
+  onlineCodeInput.addEventListener("change", () => {
+    const code = String(onlineCodeInput.value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    if (code.length >= 4) {
+      loadGroupMeta(code).then(() => renderColorPicks("join"));
+    }
+  });
   onlineCodeInput.addEventListener("keydown", (ev) => {
     if (ev.key === "Enter") {
       ev.preventDefault();
-      startOnlineJoin();
+      joinOnlineGroup();
     }
   });
   document.getElementById("btnBackOnline").addEventListener("click", () => {
-    destroyOnline();
+    leaveOnlineChat();
     hideChunnaKeyboard();
     show("screenTitle");
   });

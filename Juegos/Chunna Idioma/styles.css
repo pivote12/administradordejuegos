@@ -445,17 +445,70 @@ h1, h2, h3 { margin: 0 0 8px; }
   white-space: pre-wrap;
   word-break: break-word;
 }
-#onlineCodeInput {
+#onlineCodeInput,
+#onlineGroupName,
+#onlineNickCreate,
+#onlineNickJoin {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0.7rem 0.85rem;
   font: inherit;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--ink);
   background: rgb(2 6 23 / 0.55);
+}
+#onlineCodeInput {
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+}
+.color-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.color-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 2px solid rgb(255 255 255 / 0.2);
+  cursor: pointer;
+  padding: 0;
+}
+.color-swatch.selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.color-swatch.taken {
+  opacity: 0.35;
+  cursor: not-allowed;
+  position: relative;
+}
+.color-swatch.taken::after {
+  content: "×";
+  color: #fff;
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+.saved-groups {
+  display: grid;
+  gap: 8px;
+}
+.saved-group-btn {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgb(2 6 23 / 0.45);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.saved-group-btn strong { color: var(--accent); }
+.chat-bubble .who-color {
+  font-weight: 800;
 }
 
 .chunna-kb {
