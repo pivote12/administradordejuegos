@@ -1882,6 +1882,45 @@
         "sw": "waridi",
         "ga": "rós"
       }
+    },
+    {
+      "chunna": "⋓⨖⨖⩤⊥",
+      "ipa": "ioʊpʊəpətətrʌta",
+      "help": "ioupuepetetrata",
+      "words": {
+        "es": "cielo",
+        "en": "sky",
+        "fr": "ciel",
+        "de": "himmel",
+        "pt": "céu",
+        "it": "cielo",
+        "ru": "небо",
+        "pl": "niebo",
+        "nl": "hemel",
+        "zh": "天空",
+        "ja": "空",
+        "ko": "하늘",
+        "ar": "سماء",
+        "hi": "आकाश",
+        "tr": "gökyüzü",
+        "sv": "himmel",
+        "no": "himmel",
+        "da": "himmel",
+        "fi": "taivas",
+        "el": "ουρανός",
+        "he": "שמיים",
+        "th": "ท้องฟ้า",
+        "vi": "bầu trời",
+        "id": "langit",
+        "ms": "langit",
+        "uk": "небо",
+        "cs": "nebe",
+        "ro": "cer",
+        "hu": "ég",
+        "ca": "cel",
+        "sw": "angani",
+        "ga": "spéir"
+      }
     }
   ]
 }
