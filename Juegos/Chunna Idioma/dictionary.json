@@ -1921,6 +1921,45 @@
         "sw": "angani",
         "ga": "spéir"
       }
+    },
+    {
+      "chunna": "⊩⋺⋓⊩",
+      "ipa": "tutʃʊjutu",
+      "help": "tuchuyutu",
+      "words": {
+        "es": "lo",
+        "en": "it",
+        "fr": "le",
+        "de": "es",
+        "pt": "o",
+        "it": "lo",
+        "ru": "это",
+        "pl": "to",
+        "nl": "het",
+        "zh": "它",
+        "ja": "それ",
+        "ko": "그것",
+        "ar": "ه",
+        "hi": "यह",
+        "tr": "onu",
+        "sv": "det",
+        "no": "det",
+        "da": "det",
+        "fi": "se",
+        "el": "το",
+        "he": "זה",
+        "th": "มัน",
+        "vi": "nó",
+        "id": "itu",
+        "ms": "ia",
+        "uk": "це",
+        "cs": "to",
+        "ro": "îl",
+        "hu": "azt",
+        "ca": "ho",
+        "sw": "hicho",
+        "ga": "é"
+      }
     }
   ]
 }
