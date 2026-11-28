@@ -1498,72 +1498,114 @@
   function pickNatural(list, avoidText) {
     const avoid = fold(avoidText || "");
     const filtered = (list || []).filter((item) => fold(item) !== avoid);
-    const pool = filtered.length ? filtered : list || ["hola"];
+    const pool = filtered.length ? filtered : list || ["genial"];
     return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function detectTalkTopic(text) {
+    const t = fold(text);
+    if (/\bhola\b/.test(t) && !/como|quien|estas|sos|tiempo|mar|idea|cielo|rosa|agua|pais/.test(t)) {
+      return "greet";
+    }
+    if (/como estas|estas genial|estas libre/.test(t)) return "wellbeing";
+    if (/quien sos|quien esta|sos amigo/.test(t)) return "identity";
+    if (/manana|\btiempo\b/.test(t)) return "time";
+    if (
+      /zoologico|matematicas|\bmar\b|agua|cielo|pais|nacion|postre|carpa|bandeja|linterna|dinero|idea|rosa|grito|dado|bandeja|zoologico/.test(
+        t
+      )
+    ) {
+      return "thing";
+    }
+    if (/genial|bueno|malo|miedo|nada|libre|vacio/.test(t)) return "mood";
+    return null;
+  }
+
+  function repliesForTopic(topic) {
+    if (topic === "wellbeing") {
+      return ["genial", "bueno", "no malo", "no miedo", "libre", "nada malo", "está bueno"];
+    }
+    if (topic === "identity") {
+      return ["amigo", "amigos", "chunna", "sos amigo", "amigo bueno"];
+    }
+    if (topic === "time") {
+      return ["el tiempo está bueno", "mañana está genial", "mañana", "está genial", "genial"];
+    }
+    if (topic === "thing") {
+      return [
+        "está genial",
+        "está bueno",
+        "está malo",
+        "está vacío",
+        "genial",
+        "la idea está genial",
+        "no malo"
+      ];
+    }
+    if (topic === "mood") {
+      return ["genial", "bueno", "no malo", "está genial", "nada malo"];
+    }
+    // chat general: seguir la charla, sin reiniciar el saludo
+    return ["genial", "bueno", "no malo", "la idea está genial", "está genial", "mañana"];
   }
 
   function infiniteNpcReply(userEs) {
     const text = fold(userEs);
     const last = currentTalk && currentTalk.lastNpcEs;
+    const detected = detectTalkTopic(text);
+    if (!currentTalk) return pickNatural(repliesForTopic("chat"), last);
 
-    // Saludo → saluda de vuelta y pregunta cómo estás
-    if (/\bhola\b/.test(text) && !/como|quien|estas|sos|tiempo|mar|idea/.test(text)) {
-      return pickNatural(["hola", "hola amigo", "cómo estás", "cómo estás amigo"], last);
+    // Mantener tema: el ánimo corto no borra el tema anterior.
+    if (detected && detected !== "mood") {
+      currentTalk.topic = detected;
+    } else if (!currentTalk.topic) {
+      currentTalk.topic = detected || "chat";
     }
-    // Pregunta por estado → responde natural
-    if (/como estas|estas genial|estas libre/.test(text)) {
-      return pickNatural(
-        ["genial", "bueno", "no malo", "no miedo", "libre", "nada malo", "cómo estás"],
-        last
-      );
+    if (detected === "greet") currentTalk.greeted = true;
+
+    const topic = currentTalk.topic || "chat";
+
+    // Saludo solo al inicio: responde y sigue, nunca vuelve a “hola” en mitad de todo.
+    if (detected === "greet") {
+      if (!currentTalk.askedHow) {
+        currentTalk.askedHow = true;
+        return pickNatural(["cómo estás", "cómo estás amigo"], last);
+      }
+      return pickNatural(["cómo estás", "genial", "bueno"], last);
     }
-    // Quién sos / quién está
-    if (/quien sos|quien esta/.test(text)) {
-      return pickNatural(["amigo", "amigos", "chunna", "sos amigo", "amigo bueno"], last);
+
+    if (detected === "wellbeing") {
+      currentTalk.askedHow = true;
+      return pickNatural(repliesForTopic("wellbeing"), last);
     }
-    // Planes / tiempo
-    if (/manana|tiempo|zoologico|matematicas/.test(text)) {
-      return pickNatural(
-        ["mañana", "el tiempo está bueno", "mañana está genial", "genial", "el mar", "la idea"],
-        last
-      );
+
+    if (detected === "identity") {
+      return pickNatural(repliesForTopic("identity"), last);
     }
-    // Cosas / lugares
-    if (/agua|mar|dinero|idea|pais|nacion|postre|carpa|bandeja|linterna/.test(text)) {
-      return pickNatural(
-        [
-          "está genial",
-          "está bueno",
-          "está malo",
-          "la idea está genial",
-          "el tiempo está bueno",
-          "genial",
-          "cómo estás"
-        ],
-        last
-      );
+
+    if (detected === "time" || detected === "thing") {
+      return pickNatural(repliesForTopic(detected), last);
     }
-    // Ánimo / valoración
-    if (/genial|bueno|malo|miedo|nada|libre/.test(text)) {
-      return pickNatural(
-        ["genial", "bueno", "cómo estás", "quién sos", "la idea", "mañana", "hola amigo"],
-        last
-      );
+
+    // “genial / bueno / …” → afirmar y seguir el tema actual (sin reset social)
+    if (detected === "mood") {
+      if (topic === "time") {
+        return pickNatural(["mañana", "el tiempo está bueno", "está genial", "genial"], last);
+      }
+      if (topic === "thing") {
+        return pickNatural(["está genial", "está bueno", "la idea está genial", "genial"], last);
+      }
+      if (topic === "wellbeing" || topic === "greet") {
+        return pickNatural(["genial", "bueno", "no malo", "libre", "nada malo"], last);
+      }
+      if (topic === "identity") {
+        return pickNatural(["amigo", "amigo bueno", "chunna", "genial"], last);
+      }
+      return pickNatural(repliesForTopic("mood"), last);
     }
-    // Continuación por defecto (siempre frase creíble)
-    return pickNatural(
-      [
-        "cómo estás",
-        "quién sos",
-        "hola amigo",
-        "la idea está genial",
-        "el tiempo está bueno",
-        "mañana",
-        "genial",
-        "no malo"
-      ],
-      last
-    );
+
+    // Default: continuar el mismo hilo, jamás “hola” / “quién sos” de la nada
+    return pickNatural(repliesForTopic(topic === "greet" ? "wellbeing" : topic), last);
   }
 
   function openTalkCompose(promptText) {
@@ -1715,13 +1757,19 @@
         title: "Charla infinita",
         turns: [],
         turn: 0,
-        expectedEs: ""
+        expectedEs: "",
+        topic: "greet",
+        greeted: true,
+        askedHow: true,
+        lastNpcEs: ""
       };
       talkHint.textContent = "Sin fin · texto + grabar → Chunna";
       talkCountHint.textContent = "Mensajes tuyos: 0 · sin límite";
       const hello = translateEsPhrase("hola amigo");
       appendChat("npc", "hola amigo", hello.chunna);
-      openTalkCompose("Respondé en Chunna. También podés grabar en español y convertirlo.");
+      const how = translateEsPhrase("cómo estás");
+      appendChat("npc", "cómo estás", how.chunna);
+      openTalkCompose("Seguí el tema en Chunna. También podés grabar en español y convertirlo.");
       return;
     }
 
@@ -1745,7 +1793,7 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci18", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci19", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
     buildChunnaKeyboard();
