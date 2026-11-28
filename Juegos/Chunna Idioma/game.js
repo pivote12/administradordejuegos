@@ -63,7 +63,9 @@
     document.querySelectorAll(".screen").forEach((screen) => {
       screen.classList.toggle("active", screen.id === id);
     });
-    if (id !== "screenTranslate" && id !== "screenTalk") hideChunnaKeyboard();
+    if (id !== "screenTranslate" && id !== "screenTalk" && id !== "screenOnline") {
+      hideChunnaKeyboard();
+    }
   }
 
   function chunnaGlyphs() {
@@ -155,6 +157,10 @@
   function kbEnter() {
     if (kbTarget && kbTarget.id === "talkInput") {
       if (typeof submitTalkReply === "function") submitTalkReply();
+      return;
+    }
+    if (kbTarget && kbTarget.id === "onlineInput") {
+      if (typeof sendOnlineMessage === "function") sendOnlineMessage();
       return;
     }
     insertKbText("\n");
@@ -1793,10 +1799,361 @@
   }
 
   async function loadDict() {
-    const res = await fetch("dictionary.json?v=ci19", { cache: "no-store" });
+    const res = await fetch("dictionary.json?v=ci20", { cache: "no-store" });
     if (!res.ok) throw new Error("No se pudo cargar el diccionario Chunna");
     dict = await res.json();
     buildChunnaKeyboard();
+  }
+
+  const onlineStatus = document.getElementById("onlineStatus");
+  const onlineMyId = document.getElementById("onlineMyId");
+  const onlineHostId = document.getElementById("onlineHostId");
+  const onlineRole = document.getElementById("onlineRole");
+  const onlineConnState = document.getElementById("onlineConnState");
+  const onlineLog = document.getElementById("onlineLog");
+  const onlineCodeInput = document.getElementById("onlineCodeInput");
+  const onlineCodeDisplay = document.getElementById("onlineCodeDisplay");
+  const onlineChatWrap = document.getElementById("onlineChatWrap");
+  const onlineChatLog = document.getElementById("onlineChatLog");
+  const onlineInput = document.getElementById("onlineInput");
+  const onlineBadWords = document.getElementById("onlineBadWords");
+  const btnOnlineSend = document.getElementById("btnOnlineSend");
+  const btnOnlineCopy = document.getElementById("btnOnlineCopy");
+  const onlineLobby = document.getElementById("onlineLobby");
+
+  let onlinePeer = null;
+  let onlineConn = null;
+  let onlineRoomCode = "";
+  let onlineIsHost = false;
+  const onlineLogLines = [];
+
+  function onlineLogAdd(msg) {
+    const stamp = new Date().toLocaleTimeString();
+    onlineLogLines.push("[" + stamp + "] " + msg);
+    if (onlineLogLines.length > 80) onlineLogLines.shift();
+    onlineLog.textContent = onlineLogLines.join("\n");
+    onlineLog.scrollTop = onlineLog.scrollHeight;
+    console.log("[Chunna Online]", msg);
+  }
+
+  function setOnlineUi( partial ) {
+    if (partial.status) onlineStatus.textContent = partial.status;
+    if (partial.myId) onlineMyId.textContent = partial.myId;
+    if (partial.hostId) onlineHostId.textContent = partial.hostId;
+    if (partial.role) onlineRole.textContent = partial.role;
+    if (partial.conn) onlineConnState.textContent = partial.conn;
+  }
+
+  function makeRoomCode() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let out = "";
+    for (let i = 0; i < 6; i += 1) out += chars[Math.floor(Math.random() * chars.length)];
+    return out;
+  }
+
+  function hostPeerId(code) {
+    return "chunna-ol-" + String(code || "").toUpperCase();
+  }
+
+  function chunnaLexicon() {
+    const set = new Set();
+    allEntries().forEach((entry) => {
+      if (entry && entry.chunna) set.add(entry.chunna);
+    });
+    return set;
+  }
+
+  function validateOnlineChunna(text) {
+    const known = chunnaLexicon();
+    const raw = String(text || "").trim();
+    if (!raw) return { ok: false, bad: [], empty: true };
+    const tokens = raw.split(/\s+/);
+    const bad = [];
+    tokens.forEach((tok) => {
+      if (!tok) return;
+      if (/^[¿?¡!,.;:·]+$/.test(tok)) return;
+      if (!known.has(tok)) bad.push(tok);
+    });
+    return { ok: bad.length === 0, bad: bad, empty: false };
+  }
+
+  function refreshOnlineSendState() {
+    const check = validateOnlineChunna(onlineInput.value);
+    if (check.empty) {
+      onlineBadWords.hidden = true;
+      btnOnlineSend.disabled = true;
+      return;
+    }
+    if (!check.ok) {
+      onlineBadWords.hidden = false;
+      onlineBadWords.textContent =
+        "No se puede enviar. Palabras Chunna inexistentes: " + check.bad.join(" · ");
+      btnOnlineSend.disabled = true;
+      return;
+    }
+    onlineBadWords.hidden = true;
+    btnOnlineSend.disabled = !(onlineConn && onlineConn.open);
+  }
+
+  function appendOnlineBubble(role, text) {
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble " + (role === "you" ? "you" : "npc");
+    bubble.innerHTML =
+      "<span class='who'>" +
+      (role === "you" ? "Vos" : "Otro dispositivo") +
+      "</span>" +
+      "<span class='mono'>" +
+      text +
+      "</span>";
+    onlineChatLog.appendChild(bubble);
+    onlineChatLog.scrollTop = onlineChatLog.scrollHeight;
+  }
+
+  function destroyOnline() {
+    try {
+      if (onlineConn) onlineConn.close();
+    } catch (_err) {
+      /* ignore */
+    }
+    try {
+      if (onlinePeer) onlinePeer.destroy();
+    } catch (_err) {
+      /* ignore */
+    }
+    onlineConn = null;
+    onlinePeer = null;
+    onlineRoomCode = "";
+    onlineIsHost = false;
+    onlineChatWrap.hidden = true;
+    onlineLobby.hidden = false;
+    onlineCodeDisplay.hidden = true;
+    btnOnlineCopy.hidden = true;
+    onlineInput.value = "";
+    btnOnlineSend.disabled = true;
+    setOnlineUi({
+      status: "Desconectado",
+      myId: "—",
+      hostId: "—",
+      role: "—",
+      conn: "cerrada"
+    });
+  }
+
+  function wireOnlineConnection(conn) {
+    onlineConn = conn;
+    setOnlineUi({ conn: "conectando data…" });
+    onlineLogAdd("DataConnection con peer=" + conn.peer);
+
+    conn.on("open", () => {
+      setOnlineUi({ status: "¡Conectados!", conn: "abierta" });
+      onlineLogAdd("DataConnection OPEN");
+      onlineChatWrap.hidden = false;
+      onlineLobby.hidden = false;
+      refreshOnlineSendState();
+      try {
+        conn.send({ type: "hello", from: onlinePeer ? onlinePeer.id : "?", t: Date.now() });
+      } catch (err) {
+        onlineLogAdd("Error enviando hello: " + (err && err.message ? err.message : err));
+      }
+    });
+
+    conn.on("data", (data) => {
+      onlineLogAdd("DATA recibida: " + JSON.stringify(data));
+      if (!data || typeof data !== "object") return;
+      if (data.type === "chat" && typeof data.text === "string") {
+        const check = validateOnlineChunna(data.text);
+        if (!check.ok) {
+          onlineLogAdd("Mensaje remoto rechazado localmente (palabras inválidas): " + check.bad.join(", "));
+          return;
+        }
+        appendOnlineBubble("npc", data.text);
+      }
+      if (data.type === "hello") {
+        onlineLogAdd("Handshake hello de " + (data.from || conn.peer));
+      }
+    });
+
+    conn.on("close", () => {
+      setOnlineUi({ status: "El otro dispositivo se desconectó", conn: "cerrada" });
+      onlineLogAdd("DataConnection CLOSE");
+      btnOnlineSend.disabled = true;
+    });
+
+    conn.on("error", (err) => {
+      setOnlineUi({ status: "Error de data: " + (err && err.type ? err.type : "desconocido") });
+      onlineLogAdd("DataConnection ERROR: " + (err && err.message ? err.message : String(err)));
+    });
+  }
+
+  function createOnlinePeer(preferredId) {
+    if (typeof window.Peer !== "function") {
+      throw new Error("PeerJS no cargó. Revisá la red / unpkg.");
+    }
+    const opts = {
+      debug: 2,
+      config: {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:global.stun.twilio.com:3478" }
+        ]
+      }
+    };
+    return preferredId ? new window.Peer(preferredId, opts) : new window.Peer(opts);
+  }
+
+  function startOnlineHost() {
+    destroyOnline();
+    onlineIsHost = true;
+    onlineRoomCode = makeRoomCode();
+    const hostId = hostPeerId(onlineRoomCode);
+    onlineCodeInput.value = onlineRoomCode;
+    onlineCodeDisplay.hidden = false;
+    onlineCodeDisplay.textContent = onlineRoomCode;
+    btnOnlineCopy.hidden = false;
+    setOnlineUi({
+      status: "Creando sala…",
+      role: "HOST (creador)",
+      hostId: hostId,
+      myId: "…",
+      conn: "esperando otro dispositivo"
+    });
+    onlineLogAdd("Creando host peer id=" + hostId);
+
+    try {
+      onlinePeer = createOnlinePeer(hostId);
+    } catch (err) {
+      setOnlineUi({ status: String(err.message || err) });
+      onlineLogAdd(String(err.message || err));
+      return;
+    }
+
+    onlinePeer.on("open", (id) => {
+      setOnlineUi({
+        status: "Sala lista. Esperando al otro dispositivo…",
+        myId: id,
+        hostId: hostId
+      });
+      onlineLogAdd("Peer OPEN como host id=" + id);
+    });
+
+    onlinePeer.on("connection", (conn) => {
+      onlineLogAdd("Incoming connection from " + conn.peer);
+      if (onlineConn && onlineConn.open) {
+        onlineLogAdd("Ya hay alguien conectado; rechazo extra de " + conn.peer);
+        conn.close();
+        return;
+      }
+      wireOnlineConnection(conn);
+      setOnlineUi({ status: "Alguien se está conectando…", role: "HOST (creador)" });
+    });
+
+    onlinePeer.on("error", (err) => {
+      const msg = err && (err.type || err.message) ? (err.type || err.message) : String(err);
+      setOnlineUi({ status: "Error PeerJS host: " + msg });
+      onlineLogAdd("Peer ERROR: " + msg + " · " + JSON.stringify(err));
+    });
+
+    onlinePeer.on("disconnected", () => {
+      onlineLogAdd("Peer DISCONNECTED del broker");
+      setOnlineUi({ status: "Broker desconectado (host)" });
+    });
+  }
+
+  function startOnlineJoin() {
+    const code = String(onlineCodeInput.value || "")
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "");
+    if (code.length < 4) {
+      setOnlineUi({ status: "Escribí el código de sala completo" });
+      onlineLogAdd("Join abortado: código inválido [" + code + "]");
+      return;
+    }
+    destroyOnline();
+    onlineIsHost = false;
+    onlineRoomCode = code;
+    const hostId = hostPeerId(code);
+    onlineCodeDisplay.hidden = false;
+    onlineCodeDisplay.textContent = code;
+    btnOnlineCopy.hidden = false;
+    setOnlineUi({
+      status: "Conectando a la sala…",
+      role: "GUEST (invitado)",
+      hostId: hostId,
+      myId: "…",
+      conn: "abriendo"
+    });
+    onlineLogAdd("Join room code=" + code + " hostId=" + hostId);
+
+    try {
+      onlinePeer = createOnlinePeer();
+    } catch (err) {
+      setOnlineUi({ status: String(err.message || err) });
+      onlineLogAdd(String(err.message || err));
+      return;
+    }
+
+    onlinePeer.on("open", (id) => {
+      setOnlineUi({ myId: id, status: "Peer listo · conectando al host…" });
+      onlineLogAdd("Peer OPEN como guest id=" + id + " → connect(" + hostId + ")");
+      const conn = onlinePeer.connect(hostId, { reliable: true });
+      wireOnlineConnection(conn);
+    });
+
+    onlinePeer.on("error", (err) => {
+      const msg = err && (err.type || err.message) ? (err.type || err.message) : String(err);
+      setOnlineUi({ status: "Error PeerJS guest: " + msg });
+      onlineLogAdd("Peer ERROR: " + msg + " · " + JSON.stringify(err));
+    });
+
+    onlinePeer.on("disconnected", () => {
+      onlineLogAdd("Peer DISCONNECTED del broker (guest)");
+      setOnlineUi({ status: "Broker desconectado (guest)" });
+    });
+  }
+
+  function sendOnlineMessage() {
+    const text = String(onlineInput.value || "").trim();
+    const check = validateOnlineChunna(text);
+    if (check.empty) return;
+    if (!check.ok) {
+      refreshOnlineSendState();
+      onlineLogAdd("Envío bloqueado. Inválidas: " + check.bad.join(", "));
+      return;
+    }
+    if (!onlineConn || !onlineConn.open) {
+      setOnlineUi({ status: "No hay conexión abierta para enviar" });
+      onlineLogAdd("Envío falló: conn no abierta");
+      return;
+    }
+    const payload = { type: "chat", text: text, t: Date.now() };
+    try {
+      onlineConn.send(payload);
+      appendOnlineBubble("you", text);
+      onlineLogAdd("Enviado OK: " + text);
+      onlineInput.value = "";
+      refreshOnlineSendState();
+      markPracticeDay();
+    } catch (err) {
+      onlineLogAdd("Error send: " + (err && err.message ? err.message : err));
+      setOnlineUi({ status: "Error al enviar mensaje" });
+    }
+  }
+
+  function openOnlineScreen() {
+    stopSpeak();
+    hideChunnaKeyboard();
+    show("screenOnline");
+    onlineLogAdd("Pantalla Online abierta · PeerJS=" + (typeof window.Peer === "function" ? "sí" : "NO"));
+    if (!onlinePeer) {
+      setOnlineUi({
+        status: "Elegí Crear sala o Unirme",
+        myId: "—",
+        hostId: "—",
+        role: "—",
+        conn: "cerrada"
+      });
+    }
   }
 
   document.getElementById("btnPlay").addEventListener("click", () => {
@@ -1841,6 +2198,38 @@
   document.getElementById("btnMatch").addEventListener("click", () => {
     show("screenMatch");
     startMatchRound();
+  });
+  document.getElementById("btnOnlineTitle").addEventListener("click", openOnlineScreen);
+  document.getElementById("btnOnlineHub").addEventListener("click", openOnlineScreen);
+  document.getElementById("btnOnlineCreate").addEventListener("click", startOnlineHost);
+  document.getElementById("btnOnlineJoin").addEventListener("click", startOnlineJoin);
+  document.getElementById("btnOnlineSend").addEventListener("click", sendOnlineMessage);
+  document.getElementById("btnOnlineDisconnect").addEventListener("click", () => {
+    onlineLogAdd("Desconectar manual");
+    destroyOnline();
+  });
+  document.getElementById("btnOnlineCopy").addEventListener("click", async () => {
+    const code = onlineRoomCode || onlineCodeInput.value;
+    try {
+      await navigator.clipboard.writeText(String(code || "").toUpperCase());
+      setOnlineUi({ status: "Código copiado: " + String(code || "").toUpperCase() });
+      onlineLogAdd("Código copiado al portapapeles: " + code);
+    } catch (_err) {
+      setOnlineUi({ status: "No se pudo copiar. Código: " + code });
+      onlineLogAdd("Clipboard falló");
+    }
+  });
+  onlineInput.addEventListener("input", refreshOnlineSendState);
+  onlineCodeInput.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") {
+      ev.preventDefault();
+      startOnlineJoin();
+    }
+  });
+  document.getElementById("btnBackOnline").addEventListener("click", () => {
+    destroyOnline();
+    hideChunnaKeyboard();
+    show("screenTitle");
   });
   talkTypeSelect.addEventListener("change", () => {
     talkCountHint.textContent =
@@ -1915,6 +2304,7 @@
   textChunna.addEventListener("input", syncFromChunna);
   bindChunnaField(textChunna);
   bindChunnaField(talkInput);
+  bindChunnaField(onlineInput);
   btnKbClose.addEventListener("click", hideChunnaKeyboard);
   chunnaKeyboard.querySelectorAll("[data-kb]").forEach((btn) => {
     btn.addEventListener("pointerdown", (ev) => {

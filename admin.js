@@ -698,8 +698,8 @@ const GAME_I18N = {
     ko: { name: "AI 회의", description: "AI를 고르고 메시지를 보내면 무작위 순서로 답합니다." },
   },
   "chunna-idioma": {
-    es: { name: "Chunna Idioma", description: "Traductor, niveles, oraciones, conversaciones, charla infinita, grabar→Chunna, emparejar y racha." },
-    en: { name: "Chunna Language", description: "Translator, levels, sentences, chats, infinite talk, record→Chunna, matching and streak." },
+    es: { name: "Chunna Idioma", description: "Traductor, aprendizaje, charlas, conversación online entre dispositivos y racha." },
+    en: { name: "Chunna Language", description: "Translator, learning, chats, online conversation between devices and streak." },
     fr: { name: "Langue Chunna", description: "Traducteur et mode apprentissage (5 niveaux par mot), voix robotique et alphabet Chunna." },
     de: { name: "Chunna-Sprache", description: "Übersetzer und Lernmodus mit 5 Stufen pro Wort, Roboterstimme und Chunna-Alphabet." },
     pt: { name: "Idioma Chunna", description: "Tradutor e modo aprender com 5 níveis por palavra, voz robótica e alfabeto Chunna." },
@@ -1020,9 +1020,9 @@ const FALLBACK_GAMES = [
   {
     id: "chunna-idioma",
     name: "Chunna Idioma",
-    description: "Traductor, niveles, oraciones, conversaciones, charla infinita, grabar→Chunna, emparejar y racha.",
+    description: "Traductor, aprendizaje, charlas, conversación online entre dispositivos y racha.",
     folder: "Chunna Idioma",
-    playUrl: "https://servidordejose.com/Juegos/Chunna%20Idioma/index.html?v=ci19",
+    playUrl: "https://servidordejose.com/Juegos/Chunna%20Idioma/index.html?v=ci20",
     icon: "≬⩤",
     tags: ["idioma", "chunna", "traductor", "aprender", "alfabeto"],
     creator: "José Rafael Rodriguez Morillo",
@@ -1218,7 +1218,7 @@ async function loadGames() {
     if (location.protocol === "file:") {
       throw new Error("file-protocol");
     }
-    const response = await fetch("games.json?v=menu47", { cache: "no-store" });
+    const response = await fetch("games.json?v=menu48", { cache: "no-store" });
     if (!response.ok) throw new Error("No se pudo leer games.json");
     const data = await response.json();
     allGames = (data.games || [])
